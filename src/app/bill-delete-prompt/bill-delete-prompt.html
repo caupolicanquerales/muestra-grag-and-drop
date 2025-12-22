@@ -1,0 +1,62 @@
+
+<div class="splitter-container">
+    <p-tabs value="1">
+    <p-tablist>
+        @for (tab of tabs; track tab.value) {
+            <p-tab [value]="tab.value">{{ tab.title }}</p-tab>
+        }
+    </p-tablist>
+        <p-tabpanels>
+            @for (tab of tabs; track tab.value) {
+                <p-tabpanel [value]="tab.value">
+                        <div class="flex flex-col items-center justify-center w-full">
+                            <ng-container 
+                                [ngTemplateOutlet]="reusableTable"
+                                [ngTemplateOutletContext]="{ dataValue: tab.dataValue, pagination: tab.pagination, type: tab.type }">
+                            </ng-container>
+                        </div>
+                </p-tabpanel>
+            }
+        </p-tabpanels>
+    </p-tabs>
+</div>
+
+<ng-template #reusableTable let-dataValue="dataValue" let-pagination="pagination" let-type="type">
+    <div class="width-table">
+        <p-table
+            [value]="dataValue"
+            [paginator]="pagination"
+            [rows]="5"
+            [tableStyle]="{ 'min-width': '20rem' }"
+            [rowsPerPageOptions]="[5, 10, 20]"
+        >
+            <ng-template pTemplate="header">
+                <tr>
+                    <th>Id</th>
+                    <th>Nombre</th>
+                    <th style="width: 5rem"></th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-templatesId>
+                <tr>
+                    <td>{{ templatesId.id }}</td>
+                    <td>{{ templatesId.name }}</td>
+                    <td>
+                        <p-button icon="pi pi-trash" (click)="selectItem(templatesId,type)" severity="secondary" rounded />
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+</ng-template>
+
+ <p-dialog header="{{headerDialogTitle}}" [modal]="true" [(visible)]="visible" [style]="{ width: '25rem' }">
+    <ul>
+        <li>{{selectedPrompt?.prompt?.name}}</li>
+        <li>{{selectedPrompt?.prompt?.id}}</li>
+    </ul>
+    <div class="buttons-dialog flex justify-content-center">
+        <p-button label="Cancelar" severity="secondary" (click)="visible = false" />
+        <p-button label="Eliminar"  (click)="deletePrompt('save-prompt')" />
+    </div>
+</p-dialog>

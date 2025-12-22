@@ -1,0 +1,74 @@
+      .invoice-container {
+            width: 100%; 
+            max-width: 800px;
+            margin: clamp(1rem, 5vw, 2rem) auto; 
+            padding: clamp(1.5rem, 5vw, 3rem); 
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 10px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e9ecef;
+            box-sizing: border-box; 
+            height: 90vh;
+        }
+
+        .invoice-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap; 
+            gap: 1rem;
+            border-bottom: 2px solid #dee2e6;
+            padding-bottom: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .company-logo {
+            font-size: clamp(10px, 4vw, 20px); 
+            font-weight: 700;
+            color: #212529;
+        }
+        
+        .company-logo span {
+            color: #495057;
+            font-weight: 500;
+        }
+
+        .invoice-title {
+            text-align: right;
+        }
+
+        .invoice-title h1 {
+            margin: 0;
+            font-size: clamp(0.5rem, 6vw, 1.5rem);
+            color: #adb5bd;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .invoice-title p {
+            margin: 0.25rem 0 0;
+            color: #6c757d;
+        }
+        
+
+        .invoice-totals {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 1.5rem;
+            min-height: 20%;
+            height: 40%;
+        }
+        
+        .invoice-footer {
+            margin-top: 3rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #e9ecef;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #adb5bd;
+            flex-shrink: 0;
+        }
+
+
+ 

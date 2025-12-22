@@ -1,0 +1,9 @@
+.image-canvas-container {
+    width:  80vw;   /* Takes 100% of the viewport width */
+    height: 80vh; /* Set your desired height */
+    background-repeat: no-repeat;
+    background-size: 80%; /* Scales image down to fit the container */
+    background-position: center; /* Centers the image */
+    margin-left: -1%;
+    margin-top: -4%;
+}

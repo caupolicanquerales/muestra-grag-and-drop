@@ -1,0 +1,138 @@
+    <div class="p-button-group">
+        @if(generatePrompt){
+            <p-button 
+            icon="pi pi-align-justify" 
+            class="submit-button-shape"
+            [rounded]="true" 
+            severity="secondary" 
+            pTooltip="Generar prompt"
+            tooltipPosition="top"
+            (click)="generatePromptEvent('generate-prompt')" 
+            ></p-button>
+        }
+        @if(generateImage){
+            <p-button 
+            icon="pi pi-image" 
+            class="submit-button-shape"
+            [rounded]="true" 
+            severity="secondary" 
+            pTooltip="Generar imagen"
+            tooltipPosition="top"
+            (click)="generateImageEvent('generate-image')" 
+            ></p-button>
+        }
+        @if(saveAllowButton){
+            <p-button type="button"
+            class="submit-button-shape"
+            icon="pi pi-save" 
+            severity="secondary" 
+            [rounded]="true"
+            pTooltip="Guardar"
+            tooltipPosition="top"
+            (onClick)="op.toggle($event, $event.currentTarget)"
+            #btn></p-button>
+        }
+        @if(exportAllowButton){
+            <p-button type="button"
+            class="submit-button-shape"
+            icon="pi pi-share-alt" 
+            severity="secondary" 
+            [rounded]="true"
+            pTooltip="Exportar"
+            tooltipPosition="top"
+            (onClick)="export.toggle($event, $event.currentTarget)"
+            #btnExport></p-button>
+        }
+        @if(copyAllowButton){
+             <p-button icon="pi pi-copy" 
+            class="submit-button-shape"
+            [rounded]="true" 
+            severity="secondary" 
+            pTooltip="Copiar"
+            tooltipPosition="top"
+            (click)="copyTextEvent('copy-text')" 
+            />
+        }
+        @if(eraseAllowButton){
+            <p-button 
+            icon="pi pi-eraser" 
+            class="submit-button-shape"
+            [rounded]="true" 
+            severity="secondary" 
+            pTooltip="Borrar"
+            tooltipPosition="top"
+            (click)="eraseEvent('erase-text')" 
+            ></p-button>
+        }
+    </div>
+
+ <p-popover #op
+        position="top">
+          <div class="flex flex-col gap-4">
+              <div>
+                <div *ngFor="let item of itemsSavePrompt" class="flex items-center gap-2 px-2 py-3 hover:bg-emphasis cursor-pointer rounded-border" 
+                (click)="selectItem(item); op.hide()">
+                    <div>
+                        <p-button (click)="showDialog(item,$event); op.hide()"  icon="pi pi-database"
+                        [rounded]="true" 
+                        [text]="true"
+                        severity="secondary"
+                        [label]="item.format"/>
+                    </div>
+                  </div>    
+              </div>
+          </div>
+    </p-popover>
+
+    <p-popover #export
+        position="top">
+          <div class="flex flex-col gap-4">
+              <div>
+                <div *ngFor="let item of itemsExportPrompt" class="flex items-center gap-2 px-2 py-3 hover:bg-emphasis cursor-pointer rounded-border" 
+                (click)="selectItem(item); export.hide()">
+                    <div>
+                        <p-button (click)="exportInformation(item,$event); export.hide()"  icon="pi pi-file-export"
+                        [rounded]="true" 
+                        [text]="true"
+                        severity="secondary"
+                        [label]="item.format"/>
+                    </div>
+                  </div>    
+              </div>
+          </div>
+    </p-popover>
+
+     <p-dialog header="{{headerDialogTitle}}" [modal]="true" [(visible)]="visible" [style]="{ width: '25rem' }">
+        <form [formGroup]="promptForm">
+            <div class="flex items-center">
+                <input pInputText id="promptName" 
+                    class="flex-auto" 
+                    autocomplete="off" 
+                    placeholder="Nombre del prompt"
+                    formControlName="promptName"/>
+            </div>
+            @if (promptNameControl?.invalid && (promptNameControl?.dirty || promptNameControl?.touched)) {
+                <span class="text-red-500 text-sm mt-1">
+                    @if (promptNameControl?.errors?.['required']) {
+                        <span [style]="{'color': 'red'}">El nombre del prompt es requerido.</span>
+                    } @else if (promptNameControl?.errors?.['maxlength']) {
+                        <span [style]="{'color': 'red'}">
+                            Debe tener un máximo de {{ promptNameControl?.errors?.['maxlength'].requiredLength }} caracteres.
+                        </span>
+                    } @else if (promptNameControl?.errors?.['minlength']) {
+                        <span [style]="{'color': 'red'}">
+                            Debe tener como mínimo {{ promptNameControl?.errors?.['minlength'].requiredLength }} caracteres.
+                        </span>
+                    } @else if (promptNameControl?.errors?.['forbiddenName']) {
+                        <span [style]="{'color': 'red'}">
+                            Nombre no permitido {{ promptNameControl?.errors?.['forbiddenName'].value.promptName }}.
+                        </span>
+                    }
+                </span>
+            }
+            <div class="buttons-dialog flex justify-content-center">
+                <p-button label="Cancelar" severity="secondary" (click)="visible = false" />
+                <p-button label="Guardar" [disabled]="promptNameControl?.invalid"  (click)="emitSavePrompt('save-prompt')" />
+            </div>
+        </form>
+    </p-dialog>

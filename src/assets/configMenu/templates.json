@@ -1,0 +1,63 @@
+{
+    "Generador": [
+        {
+            "label": "Prompt nuevo",
+            "templateName": "generate-data"
+        },
+        {
+            "label": "Prompt imagen",
+            "templateName": "generate-data"
+        },
+        {
+            "label": "Prompt dato",
+            "templateName": "generate-data"
+        }
+    ],
+    "Facturas":[
+        {
+            "label": "Prompt nuevo",
+            "templateName": "show-template"
+        },
+        {
+            "label": "Prompt imagen",
+            "templateName": "show-template"
+        },
+        {
+            "label": "Prompt dato",
+            "templateName": "show-template"
+        },
+        {
+            "label": "Visualizador",
+            "templateName": "bill-visualizer"
+        }
+    ],
+    "Documentación":[
+        {
+            "label": "Ingresar",
+            "templateName": "upload-document"
+        }
+    ],
+    "Edición":[
+        {
+            "label": "Plantilla",
+            "templateName": "bill-template"
+        },
+        {
+            "label": "Editar defecto",
+            "templateName": "bill-editor-defect"
+        },
+        {
+            "label": "Editor",
+            "templateName": "bill-editor"
+        }
+    ],
+    "Borrar prompt":[
+        {
+            "label": "Ingresar",
+            "templateName": "bill-delete-prompt"
+        }
+    ]
+}
+
+
+    

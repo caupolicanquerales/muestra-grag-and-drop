@@ -1,0 +1,13 @@
+<p-dialog header="{{headerDialogTitle}}" [modal]="true" [(visible)]="visibleInput" [style]="{ width: '25rem' }">
+    <ul>
+        @for (item of promptInput; track $index) {
+            @if (conditionToShowItem(item)) {
+                <li>{{item[1]}}</li>
+            }
+        }
+    </ul>
+    <div class="buttons-dialog flex justify-content-center">
+        <p-button label="Cancelar" severity="secondary" (click)="onHideModal()" />
+        <p-button label="{{actionButtonName}}"  (click)="actionEvent('action-event')" />
+    </div>
+</p-dialog>

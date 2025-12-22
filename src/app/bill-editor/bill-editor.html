@@ -1,0 +1,69 @@
+<div class="main-wrapper">
+    <div class="card-container" >
+        <div class="header-container">
+            <h2 class="title">
+            {{ titleData }}
+            </h2>
+            <div class="flex-options">
+                <div class="radio-button">
+                    <p-radiobutton name="promptOption" [inputId]="selectedOption" [value]="radioButton1" 
+                    [(ngModel)]="selectedOption" size="small"
+                    (change)="onRadioChange($event)" />
+                    <label for="ingredient1" class="ml-2">{{radioButton1}}</label>
+                </div>
+                <div class="radio-button">
+                    <p-radiobutton name="promptOption" [inputId]="selectedOption" [value]="radioButton2" 
+                    [(ngModel)]="selectedOption" size="small" 
+                    (change)="onRadioChange($event)"/>
+                    <label for="ingredient2" class="ml-2">{{radioButton2}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="editor-content-wrapper">
+             <div class="p-selector-group">
+                <p-tree [value]="tree" class="w-full md:w-[30rem]" 
+                    selectionMode="single"
+                    [(selection)]="selectedNode"
+                    (onNodeSelect)="nodeSelect($event)" >
+                    <ng-template let-node pTemplate="default">
+                        <span [ngStyle]="node.style" [class.p-disabled]="node.selectable === false">
+                            {{ node.label }}
+                        </span>
+                </ng-template>
+                </p-tree>
+                </div>
+                <div class="relative-container">
+                    <div 
+                        id="prompt-editor" 
+                        #editorRef
+                        [innerHTML]="styledPrompt"
+                        (input)="updatePromptFromContentEditable($event)" 
+                        contenteditable="true"
+                        rows="4" 
+                        maxlength="10000"
+                        placeholder="placeHolder"
+                        class="prompt-input"
+                        [ngClass]="{'input-focus-ring': isFocused()}"
+                        (blur)="isFocused.set(false)">
+                    </div>
+                </div>
+        </div>
+        <div class="prueba">
+            <chat-buttons
+            [itemsExportPrompt]="itemsExportPrompt"
+            [itemsSavePrompt]="itemsSavePrompt"
+            [headerDialog]="headerDialog"
+            [eraseButton]="true"
+            [generateImageButton]="generateImageButton"
+            [generatePromptButton]="true"
+            [arrayPromptAndData]="promptAndDataToValidate"
+            (submitDownloadFileEmitter)="exportInformation($event)"
+            (submitCopyTextEmitter)="submitCopyText($event)"
+            (submitSavePromptEmitter)="emitSavePrompt($event)"
+            (submitEraseTextEmitter)="emitEraseText($event)"
+            (submitGenerateImage)="generateImage($event)"
+            (submitGeneratePrompt)="generatePrompt($event)"
+            ></chat-buttons>
+        </div>
+    </div>
+</div>

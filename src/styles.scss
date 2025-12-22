@@ -1,1 +1,87 @@
 /* You can add global styles to this file, and also import other style files */
+@import "primeicons/primeicons.css";
+
+
+/* =======================================================
+   1. Table Container (For Responsiveness)
+   ======================================================= */
+/* Since tables can be wide, wrap them in a container that allows horizontal scrolling */
+.response-text {
+    /* Set up a container context for the generated HTML */
+    padding: 10px; 
+}
+
+/* Ensure the table itself can be targeted within the generated content */
+/* If necessary, use ::ng-deep or a global style file to target the inner table. */
+/* Assuming standard encapsulation works, the selector below should be sufficient. */
+.status-message table { 
+    width: 100%;
+    max-width: 100%;
+    border-collapse: collapse; 
+    margin: 20px 0;
+    font-size: 14px;
+    color: #333; /* Ensure text color is readable */
+    border: 1px solid #ddd; 
+    border-radius: 6px;
+    overflow: hidden; /* Contains the border-radius on the corners */
+    table-layout: auto; /* Allow column width adjustment */
+}
+
+/* =======================================================
+   2. Table Header Styling (<thead>)
+   ======================================================= */
+.status-message thead {
+    background-color: #f0f0f0; /* Light gray background for header */
+}
+
+.status-message th {
+    /* Apply styles directly to the th element */
+    background-color: #f0f0f0 !important; /* Force background color */
+    color: #222;
+    font-weight: 600;
+    padding: 12px 10px;
+    text-align: left;
+    border: 1px solid #ddd; /* Explicit borders for all header cells */
+    border-top: none; /* Clean up top border for the first row */
+}
+
+/* =======================================================
+   3. Table Body and Data Cells (<tbody>/<td>)
+   ======================================================= */
+.status-message td {
+    padding: 10px;
+    border: 1px solid #eee; /* Light borders for all data cells */
+    border-left: none;
+    border-right: none;
+    vertical-align: top;
+    line-height: 1.4;
+    word-break: break-word; /* Allows long text in cells to wrap */
+}
+
+/* Stripe Effect (for readability) */
+.status-message tbody tr:nth-child(odd) {
+    background-color: #fff; /* Ensure odd rows are white */
+}
+.status-message tbody tr:nth-child(even) {
+    background-color: #f9f9f9; /* Subtle background for even rows */
+}
+
+/* Ensure borders are clean */
+.status-message tr:last-child td {
+    border-bottom: 1px solid #ddd;
+}
+.status-message tr:first-child th {
+    border-top: 1px solid #ddd; 
+}
+
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow-x: hidden;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}

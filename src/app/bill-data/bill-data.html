@@ -1,0 +1,19 @@
+<div class="chat-container">
+    <chat-box
+    [prompt]="prompt()"
+    [responseMessage]="responseMessage"
+    [statusMessage]="statusMessage"
+    [titleData]="titleData"
+    [subTitleData]="subTitleData"
+    [placeHolder]="placeHolder"
+    [labelExtractButton]="labelExtractButton" 
+    [formatFiles]="formatFiles"
+    [itemsExportPrompt]="itemsExportPrompt"
+    [itemsSavePrompt]="itemsSavePrompt"
+    [headerDialog]="headerDialog"
+    (submitPromptEmitter)="submitPrompt()"
+    (promptEmitter)="promptEmitter($event)"
+    (selectedFilesEmitter)="getSelectedFiles($event)"
+    (savePromptEmitterInDB)="getSavePromptEmitterInDB($event)"
+  ></chat-box>
+</div>

@@ -1,0 +1,14 @@
+
+<div class="card-content">
+    <h1 class="main-title">
+        {{ menuTitle }}
+        <div *ngIf="isUploading()" class="spinner">
+            <p-progress-spinner  strokeWidth="5" fill="transparent" animationDuration=".5s" [style]="{ width: '40px', height: '40px' }" />
+        </div>
+    </h1>
+        <p-tieredMenu 
+            #tieredMenu 
+            [model]="items"
+            styleClass="custom-menu">
+        </p-tieredMenu>
+</div>

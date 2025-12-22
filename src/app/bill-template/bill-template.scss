@@ -1,0 +1,66 @@
+.main {
+    display: flex;
+    grid-template-columns: 1fr; /* grid-cols-1 (mobile default) */
+    gap: 1.5rem; /* gap-6 */
+    padding-top: 1%;
+}
+
+.dashboard-card {
+  background-color: var(--color-white);
+  padding: 1.5rem; /* p-6 */
+  border-radius: 0.75rem; /* rounded-xl */
+  box-shadow: 0 10px 10px 2px rgba(0, 0, 0, 0.1), 0 1px 1px 0px rgba(0, 0, 0, 0.1); /* shadow-lg */
+  height: 95vh; /* h-96 (384px) */
+  align-items: center;
+  justify-content: center;
+  border-left-width: 0px; /* border-l-4 */
+  border-left-style: solid;
+}
+
+.display-basic-template{
+  display: flex;
+}
+
+.list-container {
+  height: 100%; 
+  width: 100%; 
+  display: flex;
+  flex-direction: column; 
+}
+
+.feature-bill{
+  display: block;
+}
+
+.display-bill{
+  display: flex;
+}
+.width-bill {
+  width: 60%;
+}
+
+.bill {
+  height: 100%; 
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; 
+}
+
+.item{
+  display: flex;
+}
+
+.card{
+  background: #f0f3f3;
+  padding-bottom: 3%;
+}
+
+chat-buttons {
+  flex-shrink: 0;
+  padding-top: 1rem; 
+}
+
+bill-skeleton {
+  flex-grow: 1; 
+  overflow-y: auto;
+}

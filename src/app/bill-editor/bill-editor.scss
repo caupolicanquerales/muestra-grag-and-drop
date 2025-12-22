@@ -1,0 +1,116 @@
+.main-wrapper {
+    min-height: 85vh;
+    background-color: var(--gray-bg);
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+ .card-container {
+    width: 100%;
+    max-width: 60rem;
+    padding: 2rem; 
+    background-color: white;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    border-radius: 1rem; 
+    border-top: 4px solid var(--secondary-teal); 
+    transition: all 0.3s ease-in-out;
+}
+
+.relative-container {
+    display: flex;
+    align-items: flex-start;
+    font-size: 16px;
+    line-height: 1.5;
+    flex-grow: 1; 
+    min-width: 35rem; 
+}
+
+.prompt-input {
+    width: auto;
+    min-width: 100%; 
+    height: auto; 
+    flex-grow: 1; 
+    font-size: 1rem; 
+    padding: 1rem; 
+    padding-left: 40px; 
+    padding-right: 4rem; 
+    padding-top: 1rem; 
+    box-shadow: none;
+    border: none;
+    transition: border-color 0.15s ease-in-out; 
+    resize: none;
+    overflow: hidden;
+    outline: none;
+    pointer-events: auto; 
+    z-index: 0; 
+    background: aliceblue;
+    color: #333;
+    min-height: 15rem;
+    overflow-x: visible;
+}
+
+.prompt-input:focus {
+    outline: none;
+}
+
+.p-selector-group{
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 0;
+    flex-shrink: 0;
+    width: 14rem;
+}
+
+.title {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: var(--primary-blue);
+    margin-bottom: 0.5rem;
+    padding-bottom: 2%;
+}
+
+.editor-content-wrapper {
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-start;
+}
+
+.prueba{
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 1rem;
+}
+
+:host ::ng-deep .error-node .p-treenode-label {
+    color: #d32f2f !important;
+}
+
+:host ::ng-deep .error-node .p-treenode-icon {
+    color: #d32f2f !important;
+}
+
+:host ::ng-deep .error-node > .p-treenode-content {
+    cursor: not-allowed;
+    opacity: 0.8;
+}
+
+.header-container {
+    display: flex;
+    justify-content: space-between; 
+    align-items: center;            
+    gap: 1.5rem;                    
+    width: 100%;
+}
+
+.flex-options {
+    display: flex;
+    align-items: center;
+    gap: 1rem;                      
+}
+
+.radio-button {
+    display: flex;
+    align-items: center;
+}

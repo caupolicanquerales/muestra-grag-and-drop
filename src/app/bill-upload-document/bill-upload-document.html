@@ -1,0 +1,10 @@
+<div class="over-container">
+  <upload-document
+    [uploadMessage]="uploadMessage"
+    [formatFileMessage]="formatFileMessage"
+    [allowButton]="allowButton"
+    [formatFiles]="formatFiles"
+    (submitUploadFileEmitter)="uploadFile($event)"
+    (selectedFileEmitter)="selectedFileEmitter($event)"
+  ></upload-document>
+</div>

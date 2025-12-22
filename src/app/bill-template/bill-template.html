@@ -1,0 +1,72 @@
+  <div class="main">
+    <div id="section-1" class="dashboard-card width-table display-table">
+        <upload-document
+            [uploadMessage]="uploadMessage"
+            [formatFileMessage]="formatFileMessage"
+            [allowButton]="allowButton"
+            [formatFiles]="formatFiles"
+            [multipleFiles]="multipleFiles"
+            (submitUploadFileEmitter)="uploadFile($event)"
+            (selectedMultipleFileEmitter)="selectedFileEmitter($event)"
+        ></upload-document>
+        <div class="bg-gray-100 p-6 rounded-3xl shadow-2xl">
+            <p-table
+                [value]="templatesIds"
+                [paginator]="pagination()"
+                [rows]="5"
+                [tableStyle]="{ 'min-width': '20rem' }"
+                [rowsPerPageOptions]="[5, 10, 20]"
+            >
+                <ng-template #header>
+                    <tr>
+                        <th>Nombre</th>
+                        <th style="width: 5rem"></th>
+                        <th style="width: 5rem"></th>
+                    </tr>
+                </ng-template>
+                <ng-template #body let-templatesId>
+                    <tr>
+                        <td>{{ templatesId.name }}</td>
+                        <td>
+                            <p-button icon="pi pi-eye" (click)="selectTemplate(templatesId)" severity="secondary" rounded />
+                        </td>
+                        <td>
+                            <p-button icon="pi pi-trash" (click)="deleteTemplate(templatesId)" severity="secondary" rounded />
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+    </div>
+        
+        @if (htmlString()!=undefined && htmlString()!="" && cssString()!=undefined && cssString()!="") {
+            <div id="section-1" class="dashboard-card display-basic-template width-bill display-bill">
+                <div class="list-container bg-gray-100 p-6 rounded-3xl shadow-2xl">
+                    <div class="bill">
+                        <bill-skeleton
+                        [htmlString]="htmlString()"
+                        [scssString]="cssString()"
+                        ></bill-skeleton>
+                        <chat-buttons
+                            [itemsSavePrompt]="itemsSavePrompt"
+                            [headerDialog]="headerDialog"
+                            [eraseButton]="false"
+                            [exportButton]="false"
+                            [copyButton]="false"
+                            [arrayPromptAndData]="promptAndDataToValidate"
+                            (submitSavePromptEmitter)="emitSavePrompt($event)"
+                        ></chat-buttons>
+                    </div>
+                </div>
+            </div>
+        }    
+    </div>
+
+    <dialog-template
+        [(visible)]="visible"
+        [headerDialogTitle]="headerDialogTitle"
+        [actionButtonName]="actionButtonName"
+        [selectedItem]="selectedBasicTemplate"
+        [displayInfoInSelectedItem]="displayInfoInSelectedItem"
+        (submitActionButtonEmitter)="deleteSelectedTemplate($event)"
+    ></dialog-template>

@@ -1,0 +1,32 @@
+:host ::ng-deep .p-splitter-gutter {
+    pointer-events: none;
+    visibility: hidden; 
+}
+
+.splitter-container {
+    width: 60vw;
+}
+
+.button{
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 1rem;
+}
+
+.checkbox-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); 
+    gap: 1rem;                             
+    width: 100%;
+    padding: 10px 0;
+}
+
+.checkbox-item {
+    display: flex;
+    align-items: center;
+}
+
+.checkbox-label {
+    margin-left: 8px;
+    cursor: pointer;
+}

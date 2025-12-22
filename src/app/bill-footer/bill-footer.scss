@@ -1,0 +1,15 @@
+footer {
+  background-color: #333;
+  color: white;
+  padding: 2px 0;
+  text-align: center;
+  //position: static;
+  width: 100%; 
+  box-sizing: border-box; 
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.container {
+  max-width: 1200px; 
+  margin: 0 auto;
+}

@@ -1,0 +1,16 @@
+{
+  "locale": "es",
+  "translations": {
+    "6550587441281774155": "Generador de Datos Sintéticos",
+    "4337987287804317498": "Describe el tipo de datos para facturas sintéticas que necesitas generar.",
+    "6536977490618462739": "Ej: 1000 facturas de clientes minoristas en Argentina, con montos aleatorios entre $100 y $999. Incluir descuentos variables.",
+    "570336899796662040": "Extraer datos",
+    "3242532404362461707":"Generador de facturas",
+    "3945512172732526445": "Opciones",
+    "7135207816572127498": "Arrastre y libere su documento aqui o haga click",
+    "1007271082535744699": "Formatos aceptados: PDF, DOC, DOCX, JPG, PNG (Max size: 5MB)",
+    "674827099267258344": "Generador de Imagenes",
+    "5915062004585590833": "Describe el tipo facturas sintéticas que necesitas generar.",
+    "5161822194693167539": "Formatos aceptados: HTML, CSS, SCSS (Max size: 5MB)"
+  }
+}

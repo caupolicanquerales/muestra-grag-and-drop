@@ -1,0 +1,77 @@
+<div class="main-wrapper">
+      <div class="card-container" 
+           [ngClass]="{'ring-4 ring-secondary-teal': isFocused()}">
+        
+        <h2 class="title">
+          {{ titleData }}
+        </h2>
+        <p class="subtitle">
+          {{ subTitleData }}
+        </p>
+
+        <div class="p-fluid">
+          <div class="relative-container">
+            <div class="input-and-icon-wrapper"
+            #wrapperRef
+            (drop)="uploadComponentRef.onDrop($event)"
+            (dragover)="uploadComponentRef.onDragOver($event)"
+            (dragleave)="uploadComponentRef.onDragLeave($event)"
+            >
+              <upload-document-chat
+                [formatFiles]="formatFiles"
+                (selectedFilesEmitter)="selectedFilesEvent($event)"
+                #uploadComponentRef
+              ></upload-document-chat>
+              <textarea 
+                id="prompt-input" 
+                [(ngModel)]="promptInput" 
+                (input)="sendPromptEmitter()"
+                #textAreaRef
+                rows="4" 
+                maxlength="10000"
+                placeholder={{placeHolder}}
+                class="prompt-input"
+                [ngClass]="{'input-focus-ring': isFocused()}"
+                (focus)="isFocused.set(true)"
+                (blur)="isFocused.set(false)">
+              </textarea>
+            </div>
+          </div>
+          <div class="feedback-container"
+               [ngClass]="promptInput().length > 450 ? 'feedback-error' : 'feedback-normal'">
+            <span>{{ promptInput().length }}  caracteres</span>
+              <chat-buttons
+                [eraseButton]="true"
+                [exportButton]="false"
+                [copyButton]="false"
+                [saveButton]="false"
+                (submitEraseTextEmitter)="emitEraseText($event)"
+              ></chat-buttons>
+              <p-button 
+                icon="pi pi-arrow-right" 
+                styleClass="submit-button-shape"
+                [rounded]="true" 
+                severity="secondary"
+                pTooltip="Generar"
+                tooltipPosition="top"
+                (click)="submitPrompt()" 
+                [disabled]="promptInput().length < 10"
+              />
+          </div>
+        </div>
+ 
+        <div *ngIf="statusMessage()" class="status-message">
+          <div id="response" class="response-text" [innerHTML]="responseMessage() | safeHtml"></div>
+            <chat-buttons
+              *ngIf="statusMessage()"
+              [itemsExportPrompt]="itemsExportPrompt"
+              [itemsSavePrompt]="itemsSavePrompt"
+              (submitCopyTextEmitter)="submitCopyText($event)"
+              (submitDownloadFileEmitter)="exportInformation($event)"
+              (submitSavePromptEmitter)="emitSavePrompt($event)"
+            ></chat-buttons>  
+        </div>
+      </div>
+    </div>
+
+    

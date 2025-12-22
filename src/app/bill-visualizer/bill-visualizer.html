@@ -1,0 +1,43 @@
+<div class="main">
+
+    <div id="section-1" class="dashboard-card width-table display-table">
+        <div class="list-container bg-gray-100 p-6 rounded-3xl shadow-2xl">
+            <p-table
+                [value]="imageIds"
+                [paginator]="pagination()"
+                [rows]="5"
+                [tableStyle]="{ 'min-width': '20rem' }"
+                [rowsPerPageOptions]="[5, 10, 20]"
+            >
+                <ng-template #header>
+                    <tr>
+                        <th>IMAGEN</th>
+                        <th style="width: 5rem"></th>
+                        <th style="width: 5rem"></th>
+                    </tr>
+                </ng-template>
+                <ng-template #body let-imageId>
+                    <tr>
+                        <td>{{ imageId.image }}</td>
+                        <td>
+                            <p-button icon="pi pi-eye" (click)="selectImage(imageId)" severity="secondary" rounded />
+                        </td>
+                        <td>
+                            <p-button icon="pi pi-download" (click)="downloadImage(imageId)" severity="secondary" rounded />
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+    </div>
+    @if(showImage()){
+        <div id="section-2" class="dashboard-card-2 width-bill">
+            {{imageName()}}
+        <div class="list-container bg-gray-100 p-6 rounded-3xl shadow-2xl image-fixed">
+            <visualizer-canvas
+                [base64String]="base64String()"
+                ></visualizer-canvas>  
+            </div>
+        </div>
+    }
+</div>

@@ -1,0 +1,63 @@
+<div class="card-container">
+      <div 
+        class="upload-container" 
+        (click)="fileInput.click()" 
+        (drop)="onDrop($event)" 
+        (dragover)="onDragOver($event)"
+        (dragleave)="onDragLeave($event)"
+        [class.drag-over]="isDraggingOver"
+      >
+        <input 
+          type="file" 
+          #fileInput 
+          (change)="onFileSelected($event)" 
+          [multiple]="multipleFiles" 
+          [accept]="formatFiles" 
+          style="display: none;"
+          [disabled]="allowUploadFile()"
+        >
+
+        <ng-container *ngIf="conditionSelectedFile(); else fileDetails">
+          <div class="upload-prompt">
+            <p>
+              {{uploadMessage}}
+            </p>
+            <small>
+              {{formatFileMessage}}
+            </small>
+          </div>
+        </ng-container>
+
+        <ng-template #fileDetails> 
+            <ng-container *ngIf="multipleFiles; else singleFileDetails">
+                <div class="file-info">
+                    @for (file of selectedFiles; track trackByFn($index, file); let i = $index) {
+                        <div class="file-info-container">
+                          <i [class]="getFileIcon(file)" class="file-type-icon"></i>
+                          <span class="file-name-text">{{ file?.name }}</span>
+                        </div>
+                    }
+                </div>
+            </ng-container>
+        </ng-template>
+        <ng-template #singleFileDetails>
+          <div class="file-info-container">
+            <i [class]="getFileIcon()" class="file-type-icon"></i>
+            <span class="file-name-text">{{ selectedFile()?.name }}</span>
+          </div>
+        </ng-template>
+      </div>
+
+      <div class="action-area">
+        <button pButton
+            [disabled]="conditionToDisableButton()"
+            (click)="uploadFile()"
+        >
+            <i class="pi pi-upload" pButtonIcon></i>
+            <span pButtonLabel>Cargar Documento</span>
+        </button>
+      </div>
+      <div *ngIf="isError()" [class]="isError() ? 'error-message' : ''">
+         {{ message() }} 
+      </div>
+</div>

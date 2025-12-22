@@ -1,0 +1,41 @@
+<div class="splitter-container">
+    <p-tabs value="0">
+    <p-tablist>
+        @for (tab of tabs; track tab.value) {
+            <p-tab [value]="tab.value">{{ tab.title }}</p-tab>
+        }
+    </p-tablist>
+        <p-tabpanels>
+            @for (tab of tabs; track tab.value) {
+                <p-tabpanel [value]="tab.value">
+                        <div class="checkbox-grid">
+                            @for (defect of tab.defects; track defect.defect) {
+                                <div class="checkbox-item">
+                                    <p-checkbox
+                                        inputId="{{defect.defect}}"
+                                        name="defectGroup" 
+                                        [value]="defect" 
+                                        [(ngModel)]="selectedStainDefects">
+                                    </p-checkbox>
+                                    <label [for]="defect.name" class="checkbox-label"> 
+                                        {{defect.defect}} 
+                                    </label>
+                                </div>
+                            }
+                        </div>
+                </p-tabpanel>
+            }
+            <div class="button">
+                <chat-buttons
+                [itemsSavePrompt]="itemsSavePrompt"
+                [headerDialog]="headerDialog"
+                [eraseButton]="false"
+                [exportButton]="false"
+                [copyButton]="false"
+                [arrayPromptAndData]="promptAndDataToValidate"
+                (submitSavePromptEmitter)="emitSavePrompt($event)"
+                ></chat-buttons>
+            </div>
+        </p-tabpanels>
+    </p-tabs>
+</div>

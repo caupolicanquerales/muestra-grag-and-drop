@@ -1,0 +1,48 @@
+.main-header {
+    display: flex; /* Enables Flexbox */
+    justify-content: space-between; /* Pushes the logo and nav to opposite ends */
+    align-items: center; /* Vertically centers items */
+    padding: 15px 30px;
+    background-color: #ffffff; /* Dark Blue Background */
+    color: white;
+    margin-top: -6%;
+    margin-left: -6%;
+    margin-bottom: -6%;
+    
+}
+
+/* 2. Logo and Name Link */
+.logo-link {
+    display: flex; /* Enables Flexbox for the logo and name */
+    align-items: center;
+    text-decoration: none;
+    color: rgb(46, 46, 46);
+    font-size: 1.8rem;
+    font-weight: bold;
+}
+
+.sport-icon {
+    font-size: 2rem;
+    margin-right: 10px;
+}
+
+.site-name{
+  /* 1. Typography */
+  font-family: 'Inter', 'Segoe UI', Roboto, sans-serif; /* Use a modern sans-serif font */
+  font-size: 2.0rem; /* Large size */
+  font-weight: 800; /* Extra bold */
+  line-height: 1.1; /* Tighter line height for large text */
+  letter-spacing: -0.04em; /* Slightly tighter than normal for a modern feel */
+  color: #1a1a1a; /* Very dark gray instead of pure black */
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+  margin-left: -4%;
+}
+
+.my-app-logo {
+  width: 20%; /* Adjust this value as needed */
+  height: auto; /* Maintains the aspect ratio */
+  margin-right: 15px;
+  display: block; /* Make sure it behaves like a block element */
+  max-width: 100%; /* Very important for responsiveness */
+}

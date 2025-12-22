@@ -1,0 +1,16 @@
+{
+  "locale": "en-US",
+  "translations": {
+    "6550587441281774155": "@@titleData:",
+    "4337987287804317498": "@@subTitleData:",
+    "6536977490618462739": "@@placeHolder:",
+    "570336899796662040": "@@labelExtractButton:",
+    "3242532404362461707": "@@titleApplication:",
+    "3945512172732526445": "menuTitle",
+    "7135207816572127498": "@@uploadMessage",
+    "5161822194693167539": "@@formatFileMessageBill",
+    "1007271082535744699": "@@formatFileMessage",
+    "674827099267258344": "@@titleImage:",
+    "5915062004585590833": "@@subTitleImage:"
+  }
+}
