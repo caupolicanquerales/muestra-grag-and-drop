@@ -11,7 +11,7 @@ import { TabsModule } from 'primeng/tabs';
 import { DialogModule } from 'primeng/dialog';
 import { ExecutingRestFulService } from '../service/executing-rest-ful-service';
 import { createNewObjTab, sortedTabs } from '../utils/tab-operations-utils'
-import { getConfigurationTabDeletePrompt, TabDeletePromptCategory } from '../utils/tab-configuration-utils';
+import { getConfigurationTabDeletePrompt, getDeletePromptTabName, getHeaderDialogTitle, TabDeletePromptCategory } from '../utils/tab-configuration-utils';
 
 @Component({
   selector: 'bill-delete-prompt',
@@ -22,24 +22,16 @@ import { getConfigurationTabDeletePrompt, TabDeletePromptCategory } from '../uti
 })
 export class BillDeletePrompt implements OnInit, OnDestroy{
 
-  titleTableImage: string= "Prompt imagen";
-  titleTableData: string= "Prompt dato";
-  titleTableBill: string= "Prompt factura";
-  titleTableSynthetic: string= "Dato sintético";
+  tabTitle: any = getDeletePromptTabName();
   tabs: Array<any>= [];
-  headerTitles: any={
-    image:"Esta por eliminar un prompt imagen",
-    bill:"Esta por eliminar un prompt factura",
-    data:"Esta por eliminar un prompt dato",
-    synthetic:"Esta por eliminar un dato sintético"
-  };
+  headerTitles: any= getHeaderDialogTitle();
   headerDialogTitle: string="";
   visible: boolean= false;
   selectedPrompt: any={};
   private destroy$ = new Subject<void>();
   desiredOrder=getConfigurationTabDeletePrompt();
   private orderMap: any = {};
-  private amountOfTabs: number= 4;
+  private amountOfTabs: number= 5;
 
   constructor(private serviceGeneral: ServiceGeneral, private executingRestFulService: ExecutingRestFulService){}
 
@@ -48,25 +40,31 @@ export class BillDeletePrompt implements OnInit, OnDestroy{
     this.desiredOrder.forEach((name, index) => {this.orderMap[name] = index;});
     this.serviceGeneral.promptImages$.pipe(takeUntil(this.destroy$)).subscribe(data=>{
       const page= this.setPagination(data);
-      const obj= this.setObjetForTab(data, this.titleTableImage,page, TabDeletePromptCategory.IMAGE, "1");
+      const obj= this.setObjetForTab(data, this.tabTitle[TabDeletePromptCategory.IMAGE],page, TabDeletePromptCategory.IMAGE, "1");
       this.tabs=createNewObjTab(this.tabs,obj,TabDeletePromptCategory.IMAGE);
-      this.tabs= sortedTabs(this.tabs,this.orderMap, this.amountOfTabs);
-    });
-    this.serviceGeneral.promptBills$.pipe(takeUntil(this.destroy$)).subscribe(data=>{
-      const page= this.setPagination(data);
-      const obj= this.setObjetForTab(data, this.titleTableBill,page, TabDeletePromptCategory.BILL, "3");
-      this.tabs=createNewObjTab(this.tabs,obj,TabDeletePromptCategory.BILL);
       this.tabs= sortedTabs(this.tabs,this.orderMap, this.amountOfTabs);
     });
     this.serviceGeneral.promptData$.pipe(takeUntil(this.destroy$)).subscribe(data=>{
       const page= this.setPagination(data);
-      const obj= this.setObjetForTab(data, this.titleTableData,page, TabDeletePromptCategory.DATA, "2");
+      const obj= this.setObjetForTab(data, this.tabTitle[TabDeletePromptCategory.DATA],page, TabDeletePromptCategory.DATA, "2");
       this.tabs=createNewObjTab(this.tabs,obj,TabDeletePromptCategory.DATA);
+      this.tabs= sortedTabs(this.tabs,this.orderMap, this.amountOfTabs);
+    });
+    this.serviceGeneral.promptBills$.pipe(takeUntil(this.destroy$)).subscribe(data=>{
+      const page= this.setPagination(data);
+      const obj= this.setObjetForTab(data, this.tabTitle[TabDeletePromptCategory.BILL],page, TabDeletePromptCategory.BILL, "3");
+      this.tabs=createNewObjTab(this.tabs,obj,TabDeletePromptCategory.BILL);
+      this.tabs= sortedTabs(this.tabs,this.orderMap, this.amountOfTabs);
+    });
+    this.serviceGeneral.promptSystem$.pipe(takeUntil(this.destroy$)).subscribe(data=>{
+      const page= this.setPagination(data);
+      const obj= this.setObjetForTab(data, this.tabTitle[TabDeletePromptCategory.SYSTEM],page, TabDeletePromptCategory.SYSTEM, "4");
+      this.tabs=createNewObjTab(this.tabs,obj,TabDeletePromptCategory.SYSTEM);
       this.tabs= sortedTabs(this.tabs,this.orderMap, this.amountOfTabs);
     });
     this.serviceGeneral.syntheticData$.pipe(takeUntil(this.destroy$)).subscribe(data=>{
       const page= this.setPagination(data);
-      const obj= this.setObjetForTab(data, this.titleTableSynthetic,page, TabDeletePromptCategory.SYNTHETIC, "4");
+      const obj= this.setObjetForTab(data, this.tabTitle[TabDeletePromptCategory.SYNTHETIC],page, TabDeletePromptCategory.SYNTHETIC, "5");
       this.tabs=createNewObjTab(this.tabs,obj,TabDeletePromptCategory.SYNTHETIC);
       this.tabs= sortedTabs(this.tabs,this.orderMap, this.amountOfTabs);
     });
@@ -92,6 +90,8 @@ export class BillDeletePrompt implements OnInit, OnDestroy{
       this.executingRestFulService.deletePromptDataById(request);
     }else if(this.selectedPrompt?.type==TabDeletePromptCategory.BILL){
       this.executingRestFulService.deletePromptBillById(request);
+    }else if(this.selectedPrompt?.type==TabDeletePromptCategory.SYSTEM){
+      this.executingRestFulService.deletePromptSystemById(request);
     }else if(this.selectedPrompt?.type==TabDeletePromptCategory.SYNTHETIC){
       this.executingRestFulService.deleteSyntheticDataById(requestSynthetic);
     }

@@ -21,14 +21,36 @@ export function getConfigurationTabDeletePrompt(){
     return [TabDeletePromptCategory.IMAGE,
         TabDeletePromptCategory.DATA,
         TabDeletePromptCategory.BILL,
+        TabDeletePromptCategory.SYSTEM,
         TabDeletePromptCategory.SYNTHETIC];
+}
+
+export function getDeletePromptTabName(){
+    return{
+      [TabDeletePromptCategory.IMAGE]:"Prompt imagen",
+      [TabDeletePromptCategory.DATA]:"Prompt dato",
+      [TabDeletePromptCategory.BILL]:"Prompt factura",
+      [TabDeletePromptCategory.SYSTEM]:"Prompt sistema",
+      [TabDeletePromptCategory.SYNTHETIC]:"Dato sintético"
+    }
+}
+
+export function getHeaderDialogTitle(){
+    return{
+      [TabDeletePromptCategory.IMAGE]:"Esta por eliminar un prompt imagen",
+      [TabDeletePromptCategory.DATA]:"Esta por eliminar un prompt dato",
+      [TabDeletePromptCategory.BILL]:"Esta por eliminar un prompt factura",
+      [TabDeletePromptCategory.SYSTEM]:"Esta por eliminar un prompt sistema",
+      [TabDeletePromptCategory.SYNTHETIC]:"Esta por eliminar un dato sintético"
+    }
 }
 
 export enum TabDeletePromptCategory {
   IMAGE = 'image',
   DATA = 'data',
   BILL = 'bill',
-  SYNTHETIC= 'synthetic'
+  SYNTHETIC= 'synthetic',
+  SYSTEM= 'system'
 }
 
 export enum TabGlobalDfectCategory {
@@ -37,38 +59,3 @@ export enum TabGlobalDfectCategory {
   COLOR_AGING = 'Color & Aging',
   ANNOTATIONS_FILING= 'Annotations & Filing'
 }
-
-/**
- * 
- * 
- * const extractData = (obj) => {
-  for (let key in obj) {
-    if (typeof obj[key] === 'object' && obj[key] !== null) {
-      // If it's an object, dive deeper
-      extractData(obj[key]);
-    } else {
-      // If it's a primitive, extract the info
-      console.log(`${key}: ${obj[key]}`);
-    }
-  }
-};
- */
-
-/**
- * 
- * const iterativeExtract = (rootObj) => {
-  const stack = [rootObj];
-
-  while (stack.length > 0) {
-    const current = stack.pop();
-
-    for (let key in current) {
-      if (typeof current[key] === 'object' && current[key] !== null) {
-        stack.push(current[key]);
-      } else {
-        console.log(`${key}: ${current[key]}`);
-      }
-    }
-  }
-};
- */

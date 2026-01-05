@@ -10,13 +10,14 @@ import { removeColorContent } from '../utils/operation-string-utils'
 import { Subject, takeUntil } from 'rxjs';
 import { SyntheticDataInterface } from '../models/synthetic-data-interface';
 import { PromptAndDataToValidateInterface } from '../models/prompts-and-data-to-validate-interface';
-import { getHeaderDialogToBillEditor, getSaveFormartPromptToBillEditor, getExportFormatToBillEditor } from '../utils/dialog-parameters-utils';
+import { getHeaderDialogToBillEditor, getExportFormatToBillEditor, getSaveFormartPromptForSystem, getSaveFormartPromptForData, getSaveFormartPromptForOther, getHeaderDialogToSystem, getHeaderDialogToData } from '../utils/dialog-parameters-utils';
 import { buildMainNode, getMainNode } from '../utils/tree-prompt-utils';
 import { TreeModule } from 'primeng/tree';
 import { TreeNode } from 'primeng/api';
-import { searchNodeToDisableNode } from '../utils/bfs-search-node-utils'
+import { getMapOrder, orderChildren, orderOtherPrompts, removeNodeChild, searchNodeToDisableNode } from '../utils/bfs-search-node-utils'
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { BasicTemplateInterface } from '../models/basic-template-interface';
+import { TypePromptEnum } from '../enums/type-prompt-enum';
 
 @Component({
   selector: 'bill-editor',
@@ -42,9 +43,17 @@ export class BillEditor implements OnInit, OnDestroy {
   tree: TreeNode[]= [buildMainNode('Prompts', true)];
   selectedNode: TreeNode | null =null;
   selectedOption: string= '';
-  radioButton1: string ="Prompt dato"
-  radioButton2: string ="Otros Prompt"
+  optionsRadioButton = [
+  { id: 'opt1', label: 'Prompt dato' }, 
+  { id: 'opt2', label: 'Prompt sistema' },
+  { id: 'opt3', label: 'Otros Prompt' }];
   generateImageButton: boolean= true;
+  generatePromptButton: boolean= true;
+  private htmlCss: string="";
+  private orderOtherPrompt= orderOtherPrompts();
+  private typeOtherPrompts: Array<string> =[TypePromptEnum.BILL_PROMPT,TypePromptEnum.IMAGE_PROMPT
+        ,TypePromptEnum.SYNTHETIC_DATA,TypePromptEnum.GLOBAL_DEFECT_PROMPT,TypePromptEnum.BASIC_TEMPLATE];
+  private orderMap: any = {};
 
   @ViewChild('editorRef') editorRef!: ElementRef<HTMLDivElement>;
   
@@ -52,39 +61,33 @@ export class BillEditor implements OnInit, OnDestroy {
     private executingRestFulService: ExecutingRestFulService){}
 
   ngOnInit(): void {
-    this.selectedOption=this.radioButton2;
+    this.orderMap= getMapOrder(this.orderOtherPrompt);
+    this.selectedOption=this.optionsRadioButton[2]['label'];
     this.serviceGeneral.setImageGenerated('');
     this.headerDialog= getHeaderDialogToBillEditor();
-    this.itemsSavePrompt= getSaveFormartPromptToBillEditor();
+    this.itemsSavePrompt= getSaveFormartPromptForOther();
     this.itemsExportPrompt= getExportFormatToBillEditor();
     this.serviceGeneral.promptImages$.pipe(takeUntil(this.destroy$)).subscribe(data=>{
-      this.promptAndDataToValidate.prompt_imagen=data;
-      this.tree= this.setChildrenInTreeNode('Prompt imagen', 'Prompt imagen', data);
-      this.backUpTree= JSON.stringify(this.tree);
+      this.setChildInTree(TypePromptEnum.IMAGE_PROMPT,data,this.orderOtherPrompt);
     });
     this.serviceGeneral.promptBills$.pipe(takeUntil(this.destroy$)).subscribe(data=>{
-      this.promptAndDataToValidate.prompt_facturas=data;
-      this.tree= this.setChildrenInTreeNode('Prompt factura','Prompt factura', data);
-      this.backUpTree= JSON.stringify(this.tree);
+      this.setChildInTree(TypePromptEnum.BILL_PROMPT,data,this.orderMap);
     });
     this.serviceGeneral.promptData$.pipe(takeUntil(this.destroy$)).subscribe(data=>{
-      this.promptAndDataToValidate.prompt_datos=data;
-      this.tree= this.setChildrenInTreeNode('Prompt dato','Prompt dato', data);
-      this.backUpTree= JSON.stringify(this.tree);
+      this.setChildInTree(TypePromptEnum.DATA_PROMPT,data,this.orderMap);
     });
     this.serviceGeneral.syntheticData$.pipe(takeUntil(this.destroy$)).subscribe(data=>{
-      this.promptAndDataToValidate.dato_sintético=data;
-      this.tree= this.setChildrenInTreeNode('Dato sintético','Dato sintético', data);
-      this.backUpTree= JSON.stringify(this.tree);
+      this.setChildInTree(TypePromptEnum.SYNTHETIC_DATA,data,this.orderMap);
     });
     this.serviceGeneral.promptGlobalDefect$.pipe(takeUntil(this.destroy$)).subscribe(data=>{
-      this.tree= this.setChildrenInTreeNode('Prompt defecto global','Prompt defecto global', data);
-      this.backUpTree= JSON.stringify(this.tree);
+      this.setChildInTree(TypePromptEnum.GLOBAL_DEFECT_PROMPT,data,this.orderMap);
+    });
+    this.serviceGeneral.promptSystem$.pipe(takeUntil(this.destroy$)).subscribe(data=>{
+      this.setChildInTree(TypePromptEnum.SYSTEM_PROMPT,data,this.orderMap);
     });
     this.serviceGeneral.basicTemplateData$.pipe(takeUntil(this.destroy$)).subscribe(data=>{
-      this.tree= this.setChildrenInTreeNode('Template básico','Template básico', data);
-      this.backUpTree= JSON.stringify(this.tree);
-      this.tree= this.setDisableNodeInTree(this.tree,['Prompt dato']);
+      this.setChildInTree(TypePromptEnum.BASIC_TEMPLATE,data,this.orderMap);
+      this.tree= this.setDisableNodeInTree(this.tree,[TypePromptEnum.DATA_PROMPT, TypePromptEnum.SYSTEM_PROMPT]);
     });
     this.serviceGeneral.basicTemplate$.pipe(takeUntil(this.destroy$)).subscribe(data=>this.setBasicTemplateToEditor(data));
   }
@@ -108,28 +111,8 @@ export class BillEditor implements OnInit, OnDestroy {
     }
   }
 
-  promptImageChange($event: any){
-    const coloredSpan = removeColorContent($event?.data, "rgb(47, 79, 79)");
-    this.setTimeout(coloredSpan);
-  }
-
-  promptDataChange($event: any){
-    const coloredSpan = removeColorContent($event?.data, "rgb(0, 128, 128)");
-    this.setTimeout(coloredSpan);
-  }
-
-  promptDataBill($event: any){
-    const coloredSpan = removeColorContent($event?.data, "rgb(0, 0, 139)");
-    this.setTimeout(coloredSpan);
-  }
-
-  syntheticDataChange($event: any){
-    const coloredSpan = removeColorContent($event?.data, "rgb(0, 0, 0)");
-    this.setTimeout(coloredSpan);
-  }
-
-  promptGlobalDefect($event: any){
-    const coloredSpan = removeColorContent($event?.data, "rgb(0, 0, 0)");
+  setColorText($event: any, colorRgb: string){
+    const coloredSpan = removeColorContent($event?.data, colorRgb);
     this.setTimeout(coloredSpan);
   }
 
@@ -187,18 +170,21 @@ export class BillEditor implements OnInit, OnDestroy {
       prompt: textToCopy,
       name: $event.name
     };
-    if($event?.typePrompt=="Prompt facturas"){
+    if($event?.typePrompt==TypePromptEnum.BILL_PROMPT){
       this.executingRestFulService.savePromptBill(request);
     }
-    if($event?.typePrompt=="Prompt imagen"){
+    if($event?.typePrompt==TypePromptEnum.IMAGE_PROMPT){
       this.executingRestFulService.savePromptImage(request);
     }
-    if($event?.typePrompt=="Prompt datos"){
+    if($event?.typePrompt==TypePromptEnum.DATA_PROMPT){
       this.executingRestFulService.savePromptData(request);
     }
-    if($event?.typePrompt=="Dato sintético"){
+    if($event?.typePrompt==TypePromptEnum.SYNTHETIC_DATA){
       const request= this.getSyntheticRequest(textToCopy, $event.name);
       this.executingRestFulService.saveSyntheticData(request);
+    }
+    if($event?.typePrompt==TypePromptEnum.SYSTEM_PROMPT){
+      this.executingRestFulService.savePromptSystem(request);
     }
   }
 
@@ -221,7 +207,7 @@ export class BillEditor implements OnInit, OnDestroy {
 
   generateImage($event: any){
     const textToCopy = this.getTextToCopy();
-    this.serviceGeneral.setSelectedPromptBill(textToCopy);
+    this.serviceGeneral.setSelectedPromptBill(textToCopy.trim());
     this.serviceGeneral.setChangeComponent('show-template');
   }
 
@@ -236,7 +222,7 @@ export class BillEditor implements OnInit, OnDestroy {
     let mother= this.tree[0];
     let mainNode= getMainNode(label,type,data);
     mother.children?.push(mainNode);
-    return JSON.parse(JSON.stringify([mother]));
+    return this.convertJSON([mother]);
   }
 
   private setDisableNodeInTree(tree: TreeNode[],nodeNames: Array<string>){
@@ -245,22 +231,22 @@ export class BillEditor implements OnInit, OnDestroy {
   }
 
   nodeSelect($event: any){
-     if(this.selectedNode?.data.type=="Prompt factura"){
-      this.promptDataBill(this.selectedNode?.data);
+     if(this.selectedNode?.data?.type==TypePromptEnum.BILL_PROMPT){
+      this.setColorText(this.selectedNode?.data, "rgb(0, 0, 139)");
     }
-    if(this.selectedNode?.data.type=="Prompt imagen"){
-      this.promptImageChange(this.selectedNode?.data);
+    if(this.selectedNode?.data?.type==TypePromptEnum.IMAGE_PROMPT){
+      this.setColorText(this.selectedNode?.data, "rgb(47, 79, 79)");
     }
-    if(this.selectedNode?.data.type=="Prompt dato"){
-      this.promptDataChange(this.selectedNode?.data);
+    if(this.selectedNode?.data?.type==TypePromptEnum.DATA_PROMPT){
+      this.setColorText(this.selectedNode?.data, "rgb(0, 128, 128)");
     }
-    if(this.selectedNode?.data.type=="Dato sintético"){
-      this.syntheticDataChange(this.selectedNode?.data);
+    if(this.selectedNode?.data?.type==TypePromptEnum.SYNTHETIC_DATA ||
+      this.selectedNode?.data?.type==TypePromptEnum.SYSTEM_PROMPT ||
+      this.selectedNode?.data?.type==TypePromptEnum.GLOBAL_DEFECT_PROMPT
+    ){
+      this.setColorText(this.selectedNode?.data, "rgb(0, 0, 0)");
     }
-    if(this.selectedNode?.data.type=="Prompt defecto global"){
-      this.promptGlobalDefect(this.selectedNode?.data);
-    }
-    if(this.selectedNode?.data.type=='Template básico'){
+    if(this.selectedNode?.data?.type==TypePromptEnum.BASIC_TEMPLATE){
       let request= this.getBasicTemplateInterface($event?.node?.data?.data);
       this.executingRestFulService.getBasicTemplateById(request);
     }
@@ -270,12 +256,23 @@ export class BillEditor implements OnInit, OnDestroy {
     let typePrompts=[];
     let backUp= JSON.parse(this.backUpTree);
     this.emitEraseText(null);
-    if(this.selectedOption==this.radioButton2){
-      typePrompts=['Prompt dato'];
+    this.generateImageButton=false;
+    this.generatePromptButton=false;
+    if(this.selectedOption==this.optionsRadioButton[2]['label']){
+      typePrompts=[TypePromptEnum.DATA_PROMPT, TypePromptEnum.SYSTEM_PROMPT];
       this.generateImageButton=true;
+      this.generatePromptButton=true;
+      this. itemsSavePrompt=getSaveFormartPromptForOther();
+      this.headerDialog= getHeaderDialogToBillEditor();
+    }else if(this.selectedOption==this.optionsRadioButton[1]['label']){
+      typePrompts=[...[TypePromptEnum.DATA_PROMPT],...this.typeOtherPrompts];
+      this. itemsSavePrompt=getSaveFormartPromptForSystem();
+      this.headerDialog= getHeaderDialogToSystem();
     }else{
-      typePrompts=["Prompt factura","Prompt imagen","Dato sintético","Prompt defecto global"];
-      this.generateImageButton=false;
+      typePrompts=[...[TypePromptEnum.SYSTEM_PROMPT],...this.typeOtherPrompts];
+      this.itemsSavePrompt=getSaveFormartPromptForData();
+      this.headerDialog= getHeaderDialogToData();
+      this.generatePromptButton=true;
     }
     this.tree= this.setDisableNodeInTree(backUp,typePrompts);
   }
@@ -291,7 +288,26 @@ export class BillEditor implements OnInit, OnDestroy {
   private setBasicTemplateToEditor(data: any){
     if(data && data?.["cssString"] && data?.["htmlString"]){
      const template= `<style>${data?.["cssString"]}</style>${data?.["htmlString"]}`;
+     this.htmlCss= template;
      this.setTimeout(template);
     } 
+  }
+
+  private setChildInTree(typePrompt: string,  data: Array<PromptGenerationImageInterface> | Array<SyntheticDataInterface> | Array<BasicTemplateInterface>,
+    orderPrompt: any){
+    this.tree= removeNodeChild(this.tree,typePrompt);
+    this.tree= this.setChildrenInTreeNode(typePrompt, typePrompt, data);
+    let array= this.tree[0].children;
+    const children = orderChildren(array, orderPrompt);
+    this.tree[0].children= children;
+    this.backUpTree= JSON.stringify(this.tree);
+  }
+
+  private convertJSON(tree: any){
+    let backup= JSON.stringify(this.tree, (key, value) => {
+      if (key === 'parent') return undefined;
+      return value;
+    });
+    return JSON.parse(backup);
   }
 }

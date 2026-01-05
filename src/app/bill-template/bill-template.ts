@@ -4,7 +4,6 @@ import { BillSkeleton } from '../bill-skeleton/bill-skeleton';
 import { UploadDocument } from '../upload-document/upload-document';
 import { HttpClientService } from '../service/http-client-service';
 import { ServiceGeneral } from '../service/service-general';
-import { GenerationDataInterface } from '../models/generation-data-interface';
 import { Subject, takeUntil } from 'rxjs';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
@@ -14,6 +13,8 @@ import { getHeaderDialogToBasicTemplate, getSaveFormartBasicTemplate } from '../
 import { BasicTemplateInterface } from '../models/basic-template-interface';
 import { ExecutingRestFulService } from '../service/executing-rest-ful-service';
 import { DialogTemplate } from '../dialog-template/dialog-template';
+import { GenerationImageInterface } from '../models/generation-image-interface';
+import { TypePromptEnum } from '../enums/type-prompt-enum';
 
 @Component({
   selector: 'bill-template',
@@ -56,16 +57,18 @@ export class BillTemplate implements OnInit, OnDestroy{
     this.itemsSavePrompt= getSaveFormartBasicTemplate();
     this.serviceGeneral.basicTemplateData$.pipe(takeUntil(this.destroy$)).subscribe(data=>{
       this.templatesIds=data;
+      this.pagination.set(true);
     });
     this.serviceGeneral.basicTemplate$.pipe(takeUntil(this.destroy$)).subscribe(data=>{
       this.htmlString.set(data?.["htmlString"]);
       this.cssString.set(data?.["cssString"]);
+      this.serviceGeneral.setActivateBasicTemplateStream(false);
     });
-    this.serviceGeneral.setActivateBasicTemplateStream(true);
   }
 
   ngOnDestroy(): void {
     this.serviceGeneral.setBasicTemplate({});
+    this.serviceGeneral.setActivateBasicTemplateStream(false);
     this.destroy$.next();
     this.destroy$.complete();
   }
@@ -109,7 +112,7 @@ export class BillTemplate implements OnInit, OnDestroy{
   }
 
   emitSavePrompt($event: any){
-    if($event?.typePrompt=="Template basico"){
+    if($event?.typePrompt==TypePromptEnum.BASIC_TEMPLATE){
       let request: BasicTemplateInterface = {
         id: null,
         htmlString: this.htmlString(),
@@ -134,10 +137,10 @@ export class BillTemplate implements OnInit, OnDestroy{
     });
   }
   
-  private updatePromptToGenerateBasicTemplate(request: GenerationDataInterface): void{
+  private updatePromptToGenerateBasicTemplate(request: GenerationImageInterface): void{
     this.httpService.updatePromptForBasicTemplate(request).subscribe({
       next: (data) => {
-        console.log("Se mando el prompt correctamente");
+        this.serviceGeneral.setActivateBasicTemplateStream(true);
       },
       error: (err) => {
         console.error('Error fetching data:', err);
@@ -156,10 +159,10 @@ export class BillTemplate implements OnInit, OnDestroy{
     return formData;  
   }
 
-  private getRequestGenerationData():GenerationDataInterface{
+  private getRequestGenerationData():GenerationImageInterface{
       return {
-        prompt: "Extract the information from the HTML and SCSS files into two strings. Return the result strictly as a raw JSON object using this exact structure: {'htmlString': '', 'cssString': ''}. Do not use Markdown code blocks (no ```json or ```python). Do not include any conversational text. Ensure all keys and strings use double quotes for valid JSON compatibility."
-      }
+        prompt: ["Extract the information from the HTML and SCSS files into two strings. Return the result strictly as a raw JSON object using this exact structure: {'htmlString': '', 'cssString': ''}. Do not use Markdown code blocks (no ```json or ```python). Do not include any conversational text. Ensure all keys and strings use double quotes for valid JSON compatibility."]
+      };
     }
   
 }

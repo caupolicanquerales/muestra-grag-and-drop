@@ -2,9 +2,7 @@
     margin-top: -2%;
 }
 
-
-/* Color Definitions */
-    :root {
+   :root {
       --primary-blue: #1e3a8a;
       --secondary-teal: #14b8a6;
       --gray-bg: #f3f4f6;
@@ -13,14 +11,12 @@
       --error-red: #ef4444;
     }
 
-    /* 1. Main Wrapper - Screen Layout */
     .main-wrapper {
       min-height: 77vh;
       background-color: var(--gray-bg);
-      //display: flex;
       align-items: center;
       justify-content: center;
-      padding: 1rem; /* p-4 */
+      padding: 1rem;
     }
 
     .card-container {
@@ -75,13 +71,13 @@
 
     .prompt-input {
       width: 100%; 
-      height: 100%; 
       flex-grow: 1; 
       font-size: 1rem; 
       padding: 1rem; 
       padding-left: 40px; 
       padding-right: 4rem; 
-      padding-top: 8%;
+      padding-top: 1rem;
+      padding-bottom: 0;
       box-shadow: none;
       border: none;
       transition: border-color 0.15s ease-in-out; 
@@ -91,9 +87,10 @@
       pointer-events: auto; 
       z-index: 1; 
       background: aliceblue;
+      box-sizing: border-box;
+      display: block;   
     }
     
-    /* Custom focus state */
     .prompt-input:focus {
         outline: none;
         border-color: var(--primary-blue) !important; 

@@ -39,8 +39,8 @@ export class HttpClientService {
     return this.http.post<GenerationDataResponseInterface>(this.urlRoot+'generation/prompt', request);
   }
 
-  updatePromptForBasicTemplate(request: GenerationDataInterface): Observable<GenerationDataResponseInterface> {
-    return this.http.post<GenerationDataResponseInterface>(this.urlRoot+'basic-template/prompt', request);
+  updatePromptForBasicTemplate(request: GenerationImageInterface): Observable<GenerationDataResponseInterface> {
+    return this.http.post<GenerationDataResponseInterface>(this.urlRootImage+'basic-template/prompt', request);
   }
 
   sendingFileForGenerationData(request: FormData): Observable<GenerationDataResponseInterface> {
@@ -48,7 +48,7 @@ export class HttpClientService {
   }
 
   sendingFileForBasicTemplate(request: FormData): Observable<GenerationDataResponseInterface> {
-    return this.http.post<GenerationDataResponseInterface>(this.urlRoot+'basic-template/sending-files', request);
+    return this.http.post<GenerationDataResponseInterface>(this.urlRootImage+'basic-template/sending-files', request);
   }
 
   saveFileForGenerationData(request: FormData): Observable<GenerationDataResponseInterface> {
@@ -91,6 +91,10 @@ export class HttpClientService {
     return this.http.get<MongoResponseGlobalDefectInterface>(this.urlRootMongo+'mongo/all-global-defect');
   }
 
+  getPromptGenerationSystem(): Observable<MongoResponseAllImagePromptInterface> {
+    return this.http.get<MongoResponseAllImagePromptInterface>(this.urlRootMongo+'mongo/all-system-prompt');
+  }
+
   getBasicTemplateGeneration(): Observable<MongoResponseAllBasicTemplateInterface> {
     return this.http.get<MongoResponseAllBasicTemplateInterface>(this.urlRootMongo+'mongo/all-basic-template');
   }
@@ -105,6 +109,10 @@ export class HttpClientService {
 
   savePromptGenerationData(request: PromptGenerationImageInterface): Observable<PromptGenerationImageInterface> {
     return this.http.post<PromptGenerationImageInterface>(this.urlRootMongo+'mongo/save-data-prompt',request);
+  }
+
+  savePromptGenerationSystem(request: PromptGenerationImageInterface): Observable<PromptGenerationImageInterface> {
+    return this.http.post<PromptGenerationImageInterface>(this.urlRootMongo+'mongo/save-system-prompt',request);
   }
 
   saveSynteticDataGeneration(request: SyntheticDataInterface): Observable<SyntheticDataInterface> {
@@ -145,6 +153,10 @@ export class HttpClientService {
 
   deleteBasicTemplateById(request: BasicTemplateInterface): Observable<any> {
     return this.http.delete(this.urlRootMongo+'mongo/delete-basic-template', {body: request});
+  }
+
+  deletePromptSystemById(request: PromptGenerationImageInterface): Observable<any> {
+    return this.http.delete(this.urlRootMongo+'mongo/delete-system-prompt', {body: request});
   }
 
   getTemplates(): Observable<any> {

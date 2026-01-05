@@ -51,6 +51,12 @@
             "templateName": "bill-editor"
         }
     ],
+    "Constructor":[
+        {
+            "label": "Ingresar",
+            "templateName": "bill-constructor"
+        }
+    ],
     "Borrar prompt":[
         {
             "label": "Ingresar",

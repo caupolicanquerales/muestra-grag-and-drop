@@ -1,0 +1,99 @@
+<div class="main-wrapper">
+    <div class="header-container">
+        <h2 class="title">
+        {{ titleData }}
+        </h2>
+        <div class="flex-options">
+            <div class="radio-button">
+                <p-radiobutton name="promptOption" [inputId]="selectedOption" [value]="radioButton1" 
+                [(ngModel)]="selectedOption" size="small"
+                (change)="onRadioChange($event)" />
+                <label for="ingredient1" class="ml-2">{{radioButton1}}</label>
+            </div>
+            <div class="radio-button">
+                <p-radiobutton name="promptOption" [inputId]="selectedOption" [value]="radioButton2" 
+                [(ngModel)]="selectedOption" size="small" 
+                (change)="onRadioChange($event)"/>
+                <label for="ingredient2" class="ml-2">{{radioButton2}}</label>
+            </div>
+        </div>
+    </div>
+    <div class="card-container" >
+        @for (item of editors(); track item.id; let last = $last; let i = $index) { 
+            <ng-container *ngTemplateOutlet="editorTemplate; context: {
+                index: i, 
+                id: item.id, 
+                treeData: item.tree, 
+                promptValue: item.styledPrompt ,
+                item: item
+            }"></ng-container>
+
+            @if (!last) {
+            <hr>
+            }
+            @if (last) {
+                <div class="button-editor">
+                    <chat-buttons
+                    [eraseButton]="false"
+                    [saveButton]="false"
+                    [exportButton]="false"
+                    [copyButton]="false"
+                    [generateImageButton]="true"
+                    [generatePromptButton]="false"
+                    (submitGenerateImage)="generateImage($event)"
+                    ></chat-buttons>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+<ng-template #editorTemplate 
+  let-treeData="treeData" 
+  let-selection="selection" 
+  let-promptValue="promptValue" 
+  let-id="id"
+  let-item="item"
+  let-index="index"
+  >
+  <div class="editor-content-wrapper">
+    <div class="p-selector-group">
+        <p-tree [value]="treeData" class="w-full md:w-[30rem]" 
+            selectionMode="single"
+            (onNodeSelect)="nodeSelect($event, item, item.id)">
+            <ng-template let-node pTemplate="default">
+                <span [ngStyle]="node.style" [class.p-disabled]="node.selectable === false">
+                    {{ node.label }}
+                </span>
+            </ng-template>
+        </p-tree>
+    </div>
+
+    <div class="textare-button-group">
+        <div class="relative-container">
+            <div 
+                #editorRef
+                [id]="id" 
+                [innerHTML]="promptValue"
+                (input)="updatePromptFromContentEditable($event, item)" 
+                contenteditable="true"
+                placeholder="placeHolder"
+                class="prompt-input"
+                [ngClass]="{'input-focus-ring': isFocused()}"
+                (blur)="isFocused.set(false)">
+            </div>
+        </div>
+        <div class="button-editor">
+            <chat-buttons
+            [eraseButton]="true"
+            [saveButton]="false"
+            [exportButton]="false"
+            [copyButton]="false"
+            [generateImageButton]="false"
+            [generatePromptButton]="false"
+            (submitEraseTextEmitter)="emitEraseText($event, index)"
+            ></chat-buttons>
+        </div>
+    </div>
+  </div>
+</ng-template>

@@ -5,18 +5,20 @@
             {{ titleData }}
             </h2>
             <div class="flex-options">
-                <div class="radio-button">
-                    <p-radiobutton name="promptOption" [inputId]="selectedOption" [value]="radioButton1" 
-                    [(ngModel)]="selectedOption" size="small"
-                    (change)="onRadioChange($event)" />
-                    <label for="ingredient1" class="ml-2">{{radioButton1}}</label>
-                </div>
-                <div class="radio-button">
-                    <p-radiobutton name="promptOption" [inputId]="selectedOption" [value]="radioButton2" 
-                    [(ngModel)]="selectedOption" size="small" 
-                    (change)="onRadioChange($event)"/>
-                    <label for="ingredient2" class="ml-2">{{radioButton2}}</label>
-                </div>
+                @for (option of optionsRadioButton; track option.id) {
+                    <div class="radio-button">
+                    <p-radiobutton 
+                        name="promptOption" 
+                        [inputId]="option.id" 
+                        [value]="option.label" 
+                        [(ngModel)]="selectedOption" 
+                        size="small"
+                        (change)="onRadioChange($event)" />
+                    <label [for]="option.id" class="ml-2">
+                        {{ option.label }}
+                    </label>
+                    </div>
+                }
             </div>
         </div>
         <div class="editor-content-wrapper">
@@ -55,7 +57,7 @@
             [headerDialog]="headerDialog"
             [eraseButton]="true"
             [generateImageButton]="generateImageButton"
-            [generatePromptButton]="true"
+            [generatePromptButton]="generatePromptButton"
             [arrayPromptAndData]="promptAndDataToValidate"
             (submitDownloadFileEmitter)="exportInformation($event)"
             (submitCopyTextEmitter)="submitCopyText($event)"

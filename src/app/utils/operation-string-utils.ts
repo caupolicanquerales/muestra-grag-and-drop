@@ -12,14 +12,15 @@ export function removeColorContent(htmlString: string, color: string): string {
 }
 
 export function removeTagHtmlToText(htmlString: string): string {
+    if (!htmlString) return '';
     const tempDiv = document.createElement('div');
     let processedHtml = htmlString
         .replace(/<br\s*\/?>/gi, '\n')
-        .replace(/<\/p>/gi, '\n\n')
+        .replace(/<\/p>/gi, '\n')
         .replace(/<\/li>/gi, '\n')
-        .replace(/<\/h[1-6]>/gi, '\n\n');
+        .replace(/<\/h[1-6]>/gi, '\n');
+
     tempDiv.innerHTML = processedHtml;
     let cleanText = tempDiv.textContent || tempDiv.innerText || '';
-    cleanText = cleanText.replace(/\n\s*\n/g, '\n\n').trim();
-    return cleanText;
+    return cleanText.replace(/\n\s*\n/g, '\n').replace(/^\s+|\s+$/g, '');
 }

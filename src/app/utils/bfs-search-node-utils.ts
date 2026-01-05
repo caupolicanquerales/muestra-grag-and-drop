@@ -1,4 +1,5 @@
 import { MenuItem, TreeNode } from "primeng/api";
+import { TypePromptEnum } from "../enums/type-prompt-enum";
 
 export function bfsSearchNodeToInsertFunctionCommand(root: any, handlerFunction: any, prompts: MenuItem[], promptLabel: string): MenuItem[] {
       if (!root) {
@@ -38,4 +39,43 @@ export function searchNodeToDisableNode(tree: any[], nodeNames: Array<string>): 
         }
       }
     return tree;
+}
+
+export function removeNodeChild(tree: any[], key: string): MenuItem[] {
+      if (!tree) {
+          return [];
+      }
+      let children= tree[0]?.children;
+      if(children!=undefined){
+        let newChildren= children.filter((child: MenuItem)=>child?.['key']!=key);
+        tree[0]['children']= newChildren;
+      }
+    return tree;
+}
+
+export function orderChildren(children:any, orderMap: any){
+      children.sort((a:any, b:any) => {
+        const aIndex = orderMap[a?.key];
+        const bIndex = orderMap[b?.key];
+        if (aIndex === undefined) return 1;
+        if (bIndex === undefined) return -1;
+        return aIndex - bIndex;
+      });
+    return children;
+}
+
+export function orderOtherPrompts(){
+    return [TypePromptEnum.BILL_PROMPT,
+        TypePromptEnum.IMAGE_PROMPT,
+        TypePromptEnum.SYSTEM_PROMPT,
+        ,TypePromptEnum.SYNTHETIC_DATA,
+        TypePromptEnum.DATA_PROMPT,
+        TypePromptEnum.GLOBAL_DEFECT_PROMPT,
+      TypePromptEnum.BASIC_TEMPLATE];
+}
+
+export function getMapOrder(array: Array<any>){
+  let orderMap: any = {};
+  array.forEach((name, index) => {orderMap[name] = index;});
+  return orderMap;
 }

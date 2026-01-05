@@ -52,6 +52,7 @@ export class BillMenu implements OnInit, OnDestroy{
     this.executingRestFulService.getAllBasicTemplate();
     this.executingRestFulService.getAllPromptGlobalDefect();
     this.executingRestFulService.getAllGlobalDefects();
+    this.executingRestFulService.getAllPromptSystem();
     this.serviceGeneral.isUploadingAnimation$.pipe(takeUntil(this.destroy$)).subscribe(data=>this.isUploading.set(data));
     this.serviceGeneral.promptImages$.pipe(takeUntil(this.destroy$)).subscribe(data=>this.setPromptImagesFromObservable(data));
     this.serviceGeneral.promptBills$.pipe(takeUntil(this.destroy$)).subscribe(data=>this.setPromptBillsFromObservable(data));

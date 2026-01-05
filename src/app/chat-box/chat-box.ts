@@ -51,7 +51,7 @@ export class ChatBox implements OnInit, OnDestroy{
   set prompt(value: string | undefined) {
     if (value !== undefined) {
         const text= removeTagHtmlToText(value);
-        this.promptInput.set(text);
+        this.promptInput.set(text.trim());
         setTimeout(() => {
             this.resizeTextarea();
         }, 0);
@@ -93,11 +93,14 @@ export class ChatBox implements OnInit, OnDestroy{
   }
 
   resizeTextarea(): void {
+    setTimeout(() => {
     const el = document.getElementById('prompt-input') as HTMLTextAreaElement;
-    if (el) {
-      el.style.height = 'auto';
-      el.style.height = el.scrollHeight + 'px';
-    }
+      if (el) {
+        el.style.height = 'auto';
+        const newHeight = Math.ceil(el.scrollHeight);
+        el.style.height = `${newHeight}px`;
+      }
+    }, 270);
   }
 
   private resizeTextAreAfter(resize: boolean): void{

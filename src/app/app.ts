@@ -34,6 +34,7 @@ export class App implements OnInit, OnDestroy, AfterViewInit{
   private imageIds: Array<any>=[];
   private mimeType: string = 'image/png';
   private destroy$ = new Subject<void>();
+  private flagToStartBasicTemplate: string= "Basic Template generation started for prompt";
   
   constructor(private serviceGeneral: ServiceGeneral, private receiveData:ReceiveDataService,
     private httpClient: HttpClientService, private convertBase64Byte: ConvertBase64ByteService,
@@ -46,10 +47,11 @@ export class App implements OnInit, OnDestroy, AfterViewInit{
     this.serviceGeneral.refreshSyntheticData$.pipe(takeUntil(this.destroy$)).subscribe(data=>this.getAllSyntheticData(data));
     this.serviceGeneral.refreshBasicTemplate$.pipe(takeUntil(this.destroy$)).subscribe(data=>this.getAllBasicTemplateData(data));
     this.serviceGeneral.refreshPromptGlobalDefect$.pipe(takeUntil(this.destroy$)).subscribe(data=>this.getAllPromptGlobalDefect(data));
+    this.serviceGeneral.refreshPromptSystem$.pipe(takeUntil(this.destroy$)).subscribe(data=>this.getAllPromptSystem(data));
     this.serviceGeneral.imageIds$.pipe(takeUntil(this.destroy$)).subscribe(data=>this.imageIds=data);
     this.serviceGeneral.toastMessage$.pipe(takeUntil(this.destroy$)).subscribe(data=>this.messageService.add(data));
     this.serviceGeneral.activateChatClientStream$.pipe(takeUntil(this.destroy$)).pipe(take(2)).subscribe(data=>this.setSubscriptionToDataReceiver(data));
-    this.serviceGeneral.activateBasicTemplateStream$.pipe(takeUntil(this.destroy$)).pipe(take(2)).subscribe(data=>this.setSubscriptionToBasicTemplateReceiver(data));
+    this.serviceGeneral.activateBasicTemplateStream$.pipe(takeUntil(this.destroy$)).subscribe(data=>this.setSubscriptionToBasicTemplateReceiver(data));
     this.serviceGeneral.activateUploadDocumentStream$.pipe(takeUntil(this.destroy$)).pipe(take(2)).subscribe(data=>this.setSubscriptionToFileReceiver(data));
     this.serviceGeneral.executingImageStream$.pipe(takeUntil(this.destroy$)).subscribe(data=> this.setSubscriptionToImageReceiver(data));
     this.serviceGeneral.changeComponent$.pipe(takeUntil(this.destroy$)).subscribe(data=>{
@@ -121,9 +123,9 @@ export class App implements OnInit, OnDestroy, AfterViewInit{
       this.subscriptionsFile.add(
         this.receiveData.getDataStreamBasicTemplate().subscribe({
           next: (response) => {
-            let json= response.data.message.replace("```json","");
-            let cleanJson= json.replace("```","");
-            this.catchErrorInJsonTransformation(cleanJson);
+            if(response!=this.flagToStartBasicTemplate){
+              this.catchErrorInJsonTransformation(response);
+            }
           },
           error: (err) =>{
             this.setToastMessage('error', 'Error en el procesamiento de los archivos');
@@ -205,6 +207,12 @@ export class App implements OnInit, OnDestroy, AfterViewInit{
   private getAllPromptGlobalDefect(event: string){
     if(event!=''){
       this.executingRestFulService.getAllPromptGlobalDefect();
+    }
+  }
+
+  private getAllPromptSystem(event: string){
+    if(event!=''){
+      this.executingRestFulService.getAllPromptSystem();
     }
   }
 

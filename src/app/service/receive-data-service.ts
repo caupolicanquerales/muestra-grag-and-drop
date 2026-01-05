@@ -16,7 +16,7 @@ export class ReceiveDataService {
 
   private readonly DATA_URL_FILE = 'http://localhost:8080/qdrant/stream-file';
 
-  private readonly DATA_URL_BASIC_TEMPLATE = 'http://localhost:8080/basic-template/stream-basic-template';
+  private readonly DATA_URL_BASIC_TEMPLATE = 'http://localhost:8081/basic-template/stream-basic-template';
 
   private readonly DATA_URL_IMAGE = 'http://localhost:8081/image/stream-image';
 
@@ -31,7 +31,7 @@ export class ReceiveDataService {
       return this.sseFileService.connect(this.DATA_URL_FILE);
   }
 
-  public getDataStreamBasicTemplate(): Observable<ServerSentEvent<DataMessage>> {
+  public getDataStreamBasicTemplate(): Observable<any> {
       return this.sseBasicTemplateService.connect(this.DATA_URL_BASIC_TEMPLATE);
   }
 

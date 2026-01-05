@@ -41,6 +41,9 @@ export class ServiceGeneral {
   private executingImageStream = new BehaviorSubject<boolean>(false);
   executingImageStream$: Observable<boolean> = this.executingImageStream.asObservable();
 
+  private executingBasicTemplateStream = new BehaviorSubject<boolean>(false);
+  executingBasicTemplateStream$: Observable<boolean> = this.executingBasicTemplateStream.asObservable();
+  
   private imageIds = new BehaviorSubject<Array<any>>([]);
   imageIds$: Observable<Array<any>> = this.imageIds.asObservable();
 
@@ -49,6 +52,9 @@ export class ServiceGeneral {
 
   private promptBills = new BehaviorSubject<Array<PromptGenerationImageInterface>>([]);
   promptBills$: Observable<Array<PromptGenerationImageInterface>> = this.promptBills.asObservable();
+
+  private promptSystem = new BehaviorSubject<Array<PromptGenerationImageInterface>>([]);
+  promptSystem$: Observable<Array<PromptGenerationImageInterface>> = this.promptSystem.asObservable();
 
   private promptData = new BehaviorSubject<Array<PromptGenerationImageInterface>>([]);
   promptData$: Observable<Array<PromptGenerationImageInterface>> = this.promptData.asObservable();
@@ -82,6 +88,9 @@ export class ServiceGeneral {
 
   private refreshPromptGlobalDefect = new BehaviorSubject<string>('');
   refreshPromptGlobalDefect$: Observable<string> = this.refreshPromptGlobalDefect.asObservable();
+
+  private refreshPromptSystem = new BehaviorSubject<string>('');
+  refreshPromptSystem$: Observable<string> = this.refreshPromptSystem.asObservable();
 
   private activateBasicTemplateStream = new BehaviorSubject<boolean>(false);
   activateBasicTemplateStream$: Observable<boolean> = this.activateBasicTemplateStream.asObservable();
@@ -141,6 +150,10 @@ export class ServiceGeneral {
     this.executingImageStream.next(executingImageStream);
   }
 
+  setExecutingBasicTemplatStream(executingBasicTemplateStream:boolean): void{
+    this.executingBasicTemplateStream.next(executingBasicTemplateStream);
+  }
+
   setImageIds(imageIds:Array<any>): void{
     this.imageIds.next(imageIds);
   }
@@ -151,6 +164,10 @@ export class ServiceGeneral {
 
   setPromptBills(promptBills:Array<PromptGenerationImageInterface>): void{
     this.promptBills.next(promptBills);
+  }
+
+  setPromptSystem(promptSystem:Array<PromptGenerationImageInterface>): void{
+    this.promptSystem.next(promptSystem);
   }
 
   setPromptData(promptData:Array<PromptGenerationImageInterface>): void{
@@ -199,6 +216,10 @@ export class ServiceGeneral {
 
   setRefreshPromptGlobalDefect(refresh:string): void{
     this.refreshPromptGlobalDefect.next(refresh);
+  }
+
+  setRefreshPromptSystem(refresh:string): void{
+    this.refreshPromptSystem.next(refresh);
   }
 
   setActivateBasicTemplateStream(activateBasicTemplate:boolean): void{
