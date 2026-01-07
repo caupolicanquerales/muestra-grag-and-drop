@@ -67,7 +67,7 @@ export class BillTemplate implements OnInit, OnDestroy{
   }
 
   ngOnDestroy(): void {
-    this.serviceGeneral.setBasicTemplate({});
+    this.serviceGeneral.setBasicTemplate('');
     this.serviceGeneral.setActivateBasicTemplateStream(false);
     this.destroy$.next();
     this.destroy$.complete();

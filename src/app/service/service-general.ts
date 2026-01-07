@@ -65,6 +65,9 @@ export class ServiceGeneral {
   private syntheticData = new BehaviorSubject<Array<SyntheticDataInterface>>([]);
   syntheticData$: Observable<Array<SyntheticDataInterface>> = this.syntheticData.asObservable();
 
+  private publicityData = new BehaviorSubject<Array<SyntheticDataInterface>>([]);
+  publicityData$: Observable<Array<SyntheticDataInterface>> = this.publicityData.asObservable();
+
   private basicTemplateData = new BehaviorSubject<Array<BasicTemplateInterface>>([]);
   basicTemplateData$: Observable<Array<BasicTemplateInterface>> = this.basicTemplateData.asObservable();
 
@@ -82,6 +85,9 @@ export class ServiceGeneral {
 
   private refreshSyntheticData = new BehaviorSubject<string>('');
   refreshSyntheticData$: Observable<string> = this.refreshSyntheticData.asObservable();
+
+  private refreshPublicityData = new BehaviorSubject<string>('');
+  refreshPublicityData$: Observable<string> = this.refreshPublicityData.asObservable();
 
   private refreshBasicTemplate = new BehaviorSubject<string>('');
   refreshBasicTemplate$: Observable<string> = this.refreshBasicTemplate.asObservable();
@@ -186,6 +192,10 @@ export class ServiceGeneral {
     this.syntheticData.next(syntheticData);
   }
 
+  setPublicityData(publicityData:Array<SyntheticDataInterface>): void{
+    this.publicityData.next(publicityData);
+  }
+
   setBasicTemplateData(basicTemplateData:Array<BasicTemplateInterface>): void{
     this.basicTemplateData.next(basicTemplateData);
   }
@@ -208,6 +218,10 @@ export class ServiceGeneral {
 
   setRefreshSyntheticData(refresh:string): void{
     this.refreshSyntheticData.next(refresh);
+  }
+
+  setRefreshPublicityData(refresh:string): void{
+    this.refreshPublicityData.next(refresh);
   }
 
   setRefreshBasicTemplate(refresh:string): void{

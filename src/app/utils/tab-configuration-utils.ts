@@ -22,7 +22,8 @@ export function getConfigurationTabDeletePrompt(){
         TabDeletePromptCategory.DATA,
         TabDeletePromptCategory.BILL,
         TabDeletePromptCategory.SYSTEM,
-        TabDeletePromptCategory.SYNTHETIC];
+        TabDeletePromptCategory.SYNTHETIC,
+        TabDeletePromptCategory.PUBLICITY];
 }
 
 export function getDeletePromptTabName(){
@@ -31,7 +32,8 @@ export function getDeletePromptTabName(){
       [TabDeletePromptCategory.DATA]:"Prompt dato",
       [TabDeletePromptCategory.BILL]:"Prompt factura",
       [TabDeletePromptCategory.SYSTEM]:"Prompt sistema",
-      [TabDeletePromptCategory.SYNTHETIC]:"Dato sintético"
+      [TabDeletePromptCategory.SYNTHETIC]:"Dato sintético",
+      [TabDeletePromptCategory.PUBLICITY]:"Dato publicidad"
     }
 }
 
@@ -41,7 +43,8 @@ export function getHeaderDialogTitle(){
       [TabDeletePromptCategory.DATA]:"Esta por eliminar un prompt dato",
       [TabDeletePromptCategory.BILL]:"Esta por eliminar un prompt factura",
       [TabDeletePromptCategory.SYSTEM]:"Esta por eliminar un prompt sistema",
-      [TabDeletePromptCategory.SYNTHETIC]:"Esta por eliminar un dato sintético"
+      [TabDeletePromptCategory.SYNTHETIC]:"Esta por eliminar un dato sintético",
+      [TabDeletePromptCategory.PUBLICITY]:"Esta por eliminar un dato publicidad"
     }
 }
 
@@ -50,7 +53,8 @@ export enum TabDeletePromptCategory {
   DATA = 'data',
   BILL = 'bill',
   SYNTHETIC= 'synthetic',
-  SYSTEM= 'system'
+  SYSTEM= 'system',
+  PUBLICITY= 'publicity'
 }
 
 export enum TabGlobalDfectCategory {

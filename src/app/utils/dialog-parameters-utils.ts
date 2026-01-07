@@ -40,12 +40,14 @@ export function getHeaderDialogToBillEditor(): Array<any> {
         {format: TypePromptEnum.BILL_PROMPT,
             headerDialog: "Prompt a ser guardado en factura"},
         {format: TypePromptEnum.SYNTHETIC_DATA,
-            headerDialog: "Información a ser guardado en dato sintético"}];
+            headerDialog: "Información a ser guardado en dato sintético"},
+        {format: TypePromptEnum.PUBLICITY_DATA,
+            headerDialog: "Información a ser guardado en dato publicidad"}];
 }
 
 export function getSaveFormartPromptForOther(): Array<any> {
     return [{format: TypePromptEnum.IMAGE_PROMPT},{format: TypePromptEnum.DATA_PROMPT},{format: TypePromptEnum.BILL_PROMPT},
-    {format: TypePromptEnum.SYNTHETIC_DATA}
+    {format: TypePromptEnum.SYNTHETIC_DATA}, {format: TypePromptEnum.PUBLICITY_DATA}
   ];
 }
 

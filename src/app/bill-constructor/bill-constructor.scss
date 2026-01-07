@@ -30,19 +30,17 @@
 
 .prompt-input {
     width: 100%;
-    min-width: 100%; 
     box-sizing: border-box;
     display: block;
     font-size: 1rem; 
-    padding: 1rem 4rem 1rem 40px;
-    overflow-x: auto; 
-    overflow-y: auto;   
+    padding: 1rem 4rem 1rem 40px;    
+    overflow-y: hidden;  
+    min-height: 15rem;;  
+    height: auto;            
     background: aliceblue;
     color: #333;
-    min-height: 15rem;
     outline: none;
     border: none;
-    resize: none;
 }
 
 .editor-content-wrapper {

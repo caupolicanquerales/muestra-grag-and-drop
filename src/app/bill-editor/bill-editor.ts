@@ -11,10 +11,10 @@ import { Subject, takeUntil } from 'rxjs';
 import { SyntheticDataInterface } from '../models/synthetic-data-interface';
 import { PromptAndDataToValidateInterface } from '../models/prompts-and-data-to-validate-interface';
 import { getHeaderDialogToBillEditor, getExportFormatToBillEditor, getSaveFormartPromptForSystem, getSaveFormartPromptForData, getSaveFormartPromptForOther, getHeaderDialogToSystem, getHeaderDialogToData } from '../utils/dialog-parameters-utils';
-import { buildMainNode, getMainNode } from '../utils/tree-prompt-utils';
+import { buildMainNode, disablePrompts, setChildInTree } from '../utils/tree-prompt-utils';
 import { TreeModule } from 'primeng/tree';
 import { TreeNode } from 'primeng/api';
-import { getMapOrder, orderChildren, orderOtherPrompts, removeNodeChild, searchNodeToDisableNode } from '../utils/bfs-search-node-utils'
+import { getMapOrder } from '../utils/bfs-search-node-utils'
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { BasicTemplateInterface } from '../models/basic-template-interface';
 import { TypePromptEnum } from '../enums/type-prompt-enum';
@@ -50,10 +50,8 @@ export class BillEditor implements OnInit, OnDestroy {
   generateImageButton: boolean= true;
   generatePromptButton: boolean= true;
   private htmlCss: string="";
-  private orderOtherPrompt= orderOtherPrompts();
-  private typeOtherPrompts: Array<string> =[TypePromptEnum.BILL_PROMPT,TypePromptEnum.IMAGE_PROMPT
-        ,TypePromptEnum.SYNTHETIC_DATA,TypePromptEnum.GLOBAL_DEFECT_PROMPT,TypePromptEnum.BASIC_TEMPLATE];
   private orderMap: any = {};
+  private amountTypePrompts: number= 8;
 
   @ViewChild('editorRef') editorRef!: ElementRef<HTMLDivElement>;
   
@@ -61,33 +59,43 @@ export class BillEditor implements OnInit, OnDestroy {
     private executingRestFulService: ExecutingRestFulService){}
 
   ngOnInit(): void {
-    this.orderMap= getMapOrder(this.orderOtherPrompt);
+    this.orderMap= getMapOrder();
     this.selectedOption=this.optionsRadioButton[2]['label'];
     this.serviceGeneral.setImageGenerated('');
     this.headerDialog= getHeaderDialogToBillEditor();
     this.itemsSavePrompt= getSaveFormartPromptForOther();
     this.itemsExportPrompt= getExportFormatToBillEditor();
     this.serviceGeneral.promptImages$.pipe(takeUntil(this.destroy$)).subscribe(data=>{
-      this.setChildInTree(TypePromptEnum.IMAGE_PROMPT,data,this.orderOtherPrompt);
+      this.backUpTree= setChildInTree(this.tree,this.backUpTree,TypePromptEnum.IMAGE_PROMPT,data,this.orderMap);
+      this.tree= this.setDisablePrompts();
     });
     this.serviceGeneral.promptBills$.pipe(takeUntil(this.destroy$)).subscribe(data=>{
-      this.setChildInTree(TypePromptEnum.BILL_PROMPT,data,this.orderMap);
+      this.backUpTree= setChildInTree(this.tree,this.backUpTree,TypePromptEnum.BILL_PROMPT,data,this.orderMap);
+      this.tree= this.setDisablePrompts();
     });
     this.serviceGeneral.promptData$.pipe(takeUntil(this.destroy$)).subscribe(data=>{
-      this.setChildInTree(TypePromptEnum.DATA_PROMPT,data,this.orderMap);
+      this.backUpTree= setChildInTree(this.tree,this.backUpTree,TypePromptEnum.DATA_PROMPT,data,this.orderMap);
+      this.tree= this.setDisablePrompts();
     });
     this.serviceGeneral.syntheticData$.pipe(takeUntil(this.destroy$)).subscribe(data=>{
-      this.setChildInTree(TypePromptEnum.SYNTHETIC_DATA,data,this.orderMap);
+      this.backUpTree= setChildInTree(this.tree,this.backUpTree,TypePromptEnum.SYNTHETIC_DATA,data,this.orderMap);
+      this.tree= this.setDisablePrompts();
+    });
+    this.serviceGeneral.publicityData$.pipe(takeUntil(this.destroy$)).subscribe(data=>{
+      this.backUpTree= setChildInTree(this.tree,this.backUpTree,TypePromptEnum.PUBLICITY_DATA,data,this.orderMap);
+      this.tree= this.setDisablePrompts();
     });
     this.serviceGeneral.promptGlobalDefect$.pipe(takeUntil(this.destroy$)).subscribe(data=>{
-      this.setChildInTree(TypePromptEnum.GLOBAL_DEFECT_PROMPT,data,this.orderMap);
+      this.backUpTree= setChildInTree(this.tree,this.backUpTree,TypePromptEnum.GLOBAL_DEFECT_PROMPT,data,this.orderMap);
+      this.tree= this.setDisablePrompts();
     });
     this.serviceGeneral.promptSystem$.pipe(takeUntil(this.destroy$)).subscribe(data=>{
-      this.setChildInTree(TypePromptEnum.SYSTEM_PROMPT,data,this.orderMap);
+      this.backUpTree= setChildInTree(this.tree,this.backUpTree,TypePromptEnum.SYSTEM_PROMPT,data,this.orderMap);
+      this.tree= this.setDisablePrompts();
     });
     this.serviceGeneral.basicTemplateData$.pipe(takeUntil(this.destroy$)).subscribe(data=>{
-      this.setChildInTree(TypePromptEnum.BASIC_TEMPLATE,data,this.orderMap);
-      this.tree= this.setDisableNodeInTree(this.tree,[TypePromptEnum.DATA_PROMPT, TypePromptEnum.SYSTEM_PROMPT]);
+      this.backUpTree= setChildInTree(this.tree,this.backUpTree,TypePromptEnum.BASIC_TEMPLATE,data,this.orderMap);
+      this.tree= this.setDisablePrompts();
     });
     this.serviceGeneral.basicTemplate$.pipe(takeUntil(this.destroy$)).subscribe(data=>this.setBasicTemplateToEditor(data));
   }
@@ -183,6 +191,10 @@ export class BillEditor implements OnInit, OnDestroy {
       const request= this.getSyntheticRequest(textToCopy, $event.name);
       this.executingRestFulService.saveSyntheticData(request);
     }
+    if($event?.typePrompt==TypePromptEnum.PUBLICITY_DATA){
+      const request= this.getSyntheticRequest(textToCopy, $event.name);
+      this.executingRestFulService.savePublicityData(request);
+    }
     if($event?.typePrompt==TypePromptEnum.SYSTEM_PROMPT){
       this.executingRestFulService.savePromptSystem(request);
     }
@@ -217,19 +229,6 @@ export class BillEditor implements OnInit, OnDestroy {
     this.serviceGeneral.setChangeComponent('generate-data');
   }
 
-  private setChildrenInTreeNode(label: string, type: string, 
-    data: Array<PromptGenerationImageInterface> | Array<SyntheticDataInterface> | Array<BasicTemplateInterface>){
-    let mother= this.tree[0];
-    let mainNode= getMainNode(label,type,data);
-    mother.children?.push(mainNode);
-    return this.convertJSON([mother]);
-  }
-
-  private setDisableNodeInTree(tree: TreeNode[],nodeNames: Array<string>){
-    const treeModified= searchNodeToDisableNode(tree,nodeNames);
-    return JSON.parse(JSON.stringify(treeModified));
-  }
-
   nodeSelect($event: any){
      if(this.selectedNode?.data?.type==TypePromptEnum.BILL_PROMPT){
       this.setColorText(this.selectedNode?.data, "rgb(0, 0, 139)");
@@ -242,7 +241,8 @@ export class BillEditor implements OnInit, OnDestroy {
     }
     if(this.selectedNode?.data?.type==TypePromptEnum.SYNTHETIC_DATA ||
       this.selectedNode?.data?.type==TypePromptEnum.SYSTEM_PROMPT ||
-      this.selectedNode?.data?.type==TypePromptEnum.GLOBAL_DEFECT_PROMPT
+      this.selectedNode?.data?.type==TypePromptEnum.GLOBAL_DEFECT_PROMPT ||
+      this.selectedNode?.data?.type==TypePromptEnum.PUBLICITY_DATA
     ){
       this.setColorText(this.selectedNode?.data, "rgb(0, 0, 0)");
     }
@@ -253,28 +253,24 @@ export class BillEditor implements OnInit, OnDestroy {
   }
 
   onRadioChange($event:any){
-    let typePrompts=[];
     let backUp= JSON.parse(this.backUpTree);
     this.emitEraseText(null);
     this.generateImageButton=false;
     this.generatePromptButton=false;
     if(this.selectedOption==this.optionsRadioButton[2]['label']){
-      typePrompts=[TypePromptEnum.DATA_PROMPT, TypePromptEnum.SYSTEM_PROMPT];
       this.generateImageButton=true;
       this.generatePromptButton=true;
       this. itemsSavePrompt=getSaveFormartPromptForOther();
       this.headerDialog= getHeaderDialogToBillEditor();
     }else if(this.selectedOption==this.optionsRadioButton[1]['label']){
-      typePrompts=[...[TypePromptEnum.DATA_PROMPT],...this.typeOtherPrompts];
       this. itemsSavePrompt=getSaveFormartPromptForSystem();
       this.headerDialog= getHeaderDialogToSystem();
     }else{
-      typePrompts=[...[TypePromptEnum.SYSTEM_PROMPT],...this.typeOtherPrompts];
       this.itemsSavePrompt=getSaveFormartPromptForData();
       this.headerDialog= getHeaderDialogToData();
       this.generatePromptButton=true;
     }
-    this.tree= this.setDisableNodeInTree(backUp,typePrompts);
+    this.tree= disablePrompts(backUp,this.selectedOption, this.amountTypePrompts);
   }
 
   private getBasicTemplateInterface($event:any):BasicTemplateInterface{
@@ -293,21 +289,8 @@ export class BillEditor implements OnInit, OnDestroy {
     } 
   }
 
-  private setChildInTree(typePrompt: string,  data: Array<PromptGenerationImageInterface> | Array<SyntheticDataInterface> | Array<BasicTemplateInterface>,
-    orderPrompt: any){
-    this.tree= removeNodeChild(this.tree,typePrompt);
-    this.tree= this.setChildrenInTreeNode(typePrompt, typePrompt, data);
-    let array= this.tree[0].children;
-    const children = orderChildren(array, orderPrompt);
-    this.tree[0].children= children;
-    this.backUpTree= JSON.stringify(this.tree);
-  }
-
-  private convertJSON(tree: any){
-    let backup= JSON.stringify(this.tree, (key, value) => {
-      if (key === 'parent') return undefined;
-      return value;
-    });
-    return JSON.parse(backup);
+  private setDisablePrompts():TreeNode[]{
+    let tree= JSON.parse(this.backUpTree);
+    return disablePrompts(tree,this.selectedOption, this.amountTypePrompts);
   }
 }

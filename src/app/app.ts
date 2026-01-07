@@ -48,6 +48,7 @@ export class App implements OnInit, OnDestroy, AfterViewInit{
     this.serviceGeneral.refreshBasicTemplate$.pipe(takeUntil(this.destroy$)).subscribe(data=>this.getAllBasicTemplateData(data));
     this.serviceGeneral.refreshPromptGlobalDefect$.pipe(takeUntil(this.destroy$)).subscribe(data=>this.getAllPromptGlobalDefect(data));
     this.serviceGeneral.refreshPromptSystem$.pipe(takeUntil(this.destroy$)).subscribe(data=>this.getAllPromptSystem(data));
+    this.serviceGeneral.refreshPublicityData$.pipe(takeUntil(this.destroy$)).subscribe(data=>this.getAllPublicityData(data));
     this.serviceGeneral.imageIds$.pipe(takeUntil(this.destroy$)).subscribe(data=>this.imageIds=data);
     this.serviceGeneral.toastMessage$.pipe(takeUntil(this.destroy$)).subscribe(data=>this.messageService.add(data));
     this.serviceGeneral.activateChatClientStream$.pipe(takeUntil(this.destroy$)).pipe(take(2)).subscribe(data=>this.setSubscriptionToDataReceiver(data));
@@ -195,6 +196,12 @@ export class App implements OnInit, OnDestroy, AfterViewInit{
   private getAllSyntheticData(event: string){
     if(event!=''){
       this.executingRestFulService.getAllSyntheticData();
+    }
+  }
+
+  private getAllPublicityData(event: string){
+    if(event!=''){
+      this.executingRestFulService.getAllPublicityData();
     }
   }
 

@@ -87,6 +87,10 @@ export class HttpClientService {
     return this.http.get<MongoResponseAllSyntheticDataInterface>(this.urlRootMongo+'mongo/all-synthetic-data');
   }
 
+  getPublicitycDataGeneration(): Observable<MongoResponseAllSyntheticDataInterface> {
+    return this.http.get<MongoResponseAllSyntheticDataInterface>(this.urlRootMongo+'mongo/all-publicity-data');
+  }
+
   getGlobalDefects(): Observable<MongoResponseGlobalDefectInterface> {
     return this.http.get<MongoResponseGlobalDefectInterface>(this.urlRootMongo+'mongo/all-global-defect');
   }
@@ -119,6 +123,10 @@ export class HttpClientService {
     return this.http.post<SyntheticDataInterface>(this.urlRootMongo+'mongo/save-synthetic-data',request);
   }
 
+  savePublicityDataGeneration(request: SyntheticDataInterface): Observable<SyntheticDataInterface> {
+    return this.http.post<SyntheticDataInterface>(this.urlRootMongo+'mongo/save-publicity-data',request);
+  }
+
   saveBasicTemplate(request: BasicTemplateInterface): Observable<BasicTemplateInterface> {
     return this.http.post<BasicTemplateInterface>(this.urlRootMongo+'mongo/save-basic-template',request);
   }
@@ -149,6 +157,10 @@ export class HttpClientService {
 
   deleteSyntheticDataById(request: SyntheticDataInterface): Observable<any> {
     return this.http.delete(this.urlRootMongo+'mongo/delete-synthetic-data', {body: request});
+  }
+
+  deletePublicityDataById(request: SyntheticDataInterface): Observable<any> {
+    return this.http.delete(this.urlRootMongo+'mongo/delete-publicity-data', {body: request});
   }
 
   deleteBasicTemplateById(request: BasicTemplateInterface): Observable<any> {

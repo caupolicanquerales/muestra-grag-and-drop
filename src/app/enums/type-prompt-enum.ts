@@ -5,5 +5,6 @@ export enum TypePromptEnum {
   SYNTHETIC_DATA= 'Dato sintético',
   BASIC_TEMPLATE='Template básico',
   GLOBAL_DEFECT_PROMPT='Prompt defecto global',
-  SYSTEM_PROMPT='Prompt sistema'
+  SYSTEM_PROMPT='Prompt sistema',
+  PUBLICITY_DATA='Dato publicidad'
 }

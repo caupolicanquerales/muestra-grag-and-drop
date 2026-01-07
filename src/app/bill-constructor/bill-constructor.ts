@@ -1,5 +1,5 @@
 import { CommonModule, NgClass } from '@angular/common';
-import { Component, ElementRef, HostListener, OnDestroy, OnInit, QueryList, signal, ViewChildren } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, QueryList, signal, ViewChildren } from '@angular/core';
 import { TreeNode } from 'primeng/api';
 import { TreeModule } from 'primeng/tree';
 import { ServiceGeneral } from '../service/service-general';
@@ -14,14 +14,8 @@ import { TypePromptEnum } from '../enums/type-prompt-enum';
 import { ChatButtons } from '../chat-buttons/chat-buttons';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { FormsModule } from '@angular/forms';
-import { getSystemPrompt } from '../utils/system-prompt-utils';
-
-interface EditorConfig {
-  id: string;
-  tree: any[]; 
-  styledPrompt: string;
-  typePrompt: string;
-}
+import { getSystemPromptWithoutPublicity, getSystemPromptWithPublicity } from '../utils/system-prompt-utils';
+import { EditorConfig, getEditors, orderSystem, orderSystemWithPublicity } from '../utils/bill-constructor-utils';
 
 @Component({
   selector: 'bill-constructor',
@@ -30,20 +24,16 @@ interface EditorConfig {
   templateUrl: './bill-constructor.html',
   styleUrl: './bill-constructor.scss'
 })
-export class BillConstructor implements OnInit, OnDestroy{
+export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
 
   @ViewChildren('editorRef') editorRefs!: QueryList<ElementRef<HTMLDivElement>>;
 
   titleData: string= "Constructor";
   radioButton1: string ="Prompt de sistema"
-  radioButton2: string ="Prompt de usuario"
+  radioButton2: string ="Prompt de sistema y publicidad"
   selectedOption: string= '';
   isFocused = signal(false);
   tree: TreeNode[]= [buildMainNode('Prompts', true)];
-  treeTwo: TreeNode[]= [buildMainNode('Prompts', true)];
-  selectedNode: TreeNode | null =null;
-  selectedNodeTwo: TreeNode | null =null;
-  selectedNodeThree: TreeNode | null =null;
   editors = signal<EditorConfig[]>([]);
   private destroy$ = new Subject<void>();
   private index: string="";
@@ -54,11 +44,7 @@ export class BillConstructor implements OnInit, OnDestroy{
   
   ngOnInit(): void {
     this.selectedOption=this.radioButton1;
-    this.editors.set([
-        { id: '0', tree: [], styledPrompt: '', typePrompt:''},
-        { id: '1', tree: [], styledPrompt: '', typePrompt:'' },
-        { id: '2', tree: [], styledPrompt: '', typePrompt:'' }
-      ]);
+    this.editors.set(getEditors());
     this.serviceGeneral.basicTemplateData$.pipe(takeUntil(this.destroy$)).subscribe(data=>{
       const node= this.setChildrenInTreeNode( TypePromptEnum.BASIC_TEMPLATE,TypePromptEnum.BASIC_TEMPLATE, data, TypePromptEnum.BASIC_TEMPLATE);
       this.updateSpecificEditor('0', { tree: node, typePrompt: TypePromptEnum.BASIC_TEMPLATE });
@@ -67,16 +53,30 @@ export class BillConstructor implements OnInit, OnDestroy{
       const node = this.setChildrenInTreeNode(TypePromptEnum.SYNTHETIC_DATA,TypePromptEnum.SYNTHETIC_DATA, data, TypePromptEnum.SYNTHETIC_DATA);
       this.updateSpecificEditor('1', { tree: node, typePrompt: TypePromptEnum.SYNTHETIC_DATA });
     });
+    this.serviceGeneral.publicityData$.pipe(takeUntil(this.destroy$)).subscribe(data=>{
+      const node = this.setChildrenInTreeNode( TypePromptEnum.PUBLICITY_DATA,TypePromptEnum.PUBLICITY_DATA, data, TypePromptEnum.PUBLICITY_DATA);
+      this.updateSpecificEditor('2', { tree: node, typePrompt: TypePromptEnum.PUBLICITY_DATA });
+    });
     this.serviceGeneral.promptSystem$.pipe(takeUntil(this.destroy$)).subscribe(data=>{
       const node = this.setChildrenInTreeNode( TypePromptEnum.SYSTEM_PROMPT,TypePromptEnum.SYSTEM_PROMPT, data, TypePromptEnum.SYSTEM_PROMPT);
-      this.updateSpecificEditor('2', { tree: node, typePrompt: TypePromptEnum.SYSTEM_PROMPT });
+      this.updateSpecificEditor('3', { tree: node, typePrompt: TypePromptEnum.SYSTEM_PROMPT });
+      this.onRadioChange(null);
     });
     this.serviceGeneral.basicTemplate$.pipe(takeUntil(this.destroy$)).subscribe(data=>this.setBasicTemplateToEditor(data, this.index));
   }
 
   ngOnDestroy(): void {
+    this.serviceGeneral.setBasicTemplate('');
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  ngAfterViewInit() {
+    setTimeout(() => {
+      this.editorRefs.forEach(editor => {
+        this.adjustHeight(editor.nativeElement);
+      });
+    }, 100);
   }
 
   @HostListener('window:resize', [])
@@ -92,7 +92,9 @@ export class BillConstructor implements OnInit, OnDestroy{
 
   private adjustHeight(el: HTMLDivElement) {
     el.style.height = 'auto';
-    el.style.height = el.scrollHeight + 'px';
+    setTimeout(() => {
+      el.style.height = el.scrollHeight + 'px';
+    }, 0);
   }
 
  nodeSelect($event: any, item: EditorConfig, index: any) {
@@ -193,13 +195,13 @@ export class BillConstructor implements OnInit, OnDestroy{
   onRadioChange($event:any){
     let backup=this.setEditorBackup();
     if(this.selectedOption==this.radioButton1){
-      let typePrompts= [TypePromptEnum.BASIC_TEMPLATE,
-        TypePromptEnum.SYNTHETIC_DATA, TypePromptEnum.SYSTEM_PROMPT];  
+      let typePrompts= orderSystem();  
       this.setEditors(backup, typePrompts);
     }else{
-      let typePrompts= [TypePromptEnum.SYNTHETIC_DATA];
+      let typePrompts= orderSystemWithPublicity();
       this.setEditors(backup, typePrompts);
     }
+    this.resizeAllTextareas();
   }
 
   private setEditorBackup(): EditorConfig[]{
@@ -221,12 +223,17 @@ export class BillConstructor implements OnInit, OnDestroy{
   }
 
   generateImage($event: any){
+    let prompt= '';
     if(this.selectedOption==this.radioButton1){
-      let mapPrompt: Map<string,string>= this. extractAllContent(["0","1","2"]);
-      let systemPrompt= getSystemPrompt(mapPrompt.get("0"),mapPrompt.get("1"),mapPrompt.get("2"));
-      const prompt= JSON.stringify(systemPrompt);
-      this.serviceGeneral.setSelectedPromptBill(prompt);
+      let mapPrompt: Map<string,string>= this. extractAllContent(["0","1","3"]);
+      let systemPrompt= getSystemPromptWithoutPublicity(mapPrompt.get("0"),mapPrompt.get("1"),mapPrompt.get("3"));
+      prompt= JSON.stringify(systemPrompt);  
+    }else{
+      let mapPrompt: Map<string,string>= this. extractAllContent(["0","1","2","3"]);
+      let systemPrompt= getSystemPromptWithPublicity(mapPrompt.get("0"),mapPrompt.get("1"),mapPrompt.get("2"), mapPrompt.get("3"));
+      prompt= JSON.stringify(systemPrompt);  
     }
+    this.serviceGeneral.setSelectedPromptBill(prompt);
     this.serviceGeneral.setChangeComponent('show-template');
   }
 

@@ -68,14 +68,15 @@ export function orderOtherPrompts(){
     return [TypePromptEnum.BILL_PROMPT,
         TypePromptEnum.IMAGE_PROMPT,
         TypePromptEnum.SYSTEM_PROMPT,
-        ,TypePromptEnum.SYNTHETIC_DATA,
+        TypePromptEnum.SYNTHETIC_DATA,
+        TypePromptEnum.PUBLICITY_DATA,
         TypePromptEnum.DATA_PROMPT,
         TypePromptEnum.GLOBAL_DEFECT_PROMPT,
       TypePromptEnum.BASIC_TEMPLATE];
 }
 
-export function getMapOrder(array: Array<any>){
+export function getMapOrder(){
   let orderMap: any = {};
-  array.forEach((name, index) => {orderMap[name] = index;});
+  orderOtherPrompts().forEach((name, index) => {orderMap[name] = index;});
   return orderMap;
 }

@@ -10,6 +10,7 @@ import { PromptGenerationImageInterface } from '../models/prompt-generation-imag
 import { ExecutingRestFulService } from '../service/executing-rest-ful-service';
 import { bfsSearchNodeToInsertFunctionCommand } from '../utils/bfs-search-node-utils';
 import { Subject, takeUntil } from 'rxjs';
+import { TypePromptEnum } from '../enums/type-prompt-enum';
 
 @Component({
   selector: 'bill-menu',
@@ -31,9 +32,6 @@ export class BillMenu implements OnInit, OnDestroy{
   itemPromptData: MenuItem[] =  [];
   isUploading = signal(false);
   upMenu: boolean= true;
-  private promptOptionDato:string= "Prompt dato";
-  private promptOptionImage:string= "Prompt imagen";
-  private promptOptionBill:string= "Prompt factura";
   private eraseOptionData: string= "Datos";
   private eraseAction: string= "Borrar";
   private handlerFunction: any;
@@ -53,6 +51,7 @@ export class BillMenu implements OnInit, OnDestroy{
     this.executingRestFulService.getAllPromptGlobalDefect();
     this.executingRestFulService.getAllGlobalDefects();
     this.executingRestFulService.getAllPromptSystem();
+    this.executingRestFulService.getAllPublicityData();
     this.serviceGeneral.isUploadingAnimation$.pipe(takeUntil(this.destroy$)).subscribe(data=>this.isUploading.set(data));
     this.serviceGeneral.promptImages$.pipe(takeUntil(this.destroy$)).subscribe(data=>this.setPromptImagesFromObservable(data));
     this.serviceGeneral.promptBills$.pipe(takeUntil(this.destroy$)).subscribe(data=>this.setPromptBillsFromObservable(data));
@@ -117,12 +116,12 @@ export class BillMenu implements OnInit, OnDestroy{
   }
 
   private getSelectecPrompt(event:any){
-    if(event['item']['parent']==this.promptOptionDato){
+    if(event['item']['parent']==TypePromptEnum.DATA_PROMPT){
       this.setExtractedPrompt(this.promptsData, event['item']['label']);
-    }else if(event['item']['parent']==this.promptOptionImage){
+    }else if(event['item']['parent']==TypePromptEnum.IMAGE_PROMPT){
       const promptBill= this.setExtractedPrompt(this.promptsImages, event['item']['label']);
       this.serviceGeneral.setSelectedPromptBill(promptBill);
-    }else if(event['item']['parent']==this.promptOptionBill){
+    }else if(event['item']['parent']==TypePromptEnum.BILL_PROMPT){
       const promptBill= this.setExtractedPrompt(this.promptsBills, event['item']['label']);
       this.serviceGeneral.setSelectedPromptBill(promptBill);
     }
@@ -149,7 +148,7 @@ export class BillMenu implements OnInit, OnDestroy{
     if(prompts.length>0){
       this.promptsImages= prompts;
       this.itemPromptImages=  this.setItemsForPrompt(prompts);
-      this.bfsSearchNodeFromObservable(this.itemPromptImages, 'Prompt imagen');
+      this.bfsSearchNodeFromObservable(this.itemPromptImages, TypePromptEnum.IMAGE_PROMPT);
     }
   }
 
@@ -157,7 +156,7 @@ export class BillMenu implements OnInit, OnDestroy{
     if(prompts.length>0){
       this.promptsBills= prompts;
       this.itemPromptBills=  this.setItemsForPrompt(prompts);
-      this.bfsSearchNodeFromObservable(this.itemPromptBills, 'Prompt factura');
+      this.bfsSearchNodeFromObservable(this.itemPromptBills, TypePromptEnum.BILL_PROMPT);
     }
   }
 
@@ -165,7 +164,7 @@ export class BillMenu implements OnInit, OnDestroy{
     if(prompts.length>0){
       this.promptsData= prompts;
       this.itemPromptData=  this.setItemsForPrompt(prompts);
-      this.bfsSearchNodeFromObservable(this.itemPromptData, 'Prompt dato');
+      this.bfsSearchNodeFromObservable(this.itemPromptData, TypePromptEnum.DATA_PROMPT);
     }
   }
 

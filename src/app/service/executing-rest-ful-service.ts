@@ -6,6 +6,7 @@ import { SyntheticDataInterface } from '../models/synthetic-data-interface';
 import { getToastMessageOption } from '../utils/toast-message-option-utils';
 import { BasicTemplateInterface } from '../models/basic-template-interface';
 import { Observable } from 'rxjs';
+import { RefreshFlagObservableEnum } from '../enums/refresh-flag-observable';
 
 @Injectable({
   providedIn: 'root'
@@ -22,67 +23,77 @@ export class ExecutingRestFulService {
   constructor(private httpService :HttpClientService,private serviceGeneral: ServiceGeneral){}
 
   savePromptImage(request: PromptGenerationImageInterface){
-    this.handlePromptAction(this.httpService.savePromptGenerationImage(request), 'refresh-prompt-images',
+    this.handlePromptAction(this.httpService.savePromptGenerationImage(request), RefreshFlagObservableEnum.REFRESH_PI,
       this.msgSuccessSave, this.errorSave);
   }
 
   savePromptBill(request: PromptGenerationImageInterface){
-    this.handlePromptAction(this.httpService.savePromptGenerationBill(request), 'refresh-prompt-bills',
+    this.handlePromptAction(this.httpService.savePromptGenerationBill(request), RefreshFlagObservableEnum.REFRESH_PB,
       this.msgSuccessSave, this.errorSave);
   }
 
   savePromptData(request: PromptGenerationImageInterface){
-    this.handlePromptAction(this.httpService.savePromptGenerationData(request), 'refresh-prompt-data',
+    this.handlePromptAction(this.httpService.savePromptGenerationData(request), RefreshFlagObservableEnum.REFRESH_PD,
       this.msgSuccessSave, this.errorSave);
   }
 
   savePromptSystem(request: PromptGenerationImageInterface){
-    this.handlePromptAction(this.httpService.savePromptGenerationSystem(request), 'refresh-prompt-system',
+    this.handlePromptAction(this.httpService.savePromptGenerationSystem(request), RefreshFlagObservableEnum.REFRESH_PS,
       this.msgSuccessSave, this.errorSave);
   }
 
   saveSyntheticData(request: SyntheticDataInterface){
-    this.handlePromptAction(this.httpService.saveSynteticDataGeneration(request), 'refresh-synthetic-data',
+    this.handlePromptAction(this.httpService.saveSynteticDataGeneration(request), RefreshFlagObservableEnum.REFRESH_SD,
+      this.msgSuccessSave, this.errorSave);
+  }
+
+  savePublicityData(request: SyntheticDataInterface){
+    this.handlePromptAction(this.httpService.savePublicityDataGeneration(request), RefreshFlagObservableEnum.REFRESH_PUD,
       this.msgSuccessSave, this.errorSave);
   }
 
   savePromptGlobalDefect(request: PromptGenerationImageInterface){
-    this.handlePromptAction(this.httpService.savePromptGlobalDefect(request), 'refresh-prompt-global-defect',
+    this.handlePromptAction(this.httpService.savePromptGlobalDefect(request), RefreshFlagObservableEnum.REFRESH_PGD,
       this.msgSuccessSave, this.errorSave);
   }
 
   saveBasicTemplate(request: BasicTemplateInterface){
-    this.handlePromptAction(this.httpService.saveBasicTemplate(request), 'refresh-basic-template',
+    this.handlePromptAction(this.httpService.saveBasicTemplate(request), RefreshFlagObservableEnum.REFRESH_PGD,
       this.msgSuccessSaveTemplate, this.errorSaveTemplate);
   }
 
   deletePromptImageById(request: PromptGenerationImageInterface){
-     this.handlePromptAction(this.httpService.deletePromptImageById(request), 'refresh-prompt-images',
+     this.handlePromptAction(this.httpService.deletePromptImageById(request), RefreshFlagObservableEnum.REFRESH_PI,
       this.msgSuccessDelete, this.errorDelete);
   }
 
   deletePromptBillById(request: PromptGenerationImageInterface){
-    this.handlePromptAction(this.httpService.deletePromptBillById(request), 'refresh-prompt-bills',
+    this.handlePromptAction(this.httpService.deletePromptBillById(request), RefreshFlagObservableEnum.REFRESH_PB,
       this.msgSuccessDelete, this.errorDelete);
   }
 
   deletePromptDataById(request: PromptGenerationImageInterface){
-    this.handlePromptAction(this.httpService.deletePromptDataById(request), 'refresh-prompt-data',
+    this.handlePromptAction(this.httpService.deletePromptDataById(request), RefreshFlagObservableEnum.REFRESH_PD,
       this.msgSuccessDelete, this.errorDelete);
   }
 
   deleteSyntheticDataById(request: SyntheticDataInterface){
-    this.handlePromptAction(this.httpService.deleteSyntheticDataById(request), 'refresh-synthetic-data',
+    this.handlePromptAction(this.httpService.deleteSyntheticDataById(request), RefreshFlagObservableEnum.REFRESH_SD,
+      this.msgSuccessDelete, this.errorDelete);
+  }
+
+  deletePublicityDataById(request: SyntheticDataInterface){
+    this.handlePromptAction(this.httpService.deletePublicityDataById(request), RefreshFlagObservableEnum.REFRESH_PUD,
       this.msgSuccessDelete, this.errorDelete);
   }
 
   deleteBasicTemplateById(request: BasicTemplateInterface){
-    this.handlePromptAction(this.httpService.deleteBasicTemplateById(request), 'refresh-basic-template',
+    this.handlePromptAction(this.httpService.deleteBasicTemplateById(request), RefreshFlagObservableEnum.REFRESH_BT,
       'El template básico ha sido eliminado correctamente', 'Hubo un error en la eliminación del template básico');
   }
 
   deletePromptSystemById(request: PromptGenerationImageInterface){
-    this.handlePromptAction(this.httpService.deletePromptSystemById(request), 'refresh-prompt-system',
+    this.handlePromptAction(this.httpService.deletePromptSystemById(request), RefreshFlagObservableEnum.REFRESH_PS,
       this.msgSuccessDelete, this.errorDelete);
   }
 
@@ -104,20 +115,22 @@ export class ExecutingRestFulService {
   }
 
   private setRefreshObservable(refreshKey: string){
-    if (refreshKey === 'refresh-prompt-bills') {
+    if (refreshKey === RefreshFlagObservableEnum.REFRESH_PB) {
           this.serviceGeneral.setRefreshPromptBills(refreshKey);
-    } else if(refreshKey === 'refresh-prompt-data') {
+    } else if(refreshKey === RefreshFlagObservableEnum.REFRESH_PD) {
       this.serviceGeneral.setRefreshPromptData(refreshKey);
-    } else if(refreshKey ===  'refresh-prompt-images'){
+    } else if(refreshKey ===  RefreshFlagObservableEnum.REFRESH_PI){
       this.serviceGeneral.setRefreshPromptImages(refreshKey);
-    }else if(refreshKey ===  'refresh-prompt-system'){
+    }else if(refreshKey ===  RefreshFlagObservableEnum.REFRESH_PS){
       this.serviceGeneral.setRefreshPromptSystem(refreshKey);
-    }else if(refreshKey ===  'refresh-synthetic-data'){
+    }else if(refreshKey ===  RefreshFlagObservableEnum.REFRESH_SD){
       this.serviceGeneral.setRefreshSyntheticData(refreshKey);
-    }else if(refreshKey ===  'refresh-prompt-global-defect'){
+    }else if(refreshKey ===  RefreshFlagObservableEnum.REFRESH_PGD){
       this.serviceGeneral.setRefreshPromptGlobalDefect(refreshKey);
-    }else if(refreshKey ===  'refresh-basic-template'){
+    }else if(refreshKey ===  RefreshFlagObservableEnum.REFRESH_BT){
        this.serviceGeneral.setRefreshBasicTemplate(refreshKey);
+    }else if(refreshKey ===  RefreshFlagObservableEnum.REFRESH_PUD){
+      this.serviceGeneral.setRefreshPublicityData(refreshKey);
     }
   }
 
@@ -181,6 +194,12 @@ getBasicTemplateById(request: BasicTemplateInterface): void{
   getAllPromptSystem(){
     this.httpService.getPromptGenerationSystem().subscribe(response=>{
       this.serviceGeneral.setPromptSystem(response.prompts);
+    });
+  }
+
+  getAllPublicityData(){
+    this.httpService.getPublicitycDataGeneration().subscribe(response=>{
+      this.serviceGeneral.setPublicityData(response.synthetics);
     });
   }
 
