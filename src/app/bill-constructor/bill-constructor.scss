@@ -97,3 +97,15 @@
     align-items: center;
     gap: 1rem;                      
 }
+
+.title-header {
+    display: flex;
+    align-items: center; 
+    gap: 12px;           
+    margin-bottom: 1rem; 
+}
+
+.title-text {
+    margin: 0;  
+    font-size: 1.5rem;  
+}

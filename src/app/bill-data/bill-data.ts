@@ -1,4 +1,4 @@
-import { Component, signal, OnInit, WritableSignal, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
+import { Component, signal, OnInit, WritableSignal, OnDestroy, ChangeDetectionStrategy, inject } from '@angular/core';
 import { HttpClientService } from '../service/http-client-service';
 import { GenerationDataInterface } from '../models/generation-data-interface';
 import { ServiceGeneral } from '../service/service-general';
@@ -9,11 +9,12 @@ import { ExecutingRestFulService } from '../service/executing-rest-ful-service';
 import { Subject, takeUntil } from 'rxjs';
 import { SyntheticDataInterface } from '../models/synthetic-data-interface';
 import { getHeaderDialogToBillData, getExportFormatToBillData, getSaveFormartPromptToBillData } from '../utils/dialog-parameters-utils';
+import { informationDataGenerationHelp } from '../utils/infor-help-tour-utils';
 
 @Component({
   selector: 'bill-data',
   standalone: true,
-  imports: [ChatBox],
+  imports: [ChatBox ],
   templateUrl: './bill-data.html',
   styleUrl: './bill-data.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -34,6 +35,7 @@ export class BillData implements OnInit, OnDestroy{
   itemsSavePrompt: Array<any>=[];
   headerDialog: Array<any>= [];
   private destroy$ = new Subject<void>();
+  informationDataGenerationHelp: any= informationDataGenerationHelp();
 
   
   constructor(private httpService :HttpClientService,private serviceGeneral: ServiceGeneral,
@@ -179,4 +181,5 @@ export class BillData implements OnInit, OnDestroy{
       name: name
     };
   }
+
 }

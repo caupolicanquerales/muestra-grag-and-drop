@@ -64,6 +64,18 @@
             (click)="eraseEvent('erase-text')" 
             ></p-button>
         }
+        @if(helpAllowButton){
+            <p-button 
+            icon="pi pi-search" 
+            class="submit-button-shape-help"
+            [rounded]="true" 
+            [text]="true"
+            severity="secondary" 
+            pTooltip="Ayuda"
+            tooltipPosition="top"
+            (click)="helpEvent('help-text')" 
+            ></p-button>
+        }
     </div>
 
  <p-popover #op

@@ -6,6 +6,7 @@ import { HttpClientService } from '../service/http-client-service';
 import { ServiceGeneral } from '../service/service-general';
 import { Subject, takeUntil } from 'rxjs';
 import { VisualizerCanvas } from '../visualizer-canvas/visualizer-canvas';
+import { informationImageGenerationHelp } from '../utils/infor-help-tour-utils';
 
 interface Item {
   id: string;
@@ -33,7 +34,8 @@ export class ProcessTemplateBill implements OnInit, OnDestroy{
   placeHolder: string= $localize`@@placeHolder:`; 
   labelExtractButton: string= $localize`@@labelExtractButton:`;
   private destroy$ = new Subject<void>();
-
+  informationImageGenerationHelp: any= informationImageGenerationHelp();
+  
   constructor(private httpService :HttpClientService,private serviceGeneral: ServiceGeneral){}
 
   ngOnInit(): void {

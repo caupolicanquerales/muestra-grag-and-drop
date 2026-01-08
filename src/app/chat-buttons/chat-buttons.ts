@@ -40,6 +40,8 @@ export class ChatButtons implements OnInit{
   @Input()
   generatePromptButton: boolean= false;
   @Input()
+  helpButton: boolean= false;
+  @Input()
   arrayPromptAndData: PromptAndDataToValidateInterface={};
 
   @Output()
@@ -54,6 +56,8 @@ export class ChatButtons implements OnInit{
   submitGenerateImage: EventEmitter<string>= new EventEmitter<string>();
   @Output()
   submitGeneratePrompt: EventEmitter<string>= new EventEmitter<string>();
+  @Output()
+  submitHelpTextEmitter: EventEmitter<string>= new EventEmitter<string>();
 
   visible: boolean= false;
   headerDialogTitle: string="";
@@ -104,6 +108,10 @@ export class ChatButtons implements OnInit{
     return this.generatePromptButton;
   }
 
+  get helpAllowButton(){
+    return this.helpButton;
+  }
+
   showDialog(item: any, event: Event){
     event.stopPropagation();
     const header=this.headerDialog.filter(header=>header.format==item.format);
@@ -124,6 +132,10 @@ export class ChatButtons implements OnInit{
 
   eraseEvent($event: string){
     this.submitEraseTextEmitter.emit($event);
+  }
+
+  helpEvent($event: string){
+    this.submitHelpTextEmitter.emit($event);
   }
 
   generateImageEvent($event: string){

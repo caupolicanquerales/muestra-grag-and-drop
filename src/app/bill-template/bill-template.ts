@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, signal, WritableSignal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnDestroy, OnInit, signal, WritableSignal } from '@angular/core';
 import { BillSkeleton } from '../bill-skeleton/bill-skeleton';
 import { UploadDocument } from '../upload-document/upload-document';
 import { HttpClientService } from '../service/http-client-service';
@@ -15,11 +15,13 @@ import { ExecutingRestFulService } from '../service/executing-rest-ful-service';
 import { DialogTemplate } from '../dialog-template/dialog-template';
 import { GenerationImageInterface } from '../models/generation-image-interface';
 import { TypePromptEnum } from '../enums/type-prompt-enum';
+import { JoyrideModule, JoyrideService } from 'ngx-joyride';
+import { templateHelp } from '../utils/infor-help-tour-utils';
 
 @Component({
   selector: 'bill-template',
   imports: [CommonModule, BillSkeleton, UploadDocument, TableModule, ButtonModule, ChatButtons,
-    DialogTemplate],
+    DialogTemplate, JoyrideModule],
   standalone: true,
   templateUrl: './bill-template.html',
   styleUrl: './bill-template.scss',
@@ -47,6 +49,8 @@ export class BillTemplate implements OnInit, OnDestroy{
   selectedBasicTemplate: any={};
   actionButtonName: string= "Eliminar";
   displayInfoInSelectedItem: Array<string>=["id","name"];
+  private readonly joyrideService = inject(JoyrideService);
+  templateHelp: any= templateHelp();
 
   constructor(private httpService :HttpClientService,private serviceGeneral: ServiceGeneral,
     private executingRestFulService: ExecutingRestFulService){}
@@ -164,5 +168,8 @@ export class BillTemplate implements OnInit, OnDestroy{
         prompt: ["Extract the information from the HTML and SCSS files into two strings. Return the result strictly as a raw JSON object using this exact structure: {'htmlString': '', 'cssString': ''}. Do not use Markdown code blocks (no ```json or ```python). Do not include any conversational text. Ensure all keys and strings use double quotes for valid JSON compatibility."]
       };
     }
-  
+
+  startTour() {
+      this.joyrideService.startTour({ steps: ['modeStep'] });
+  }
 }

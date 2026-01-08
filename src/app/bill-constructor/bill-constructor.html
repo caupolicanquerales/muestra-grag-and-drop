@@ -1,8 +1,24 @@
 <div class="main-wrapper">
-    <div class="header-container">
-        <h2 class="title">
-        {{ titleData }}
-        </h2>
+    <div class="header-container"
+        joyrideStep="modeStep" 
+        [title]="promptSystemHelp['title']" 
+        [text]="promptSystemHelp['text']"
+        >
+        <div class="title-header">
+            <h2 class="title-text">
+                {{ titleData }}
+            </h2>
+            <chat-buttons
+                [eraseButton]="false"
+                [saveButton]="false"
+                [exportButton]="false"
+                [copyButton]="false"
+                [generateImageButton]="false"
+                [generatePromptButton]="false"
+                [helpButton]="true"
+                (submitHelpTextEmitter)="startTour()"
+            ></chat-buttons>
+        </div>
         <div class="flex-options">
             <div class="radio-button">
                 <p-radiobutton name="promptOption" [inputId]="selectedOption" [value]="radioButton1" 
@@ -25,7 +41,8 @@
                 id: item.id, 
                 treeData: item.tree, 
                 promptValue: item.styledPrompt ,
-                item: item
+                item: item,
+                titles: titlesHelp
             }"></ng-container>
 
             @if (!last) {
@@ -55,20 +72,16 @@
   let-id="id"
   let-item="item"
   let-index="index"
+  let-titles="titles"
   >
   <div class="editor-content-wrapper">
-    <div class="p-selector-group">
-        <p-tree [value]="treeData" class="w-full md:w-[30rem]" 
-            selectionMode="single"
-            (onNodeSelect)="nodeSelect($event, item, item.id)">
-            <ng-template let-node pTemplate="default">
-                <span [ngStyle]="node.style" [class.p-disabled]="node.selectable === false">
-                    {{ node.label }}
-                </span>
-            </ng-template>
-        </p-tree>
+    <div class="p-selector-group" 
+        [joyrideStep]="'treeStep_' + item.id"
+        [title]="titles[item.id+1]"
+        [text]="textHelp[item.id+1]">
+        
+        <ng-container *ngTemplateOutlet="treeContent; context: { item: item, treeData: treeData }"></ng-container>
     </div>
-
     <div class="textare-button-group">
         <div class="relative-container">
             <div 
@@ -96,4 +109,17 @@
         </div>
     </div>
   </div>
+</ng-template>
+
+
+<ng-template #treeContent let-item="item" let-treeData="treeData">
+    <p-tree [value]="treeData" class="w-full md:w-[30rem]" 
+        selectionMode="single"
+        (onNodeSelect)="nodeSelect($event, item, item.id)">
+        <ng-template let-node pTemplate="default">
+            <span [ngStyle]="node.style" [class.p-disabled]="node.selectable === false">
+                {{ node.label }}
+            </span>
+        </ng-template>
+    </p-tree>
 </ng-template>

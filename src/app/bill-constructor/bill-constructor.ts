@@ -1,5 +1,5 @@
 import { CommonModule, NgClass } from '@angular/common';
-import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, QueryList, signal, ViewChildren } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, inject, OnDestroy, OnInit, QueryList, signal, ViewChildren } from '@angular/core';
 import { TreeNode } from 'primeng/api';
 import { TreeModule } from 'primeng/tree';
 import { ServiceGeneral } from '../service/service-general';
@@ -15,11 +15,12 @@ import { ChatButtons } from '../chat-buttons/chat-buttons';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { FormsModule } from '@angular/forms';
 import { getSystemPromptWithoutPublicity, getSystemPromptWithPublicity } from '../utils/system-prompt-utils';
-import { EditorConfig, getEditors, orderSystem, orderSystemWithPublicity } from '../utils/bill-constructor-utils';
+import { EditorConfig, getEditors, orderSystem, orderSystemWithPublicity, systemPromptHelp, textHelp, titlesHelp } from '../utils/bill-constructor-utils';
+import { JoyrideModule, JoyrideService } from 'ngx-joyride';
 
 @Component({
   selector: 'bill-constructor',
-  imports: [CommonModule, NgClass, FormsModule, TreeModule, ChatButtons, RadioButtonModule],
+  imports: [CommonModule, NgClass, FormsModule, TreeModule, ChatButtons, RadioButtonModule, JoyrideModule],
   standalone: true,
   templateUrl: './bill-constructor.html',
   styleUrl: './bill-constructor.scss'
@@ -38,6 +39,10 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
   private destroy$ = new Subject<void>();
   private index: string="";
   private editorBackup: string='';
+  private readonly joyrideService = inject(JoyrideService);
+  titlesHelp: any= titlesHelp();
+  textHelp: any= textHelp();
+  promptSystemHelp: any= systemPromptHelp();
 
   constructor(private serviceGeneral: ServiceGeneral,
     private executingRestFulService: ExecutingRestFulService){}
@@ -237,4 +242,8 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
     this.serviceGeneral.setChangeComponent('show-template');
   }
 
+  startTour() {
+    const dynamicSteps = this.editors().map(item => `treeStep_${item.id}`);
+    this.joyrideService.startTour({ steps: ['modeStep', ...dynamicSteps] });
+  }
 }

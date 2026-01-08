@@ -1,6 +1,19 @@
   <div class="main">
     <div id="section-1" class="dashboard-card width-table display-table">
+        <chat-buttons
+                [eraseButton]="false"
+                [saveButton]="false"
+                [exportButton]="false"
+                [copyButton]="false"
+                [generateImageButton]="false"
+                [generatePromptButton]="false"
+                [helpButton]="true"
+                (submitHelpTextEmitter)="startTour()"
+            ></chat-buttons>
         <upload-document
+            joyrideStep="modeStep" 
+            [title]="templateHelp['title']" 
+            [text]="templateHelp['text']"
             [uploadMessage]="uploadMessage"
             [formatFileMessage]="formatFileMessage"
             [allowButton]="allowButton"

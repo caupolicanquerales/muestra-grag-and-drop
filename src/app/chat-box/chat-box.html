@@ -1,14 +1,23 @@
 <div class="main-wrapper">
       <div class="card-container" 
-           [ngClass]="{'ring-4 ring-secondary-teal': isFocused()}">
-        
+           [ngClass]="{'ring-4 ring-secondary-teal': isFocused()}"
+           joyrideStep="modeStep" 
+          [title]="informationHelpTour['title']" 
+          [text]="informationHelpTour['text']">
         <h2 class="title">
           {{ titleData }}
         </h2>
         <p class="subtitle">
           {{ subTitleData }}
         </p>
-
+        <chat-buttons
+            [eraseButton]="false"
+            [exportButton]="false"
+            [copyButton]="false"
+            [saveButton]="false"
+            [helpButton]="helpButton"
+            (submitHelpTextEmitter)="emitHelpTextEvent($event)"
+        ></chat-buttons>
         <div class="p-fluid">
           <div class="relative-container">
             <div class="input-and-icon-wrapper"

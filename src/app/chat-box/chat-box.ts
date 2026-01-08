@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, HostListener, Input, OnDestroy, OnInit, Output, signal, ViewChild, WritableSignal } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, HostListener, inject, Input, OnDestroy, OnInit, Output, signal, ViewChild, WritableSignal } from '@angular/core';
 import { SafeHtmlPipePipe } from '../pipes/safe-html-pipe-pipe';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -12,12 +12,13 @@ import { ChatButtons } from '../chat-buttons/chat-buttons';
 import { removeTagHtmlToText } from '../utils/operation-string-utils'
 import { Subject, takeUntil } from 'rxjs';
 import { TooltipModule } from 'primeng/tooltip';
+import { JoyrideModule, JoyrideService } from 'ngx-joyride';
 
 @Component({
   selector: 'chat-box',
   standalone:true,
   imports: [CommonModule,SafeHtmlPipePipe,FormsModule,NgClass,ButtonModule, UploadDocumentChat,
-    ChatButtons, TooltipModule],
+    ChatButtons, TooltipModule, JoyrideModule],
   templateUrl: './chat-box.html',
   styleUrl: './chat-box.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -26,6 +27,7 @@ export class ChatBox implements OnInit, OnDestroy{
 
   promptInput = signal('');
   private destroy$ = new Subject<void>();
+  private readonly joyrideService = inject(JoyrideService);
 
   @Input()
   titleData: string='';
@@ -47,6 +49,10 @@ export class ChatBox implements OnInit, OnDestroy{
   itemsExportPrompt: Array<any>=[];
   @Input()
   headerDialog: Array<any>=[];
+  @Input()
+  helpButton: boolean= false;
+  @Input()
+  informationHelpTour: any= {};
   @Input()
   set prompt(value: string | undefined) {
     if (value !== undefined) {
@@ -139,6 +145,10 @@ export class ChatBox implements OnInit, OnDestroy{
     this.selectedFilesEmitter.emit($event);
   }
 
+  emitHelpTextEvent($event: any){
+    this.joyrideService.startTour({ steps: ['modeStep'] });
+  }
+
   downloadFile(extension: string){
     const textToCopy = this.getTextToCopy(extension);
     const typeExt= getMapTypeFormatDownloadFile().get(extension);
@@ -180,4 +190,5 @@ export class ChatBox implements OnInit, OnDestroy{
             this.resizeTextarea();
         }, 0);
   }
+  
 }
