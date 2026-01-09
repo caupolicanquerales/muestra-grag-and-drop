@@ -46,7 +46,6 @@ export class BillData implements OnInit, OnDestroy{
     this.headerDialog= getHeaderDialogToBillData();
     this.itemsExportPrompt= getExportFormatToBillData();
     this.itemsSavePrompt= getSaveFormartPromptToBillData();
-    this.serviceGeneral.setActivateChatClientStream(true);
     this.serviceGeneral.statusMessage$.pipe(takeUntil(this.destroy$)).subscribe(status=>this.statusMessage.set(status));
     this.serviceGeneral.responseMessagePrompt$.pipe(takeUntil(this.destroy$)).subscribe(token=>this.responseMessage.update(currentValue=>currentValue + token));
     this.serviceGeneral.selectedPrompt$.pipe(takeUntil(this.destroy$)).subscribe(data=>this.prompt.set(data));
@@ -114,7 +113,11 @@ export class BillData implements OnInit, OnDestroy{
 
   private executingPrompt(){
     const request= this.getRequestGenerationData();
-    this.updatePromptToGenerateData(request); 
+    //this.serviceGeneral.setActivateChatClientStream(true);
+    this.serviceGeneral.setActivateChatClientStreamPrueba(request);
+    setTimeout(() => {
+      this.updatePromptToGenerateData(request);
+    }, 50); 
   }
 
   private executingPromptAndFiles(){
@@ -134,6 +137,11 @@ export class BillData implements OnInit, OnDestroy{
   }
 
   private updatePromptToGenerateData(request: GenerationDataInterface): void{
+    this.prompt.set('');
+    this.serviceGeneral.setResizeInput(true);
+    this.serviceGeneral.setIsUploadingAnimation(true);
+    
+    /*
     this.httpService.updatePromptForGenerationData(request).subscribe({
       next: (data) => {
         this.prompt.set('');
@@ -146,7 +154,7 @@ export class BillData implements OnInit, OnDestroy{
       complete: () => {
         console.log('Request completed.');
       }
-    })
+    })*/
   }
 
   private sendingFileAndPrompt(){

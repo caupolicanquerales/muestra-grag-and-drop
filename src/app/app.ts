@@ -1,10 +1,10 @@
-import { Component, OnInit, ViewChild, ViewContainerRef, AfterViewInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewContainerRef, AfterViewInit, OnDestroy, DestroyRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BillHeader } from './bill-header/bill-header';
 import { BillFooter } from './bill-footer/bill-footer';
 import { BillMenu } from './bill-menu/bill-menu';
 import { ServiceGeneral } from './service/service-general';
-import { Subject, Subscription, take, takeUntil } from 'rxjs';
+import { finalize, Subject, Subscription, take, takeUntil } from 'rxjs';
 import { ReceiveDataService } from './service/receive-data-service';
 import { nanoid } from 'nanoid';
 import { HttpClientService } from './service/http-client-service';
@@ -14,6 +14,8 @@ import { MessageService } from 'primeng/api'
 import { ExecutingRestFulService } from './service/executing-rest-ful-service';
 import { getMapComponentToDisplay } from './utils/map-component-utils';
 import { getToastMessageOption } from './utils/toast-message-option-utils';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { GenerationDataInterface } from './models/generation-data-interface';
 
 
 @Component({
@@ -35,6 +37,9 @@ export class App implements OnInit, OnDestroy, AfterViewInit{
   private mimeType: string = 'image/png';
   private destroy$ = new Subject<void>();
   private flagToStartBasicTemplate: string= "Basic Template generation started for prompt";
+
+  private destroyRef = inject(DestroyRef);
+  private sseSubscription?: Subscription;
   
   constructor(private serviceGeneral: ServiceGeneral, private receiveData:ReceiveDataService,
     private httpClient: HttpClientService, private convertBase64Byte: ConvertBase64ByteService,
@@ -51,7 +56,7 @@ export class App implements OnInit, OnDestroy, AfterViewInit{
     this.serviceGeneral.refreshPublicityData$.pipe(takeUntil(this.destroy$)).subscribe(data=>this.getAllPublicityData(data));
     this.serviceGeneral.imageIds$.pipe(takeUntil(this.destroy$)).subscribe(data=>this.imageIds=data);
     this.serviceGeneral.toastMessage$.pipe(takeUntil(this.destroy$)).subscribe(data=>this.messageService.add(data));
-    this.serviceGeneral.activateChatClientStream$.pipe(takeUntil(this.destroy$)).pipe(take(2)).subscribe(data=>this.setSubscriptionToDataReceiver(data));
+    this.serviceGeneral.chatClientStreamPrueba$.pipe(takeUntil(this.destroy$)).subscribe(data=>this.setSubscriptionToDataReceiver(data));
     this.serviceGeneral.activateBasicTemplateStream$.pipe(takeUntil(this.destroy$)).subscribe(data=>this.setSubscriptionToBasicTemplateReceiver(data));
     this.serviceGeneral.activateUploadDocumentStream$.pipe(takeUntil(this.destroy$)).pipe(take(2)).subscribe(data=>this.setSubscriptionToFileReceiver(data));
     this.serviceGeneral.executingImageStream$.pipe(takeUntil(this.destroy$)).subscribe(data=> this.setSubscriptionToImageReceiver(data));
@@ -83,24 +88,35 @@ export class App implements OnInit, OnDestroy, AfterViewInit{
     const componentRef = this.viewContainerRef.createComponent(componentType);
   }
 
-  private setSubscriptionToDataReceiver(executing: boolean){
-    if(executing){
-      this.subscriptions.add(
-        this.receiveData.getDataStream().subscribe({
-          next: (token) => {
-            this.serviceGeneral.setStatusMessage(true);
-            this.serviceGeneral.setIsUploadingAnimation(false);
-            this.serviceGeneral.setResponseMessagePrompt(token.data.message);
-          },
-          error: (err) =>{
-            this.serviceGeneral.setStatusMessage(false);
-            this.serviceGeneral.setIsUploadingAnimation(false);
-            this.serviceGeneral.setResponseMessagePrompt('Error: Could not complete the request.');
-          },
-        })
-      );
+  private setSubscriptionToDataReceiver(request: GenerationDataInterface) {
+    if (this.sseSubscription) {
+        this.sseSubscription.unsubscribe();
     }
-  }
+
+    if (request && request.prompt!='') {
+        this.sseSubscription = this.receiveData.getDataStream(request)
+            .pipe(
+                takeUntilDestroyed(this.destroyRef), 
+                finalize(() => console.log('Observable stream fully finalized'))
+            )
+            .subscribe({
+                next: (token) => {
+                    this.serviceGeneral.setStatusMessage(true);
+                    this.serviceGeneral.setIsUploadingAnimation(false);
+                    this.serviceGeneral.setResponseMessagePrompt(token.data.message);
+                },
+                error: (err) => {
+                    this.serviceGeneral.setStatusMessage(false);
+                    this.serviceGeneral.setIsUploadingAnimation(false);
+                    this.serviceGeneral.setResponseMessagePrompt('Error: Could not complete the request.');
+                },
+                complete: () => {
+                    console.log('Stream completed via backend signal');
+                }
+            });
+        this.subscriptions.add(this.sseSubscription);
+    }
+}
 
   private setSubscriptionToFileReceiver(executing: boolean): void{
     if(executing){

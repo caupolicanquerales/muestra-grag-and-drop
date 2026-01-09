@@ -5,6 +5,7 @@ import { ToastMessageOptions } from 'primeng/api';
 import { SyntheticDataInterface } from '../models/synthetic-data-interface';
 import { BasicTemplateInterface } from '../models/basic-template-interface';
 import { GlobalDefectInterface } from '../models/global-defect-interface';
+import { GenerationDataInterface } from '../models/generation-data-interface';
 
 @Injectable({
   providedIn: 'root'
@@ -115,6 +116,10 @@ export class ServiceGeneral {
 
   private globalDefect = new BehaviorSubject<Array<GlobalDefectInterface>>([]);
   globalDefect$: Observable<Array<GlobalDefectInterface>> = this.globalDefect.asObservable();
+
+  private chatClientStreamPrueba = new BehaviorSubject<GenerationDataInterface>({prompt:''});
+  chatClientStreamPrueba$: Observable<GenerationDataInterface> = this.chatClientStreamPrueba.asObservable();
+  
 
   setChangeComponent(component:string): void{
     this.changeComponent.next(component);
@@ -254,6 +259,10 @@ export class ServiceGeneral {
 
   setImageGenerated(image:string): void{
     this.imageGenerated.next(image);
+  }
+
+  setActivateChatClientStreamPrueba(promptChatClient:GenerationDataInterface): void{
+    this.chatClientStreamPrueba.next(promptChatClient);
   }
 
 }
