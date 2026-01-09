@@ -3,7 +3,7 @@ import { AfterViewInit, Component, ElementRef, HostListener, inject, OnDestroy, 
 import { TreeNode } from 'primeng/api';
 import { TreeModule } from 'primeng/tree';
 import { ServiceGeneral } from '../service/service-general';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil, Observable } from 'rxjs';
 import { PromptGenerationImageInterface } from '../models/prompt-generation-image-interface';
 import { SyntheticDataInterface } from '../models/synthetic-data-interface';
 import { BasicTemplateInterface } from '../models/basic-template-interface';
@@ -50,24 +50,11 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
   ngOnInit(): void {
     this.selectedOption=this.radioButton1;
     this.editors.set(getEditors());
-    this.serviceGeneral.basicTemplateData$.pipe(takeUntil(this.destroy$)).subscribe(data=>{
-      const node= this.setChildrenInTreeNode( TypePromptEnum.BASIC_TEMPLATE,TypePromptEnum.BASIC_TEMPLATE, data, TypePromptEnum.BASIC_TEMPLATE);
-      this.updateSpecificEditor('0', { tree: node, typePrompt: TypePromptEnum.BASIC_TEMPLATE });
-    });
-    this.serviceGeneral.syntheticData$.pipe(takeUntil(this.destroy$)).subscribe(data=>{
-      const node = this.setChildrenInTreeNode(TypePromptEnum.SYNTHETIC_DATA,TypePromptEnum.SYNTHETIC_DATA, data, TypePromptEnum.SYNTHETIC_DATA);
-      this.updateSpecificEditor('1', { tree: node, typePrompt: TypePromptEnum.SYNTHETIC_DATA });
-    });
-    this.serviceGeneral.publicityData$.pipe(takeUntil(this.destroy$)).subscribe(data=>{
-      const node = this.setChildrenInTreeNode( TypePromptEnum.PUBLICITY_DATA,TypePromptEnum.PUBLICITY_DATA, data, TypePromptEnum.PUBLICITY_DATA);
-      this.updateSpecificEditor('2', { tree: node, typePrompt: TypePromptEnum.PUBLICITY_DATA });
-    });
-    this.serviceGeneral.promptSystem$.pipe(takeUntil(this.destroy$)).subscribe(data=>{
-      const node = this.setChildrenInTreeNode( TypePromptEnum.SYSTEM_PROMPT,TypePromptEnum.SYSTEM_PROMPT, data, TypePromptEnum.SYSTEM_PROMPT);
-      this.updateSpecificEditor('3', { tree: node, typePrompt: TypePromptEnum.SYSTEM_PROMPT });
-      this.onRadioChange(null);
-    });
-    this.serviceGeneral.basicTemplate$.pipe(takeUntil(this.destroy$)).subscribe(data=>this.setBasicTemplateToEditor(data, this.index));
+    this.handleDataUpdate('0', TypePromptEnum.BASIC_TEMPLATE, this.serviceGeneral.basicTemplateData$);
+    this.handleDataUpdate('1', TypePromptEnum.SYNTHETIC_DATA, this.serviceGeneral.syntheticData$);
+    this.handleDataUpdate('2', TypePromptEnum.PUBLICITY_DATA, this.serviceGeneral.publicityData$);
+    this.handleDataUpdate('3', TypePromptEnum.SYSTEM_PROMPT, this.serviceGeneral.promptSystem$);
+    this.subscribeUntilDestroyed(this.serviceGeneral.basicTemplate$, data => this.setBasicTemplateToEditor(data, this.index));
   }
 
   ngOnDestroy(): void {
@@ -140,6 +127,20 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
         editor.id === id ? { ...editor, ...changes } : editor
       )
     );
+  }
+
+  private subscribeUntilDestroyed<T>(obs: Observable<T>, handler: (v: T) => void) {
+    obs.pipe(takeUntil(this.destroy$)).subscribe(handler);
+  }
+
+  private handleDataUpdate(editorId: string, kind: TypePromptEnum, data$: Observable<any>) {
+    this.subscribeUntilDestroyed(data$, (data) => {
+      const node = this.setChildrenInTreeNode(kind, kind, data, kind);
+      this.updateSpecificEditor(editorId, { tree: node, typePrompt: kind });
+      if (kind === TypePromptEnum.SYSTEM_PROMPT) {
+        this.onRadioChange(null);
+      }
+    });
   }
 
   private getBasicTemplateInterface($event:any):BasicTemplateInterface{

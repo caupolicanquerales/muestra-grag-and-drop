@@ -167,15 +167,13 @@ export class ChatButtons implements OnInit{
     this.visible= false;
   }
 
-  private getArrayNameToValidate(format: string){
-    if(format=="Prompt imagen"){
-      return this.arrayPromptAndData.prompt_imagen;
-    }else if(format=="Prompt datos"){
-      return this.arrayPromptAndData.prompt_datos;
-    }else if(format=="Prompt facturas"){
-      return this.arrayPromptAndData.prompt_facturas;
-    }else{
-      return this.arrayPromptAndData.dato_sintético;
-    }
+  private getArrayNameToValidate(format: string) {
+    const map: Record<string, any> = {
+      'Prompt imagen': this.arrayPromptAndData.prompt_imagen,
+      'Prompt datos': this.arrayPromptAndData.prompt_datos,
+      'Prompt facturas': this.arrayPromptAndData.prompt_facturas,
+      'Dato sintético': this.arrayPromptAndData.dato_sintético
+    };
+    return map[format] ?? this.arrayPromptAndData.dato_sintético;
   }
 }

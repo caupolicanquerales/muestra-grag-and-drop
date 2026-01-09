@@ -4,7 +4,7 @@ import { ButtonModule } from 'primeng/button';
 import { SplitterModule } from 'primeng/splitter';
 import { TableModule } from 'primeng/table';
 import { ServiceGeneral } from '../service/service-general';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil, Observable } from 'rxjs';
 import { PromptGenerationImageInterface } from '../models/prompt-generation-image-interface';
 import { SyntheticDataInterface } from '../models/synthetic-data-interface';
 import { TabsModule } from 'primeng/tabs';
@@ -38,29 +38,25 @@ export class BillDeletePrompt implements OnInit, OnDestroy{
   ngOnInit(): void {
     this.serviceGeneral.setImageGenerated('');
     this.desiredOrder.forEach((name, index) => {this.orderMap[name] = index;});
-    this.serviceGeneral.promptImages$.pipe(takeUntil(this.destroy$)).subscribe(data=>{
-      this.setTabs(this.tabTitle[TabDeletePromptCategory.IMAGE], TabDeletePromptCategory.IMAGE, data, "1");
-    });
-    this.serviceGeneral.promptData$.pipe(takeUntil(this.destroy$)).subscribe(data=>{
-      this.setTabs(this.tabTitle[TabDeletePromptCategory.DATA], TabDeletePromptCategory.DATA, data, "2");
-    });
-    this.serviceGeneral.promptBills$.pipe(takeUntil(this.destroy$)).subscribe(data=>{
-      this.setTabs(this.tabTitle[TabDeletePromptCategory.BILL], TabDeletePromptCategory.BILL, data, "3");
-    });
-    this.serviceGeneral.promptSystem$.pipe(takeUntil(this.destroy$)).subscribe(data=>{
-      this.setTabs(this.tabTitle[TabDeletePromptCategory.SYSTEM], TabDeletePromptCategory.SYSTEM, data, "4");
-    });
-    this.serviceGeneral.syntheticData$.pipe(takeUntil(this.destroy$)).subscribe(data=>{
-      this.setTabs(this.tabTitle[TabDeletePromptCategory.SYNTHETIC], TabDeletePromptCategory.SYNTHETIC, data, "5");
-    });
-    this.serviceGeneral.publicityData$.pipe(takeUntil(this.destroy$)).subscribe(data=>{
-      this.setTabs(this.tabTitle[TabDeletePromptCategory.PUBLICITY], TabDeletePromptCategory.PUBLICITY, data, "6");
-    });
+    const tabs = [
+      { obs: this.serviceGeneral.promptImages$, title: this.tabTitle[TabDeletePromptCategory.IMAGE], cat: TabDeletePromptCategory.IMAGE, num: '1' },
+      { obs: this.serviceGeneral.promptData$, title: this.tabTitle[TabDeletePromptCategory.DATA], cat: TabDeletePromptCategory.DATA, num: '2' },
+      { obs: this.serviceGeneral.promptBills$, title: this.tabTitle[TabDeletePromptCategory.BILL], cat: TabDeletePromptCategory.BILL, num: '3' },
+      { obs: this.serviceGeneral.promptSystem$, title: this.tabTitle[TabDeletePromptCategory.SYSTEM], cat: TabDeletePromptCategory.SYSTEM, num: '4' },
+      { obs: this.serviceGeneral.syntheticData$, title: this.tabTitle[TabDeletePromptCategory.SYNTHETIC], cat: TabDeletePromptCategory.SYNTHETIC, num: '5' },
+      { obs: this.serviceGeneral.publicityData$, title: this.tabTitle[TabDeletePromptCategory.PUBLICITY], cat: TabDeletePromptCategory.PUBLICITY, num: '6' },
+    ];
+
+    tabs.forEach(t => this.subscribeUntilDestroyed(t.obs as Observable<any>, data => this.setTabs(t.title, t.cat, data, t.num)));
   }
 
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();  
+  }
+
+  private subscribeUntilDestroyed<T>(obs: Observable<T>, handler: (v: T) => void) {
+    obs.pipe(takeUntil(this.destroy$)).subscribe(handler);
   }
 
   selectItem($event:any, type: string):void{
@@ -70,22 +66,21 @@ export class BillDeletePrompt implements OnInit, OnDestroy{
   }
 
   deletePrompt($event: any){
-    const request= this.getPromptGenerationImageInterface(this.selectedPrompt?.prompt);
-    const requestSynthetic= this.getPromptSyntheticDataInterface(this.selectedPrompt?.prompt);
-    if(this.selectedPrompt?.type==TabDeletePromptCategory.IMAGE){
-      this.executingRestFulService.deletePromptImageById(request);
-    }else if(this.selectedPrompt?.type==TabDeletePromptCategory.DATA){
-      this.executingRestFulService.deletePromptDataById(request);
-    }else if(this.selectedPrompt?.type==TabDeletePromptCategory.BILL){
-      this.executingRestFulService.deletePromptBillById(request);
-    }else if(this.selectedPrompt?.type==TabDeletePromptCategory.SYSTEM){
-      this.executingRestFulService.deletePromptSystemById(request);
-    }else if(this.selectedPrompt?.type==TabDeletePromptCategory.SYNTHETIC){
-      this.executingRestFulService.deleteSyntheticDataById(requestSynthetic);
-    }else if(this.selectedPrompt?.type==TabDeletePromptCategory.PUBLICITY){
-      this.executingRestFulService.deletePublicityDataById(requestSynthetic);
-    }
-    this.visible=false;
+    const request = this.getPromptGenerationImageInterface(this.selectedPrompt?.prompt);
+    const requestSynthetic = this.getPromptSyntheticDataInterface(this.selectedPrompt?.prompt);
+
+    const actions: Record<string, () => void> = {
+      [TabDeletePromptCategory.IMAGE]: () => this.executingRestFulService.deletePromptImageById(request),
+      [TabDeletePromptCategory.DATA]: () => this.executingRestFulService.deletePromptDataById(request),
+      [TabDeletePromptCategory.BILL]: () => this.executingRestFulService.deletePromptBillById(request),
+      [TabDeletePromptCategory.SYSTEM]: () => this.executingRestFulService.deletePromptSystemById(request),
+      [TabDeletePromptCategory.SYNTHETIC]: () => this.executingRestFulService.deleteSyntheticDataById(requestSynthetic),
+      [TabDeletePromptCategory.PUBLICITY]: () => this.executingRestFulService.deletePublicityDataById(requestSynthetic),
+    };
+
+    const action = actions[this.selectedPrompt?.type];
+    if (action) action();
+    this.visible = false;
   }
 
   private setPagination(array: Array<any>){

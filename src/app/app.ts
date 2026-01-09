@@ -4,7 +4,7 @@ import { BillHeader } from './bill-header/bill-header';
 import { BillFooter } from './bill-footer/bill-footer';
 import { BillMenu } from './bill-menu/bill-menu';
 import { ServiceGeneral } from './service/service-general';
-import { finalize, Subject, Subscription, take, takeUntil } from 'rxjs';
+import { finalize, Subject, Subscription, take, takeUntil, Observable } from 'rxjs';
 import { ReceiveDataService } from './service/receive-data-service';
 import { nanoid } from 'nanoid';
 import { HttpClientService } from './service/http-client-service';
@@ -46,20 +46,20 @@ export class App implements OnInit, OnDestroy, AfterViewInit{
     private messageService: MessageService, private executingRestFulService: ExecutingRestFulService){}
 
   ngOnInit(): void {
-    this.serviceGeneral.refreshPromptBills$.pipe(takeUntil(this.destroy$)).subscribe(data=>this.getAllPromptBills(data));
-    this.serviceGeneral.refreshPromptData$.pipe(takeUntil(this.destroy$)).subscribe(data=>this.getAllPromptData(data));
-    this.serviceGeneral.refreshPromptImages$.pipe(takeUntil(this.destroy$)).subscribe(data=>this.getAllPromptImages(data));
-    this.serviceGeneral.refreshSyntheticData$.pipe(takeUntil(this.destroy$)).subscribe(data=>this.getAllSyntheticData(data));
-    this.serviceGeneral.refreshBasicTemplate$.pipe(takeUntil(this.destroy$)).subscribe(data=>this.getAllBasicTemplateData(data));
-    this.serviceGeneral.refreshPromptGlobalDefect$.pipe(takeUntil(this.destroy$)).subscribe(data=>this.getAllPromptGlobalDefect(data));
-    this.serviceGeneral.refreshPromptSystem$.pipe(takeUntil(this.destroy$)).subscribe(data=>this.getAllPromptSystem(data));
-    this.serviceGeneral.refreshPublicityData$.pipe(takeUntil(this.destroy$)).subscribe(data=>this.getAllPublicityData(data));
-    this.serviceGeneral.imageIds$.pipe(takeUntil(this.destroy$)).subscribe(data=>this.imageIds=data);
-    this.serviceGeneral.toastMessage$.pipe(takeUntil(this.destroy$)).subscribe(data=>this.messageService.add(data));
-    this.serviceGeneral.chatClientStreamPrueba$.pipe(takeUntil(this.destroy$)).subscribe(data=>this.setSubscriptionToDataReceiver(data));
-    this.serviceGeneral.activateBasicTemplateStream$.pipe(takeUntil(this.destroy$)).subscribe(data=>this.setSubscriptionToBasicTemplateReceiver(data));
+    this.subscribeUntilDestroyed(this.serviceGeneral.refreshPromptBills$, data => this.getAll('promptBills', data));
+    this.subscribeUntilDestroyed(this.serviceGeneral.refreshPromptData$, data => this.getAll('promptData', data));
+    this.subscribeUntilDestroyed(this.serviceGeneral.refreshPromptImages$, data => this.getAll('promptImages', data));
+    this.subscribeUntilDestroyed(this.serviceGeneral.refreshSyntheticData$, data => this.getAll('syntheticData', data));
+    this.subscribeUntilDestroyed(this.serviceGeneral.refreshBasicTemplate$, data => this.getAll('basicTemplate', data));
+    this.subscribeUntilDestroyed(this.serviceGeneral.refreshPromptGlobalDefect$, data => this.getAll('promptGlobalDefect', data));
+    this.subscribeUntilDestroyed(this.serviceGeneral.refreshPromptSystem$, data => this.getAll('promptSystem', data));
+    this.subscribeUntilDestroyed(this.serviceGeneral.refreshPublicityData$, data => this.getAll('publicityData', data));
+    this.subscribeUntilDestroyed(this.serviceGeneral.imageIds$, data => this.imageIds = data);
+    this.subscribeUntilDestroyed(this.serviceGeneral.toastMessage$, data => this.messageService.add(data));
+    this.subscribeUntilDestroyed(this.serviceGeneral.chatClientStreamPrueba$, data => this.setSubscriptionToDataReceiver(data));
+    this.subscribeUntilDestroyed(this.serviceGeneral.activateBasicTemplateStream$, data => this.setSubscriptionToBasicTemplateReceiver(data));
     this.serviceGeneral.activateUploadDocumentStream$.pipe(takeUntil(this.destroy$)).pipe(take(2)).subscribe(data=>this.setSubscriptionToFileReceiver(data));
-    this.serviceGeneral.executingImageStream$.pipe(takeUntil(this.destroy$)).subscribe(data=> this.setSubscriptionToImageReceiver(data));
+    this.subscribeUntilDestroyed(this.serviceGeneral.executingImageStream$, data => this.setSubscriptionToImageReceiver(data));
     this.serviceGeneral.changeComponent$.pipe(takeUntil(this.destroy$)).subscribe(data=>{
       if(data!=''){
         this.loadComponent(data);
@@ -191,52 +191,24 @@ export class App implements OnInit, OnDestroy, AfterViewInit{
     return formData;
   }
 
-  private getAllPromptImages(event: string){
-    if(event!=''){
-      this.executingRestFulService.getAllPromptImages();
-    }
+  private subscribeUntilDestroyed<T>(obs: Observable<T>, handler: (v: T) => void) {
+    obs.pipe(takeUntil(this.destroy$)).subscribe(handler);
   }
 
-  private getAllPromptBills(event: string){
-    if(event!=''){
-      this.executingRestFulService.getAllPromptBill();
-    }
-  }
-
-  private getAllPromptData(event: string){
-    if(event!=''){
-      this.executingRestFulService.getAllPromptData();
-    }
-  }
-
-  private getAllSyntheticData(event: string){
-    if(event!=''){
-      this.executingRestFulService.getAllSyntheticData();
-    }
-  }
-
-  private getAllPublicityData(event: string){
-    if(event!=''){
-      this.executingRestFulService.getAllPublicityData();
-    }
-  }
-
-  private getAllBasicTemplateData(event: string){
-    if(event!=''){
-      this.executingRestFulService.getAllBasicTemplate();
-    }
-  }
-
-  private getAllPromptGlobalDefect(event: string){
-    if(event!=''){
-      this.executingRestFulService.getAllPromptGlobalDefect();
-    }
-  }
-
-  private getAllPromptSystem(event: string){
-    if(event!=''){
-      this.executingRestFulService.getAllPromptSystem();
-    }
+  private getAll(kind: 'promptImages'|'promptBills'|'promptData'|'syntheticData'|'publicityData'|'basicTemplate'|'promptGlobalDefect'|'promptSystem', event: string){
+    if(!event) return;
+    const actions: Record<string, () => void> = {
+      promptImages: () => this.executingRestFulService.getAllPromptImages(),
+      promptBills: () => this.executingRestFulService.getAllPromptBill(),
+      promptData: () => this.executingRestFulService.getAllPromptData(),
+      syntheticData: () => this.executingRestFulService.getAllSyntheticData(),
+      publicityData: () => this.executingRestFulService.getAllPublicityData(),
+      basicTemplate: () => this.executingRestFulService.getAllBasicTemplate(),
+      promptGlobalDefect: () => this.executingRestFulService.getAllPromptGlobalDefect(),
+      promptSystem: () => this.executingRestFulService.getAllPromptSystem(),
+    };
+    const action = actions[kind];
+    if(action) action();
   }
 
   private setToastMessage(state: string, details: string){

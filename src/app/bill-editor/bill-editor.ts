@@ -7,7 +7,7 @@ import { PromptGenerationImageInterface } from '../models/prompt-generation-imag
 import { triggerDownloadTheFile, getMapTypeFormatDownloadFile } from '../utils/download-file-utils';
 import { ExecutingRestFulService } from '../service/executing-rest-ful-service';
 import { removeColorContent } from '../utils/operation-string-utils'
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil, Observable } from 'rxjs';
 import { SyntheticDataInterface } from '../models/synthetic-data-interface';
 import { PromptAndDataToValidateInterface } from '../models/prompts-and-data-to-validate-interface';
 import { getHeaderDialogToBillEditor, getExportFormatToBillEditor, getSaveFormartPromptForSystem, getSaveFormartPromptForData, getSaveFormartPromptForOther, getHeaderDialogToSystem, getHeaderDialogToData } from '../utils/dialog-parameters-utils';
@@ -65,38 +65,23 @@ export class BillEditor implements OnInit, OnDestroy {
     this.headerDialog= getHeaderDialogToBillEditor();
     this.itemsSavePrompt= getSaveFormartPromptForOther();
     this.itemsExportPrompt= getExportFormatToBillEditor();
-    this.serviceGeneral.promptImages$.pipe(takeUntil(this.destroy$)).subscribe(data=>{
-      this.backUpTree= setChildInTree(this.tree,this.backUpTree,TypePromptEnum.IMAGE_PROMPT,data,this.orderMap);
-      this.tree= this.setDisablePrompts();
-    });
-    this.serviceGeneral.promptBills$.pipe(takeUntil(this.destroy$)).subscribe(data=>{
-      this.backUpTree= setChildInTree(this.tree,this.backUpTree,TypePromptEnum.BILL_PROMPT,data,this.orderMap);
-      this.tree= this.setDisablePrompts();
-    });
-    this.serviceGeneral.promptData$.pipe(takeUntil(this.destroy$)).subscribe(data=>{
-      this.backUpTree= setChildInTree(this.tree,this.backUpTree,TypePromptEnum.DATA_PROMPT,data,this.orderMap);
-      this.tree= this.setDisablePrompts();
-    });
-    this.serviceGeneral.syntheticData$.pipe(takeUntil(this.destroy$)).subscribe(data=>{
-      this.backUpTree= setChildInTree(this.tree,this.backUpTree,TypePromptEnum.SYNTHETIC_DATA,data,this.orderMap);
-      this.tree= this.setDisablePrompts();
-    });
-    this.serviceGeneral.publicityData$.pipe(takeUntil(this.destroy$)).subscribe(data=>{
-      this.backUpTree= setChildInTree(this.tree,this.backUpTree,TypePromptEnum.PUBLICITY_DATA,data,this.orderMap);
-      this.tree= this.setDisablePrompts();
-    });
-    this.serviceGeneral.promptGlobalDefect$.pipe(takeUntil(this.destroy$)).subscribe(data=>{
-      this.backUpTree= setChildInTree(this.tree,this.backUpTree,TypePromptEnum.GLOBAL_DEFECT_PROMPT,data,this.orderMap);
-      this.tree= this.setDisablePrompts();
-    });
-    this.serviceGeneral.promptSystem$.pipe(takeUntil(this.destroy$)).subscribe(data=>{
-      this.backUpTree= setChildInTree(this.tree,this.backUpTree,TypePromptEnum.SYSTEM_PROMPT,data,this.orderMap);
-      this.tree= this.setDisablePrompts();
-    });
-    this.serviceGeneral.basicTemplateData$.pipe(takeUntil(this.destroy$)).subscribe(data=>{
-      this.backUpTree= setChildInTree(this.tree,this.backUpTree,TypePromptEnum.BASIC_TEMPLATE,data,this.orderMap);
-      this.tree= this.setDisablePrompts();
-    });
+    const sources = [
+      { obs: this.serviceGeneral.promptImages$, type: TypePromptEnum.IMAGE_PROMPT },
+      { obs: this.serviceGeneral.promptBills$, type: TypePromptEnum.BILL_PROMPT },
+      { obs: this.serviceGeneral.promptData$, type: TypePromptEnum.DATA_PROMPT },
+      { obs: this.serviceGeneral.syntheticData$, type: TypePromptEnum.SYNTHETIC_DATA },
+      { obs: this.serviceGeneral.publicityData$, type: TypePromptEnum.PUBLICITY_DATA },
+      { obs: this.serviceGeneral.promptGlobalDefect$, type: TypePromptEnum.GLOBAL_DEFECT_PROMPT },
+      { obs: this.serviceGeneral.promptSystem$, type: TypePromptEnum.SYSTEM_PROMPT },
+      { obs: this.serviceGeneral.basicTemplateData$, type: TypePromptEnum.BASIC_TEMPLATE },
+    ];
+
+    sources.forEach(s =>
+      this.subscribeUntilDestroyed(s.obs as Observable<any>, data => {
+        this.backUpTree = setChildInTree(this.tree, this.backUpTree, s.type, data, this.orderMap);
+        this.tree = this.setDisablePrompts();
+      })
+    );
     this.serviceGeneral.basicTemplate$.pipe(takeUntil(this.destroy$)).subscribe(data=>this.setBasicTemplateToEditor(data));
   }
 
@@ -104,6 +89,10 @@ export class BillEditor implements OnInit, OnDestroy {
     this.serviceGeneral.setBasicTemplate('');
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  private subscribeUntilDestroyed<T>(obs: Observable<T>, handler: (v: T) => void) {
+    obs.pipe(takeUntil(this.destroy$)).subscribe(handler);
   }
 
   @HostListener('window:resize', [])
@@ -173,31 +162,23 @@ export class BillEditor implements OnInit, OnDestroy {
 
   emitSavePrompt($event: any){
     const textToCopy = this.getTextToCopy();
-    let request: PromptGenerationImageInterface = {
+    const requestBase: PromptGenerationImageInterface = {
       id: null,
       prompt: textToCopy,
       name: $event.name
     };
-    if($event?.typePrompt==TypePromptEnum.BILL_PROMPT){
-      this.executingRestFulService.savePromptBill(request);
-    }
-    if($event?.typePrompt==TypePromptEnum.IMAGE_PROMPT){
-      this.executingRestFulService.savePromptImage(request);
-    }
-    if($event?.typePrompt==TypePromptEnum.DATA_PROMPT){
-      this.executingRestFulService.savePromptData(request);
-    }
-    if($event?.typePrompt==TypePromptEnum.SYNTHETIC_DATA){
-      const request= this.getSyntheticRequest(textToCopy, $event.name);
-      this.executingRestFulService.saveSyntheticData(request);
-    }
-    if($event?.typePrompt==TypePromptEnum.PUBLICITY_DATA){
-      const request= this.getSyntheticRequest(textToCopy, $event.name);
-      this.executingRestFulService.savePublicityData(request);
-    }
-    if($event?.typePrompt==TypePromptEnum.SYSTEM_PROMPT){
-      this.executingRestFulService.savePromptSystem(request);
-    }
+
+    const actions: Record<string, () => void> = {
+      [TypePromptEnum.BILL_PROMPT]: () => this.executingRestFulService.savePromptBill(requestBase),
+      [TypePromptEnum.IMAGE_PROMPT]: () => this.executingRestFulService.savePromptImage(requestBase),
+      [TypePromptEnum.DATA_PROMPT]: () => this.executingRestFulService.savePromptData(requestBase),
+      [TypePromptEnum.SYNTHETIC_DATA]: () => this.executingRestFulService.saveSyntheticData(this.getSyntheticRequest(textToCopy, $event.name)),
+      [TypePromptEnum.PUBLICITY_DATA]: () => this.executingRestFulService.savePublicityData(this.getSyntheticRequest(textToCopy, $event.name)),
+      [TypePromptEnum.SYSTEM_PROMPT]: () => this.executingRestFulService.savePromptSystem(requestBase),
+    };
+
+    const action = actions[$event?.typePrompt];
+    if (action) action();
   }
 
   private getSyntheticRequest(textToCopy: string, name: string): SyntheticDataInterface{
@@ -230,26 +211,25 @@ export class BillEditor implements OnInit, OnDestroy {
   }
 
   nodeSelect($event: any){
-     if(this.selectedNode?.data?.type==TypePromptEnum.BILL_PROMPT){
-      this.setColorText(this.selectedNode?.data, "rgb(0, 0, 139)");
-    }
-    if(this.selectedNode?.data?.type==TypePromptEnum.IMAGE_PROMPT){
-      this.setColorText(this.selectedNode?.data, "rgb(47, 79, 79)");
-    }
-    if(this.selectedNode?.data?.type==TypePromptEnum.DATA_PROMPT){
-      this.setColorText(this.selectedNode?.data, "rgb(0, 128, 128)");
-    }
-    if(this.selectedNode?.data?.type==TypePromptEnum.SYNTHETIC_DATA ||
-      this.selectedNode?.data?.type==TypePromptEnum.SYSTEM_PROMPT ||
-      this.selectedNode?.data?.type==TypePromptEnum.GLOBAL_DEFECT_PROMPT ||
-      this.selectedNode?.data?.type==TypePromptEnum.PUBLICITY_DATA
-    ){
-      this.setColorText(this.selectedNode?.data, "rgb(0, 0, 0)");
-    }
-    if(this.selectedNode?.data?.type==TypePromptEnum.BASIC_TEMPLATE){
-      let request= this.getBasicTemplateInterface($event?.node?.data?.data);
+    const type = this.selectedNode?.data?.type;
+    if (type === TypePromptEnum.BASIC_TEMPLATE) {
+      const request = this.getBasicTemplateInterface($event?.node?.data?.data);
       this.executingRestFulService.getBasicTemplateById(request);
+      return;
     }
+
+    const colorMap: Record<string, string> = {
+      [TypePromptEnum.BILL_PROMPT]: 'rgb(0, 0, 139)',
+      [TypePromptEnum.IMAGE_PROMPT]: 'rgb(47, 79, 79)',
+      [TypePromptEnum.DATA_PROMPT]: 'rgb(0, 128, 128)',
+      [TypePromptEnum.SYNTHETIC_DATA]: 'rgb(0, 0, 0)',
+      [TypePromptEnum.SYSTEM_PROMPT]: 'rgb(0, 0, 0)',
+      [TypePromptEnum.GLOBAL_DEFECT_PROMPT]: 'rgb(0, 0, 0)',
+      [TypePromptEnum.PUBLICITY_DATA]: 'rgb(0, 0, 0)'
+    };
+
+    const color = colorMap[type as string];
+    if (color) this.setColorText(this.selectedNode?.data, color);
   }
 
   onRadioChange($event:any){

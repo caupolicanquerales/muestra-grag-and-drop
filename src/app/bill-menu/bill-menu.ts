@@ -9,7 +9,7 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { PromptGenerationImageInterface } from '../models/prompt-generation-image-interface';
 import { ExecutingRestFulService } from '../service/executing-rest-ful-service';
 import { bfsSearchNodeToInsertFunctionCommand } from '../utils/bfs-search-node-utils';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil, Observable } from 'rxjs';
 import { TypePromptEnum } from '../enums/type-prompt-enum';
 
 @Component({
@@ -43,19 +43,23 @@ export class BillMenu implements OnInit, OnDestroy{
   ngOnInit(): void {
     this.httpClient.getMenuConfigFromRepository().subscribe(data=> this.items=data);
     this.handlerFunction = (event:any) => this.handleMenuClick(event);
-    this.executingRestFulService.getAllPromptImages();
-    this.executingRestFulService.getAllPromptBill();
-    this.executingRestFulService.getAllPromptData();
-    this.executingRestFulService.getAllSyntheticData();
-    this.executingRestFulService.getAllBasicTemplate();
-    this.executingRestFulService.getAllPromptGlobalDefect();
-    this.executingRestFulService.getAllGlobalDefects();
-    this.executingRestFulService.getAllPromptSystem();
-    this.executingRestFulService.getAllPublicityData();
+    const restCalls = [
+      () => this.executingRestFulService.getAllPromptImages(),
+      () => this.executingRestFulService.getAllPromptBill(),
+      () => this.executingRestFulService.getAllPromptData(),
+      () => this.executingRestFulService.getAllSyntheticData(),
+      () => this.executingRestFulService.getAllBasicTemplate(),
+      () => this.executingRestFulService.getAllPromptGlobalDefect(),
+      () => this.executingRestFulService.getAllGlobalDefects(),
+      () => this.executingRestFulService.getAllPromptSystem(),
+      () => this.executingRestFulService.getAllPublicityData(),
+    ];
+    restCalls.forEach(fn => fn());
+
     this.serviceGeneral.isUploadingAnimation$.pipe(takeUntil(this.destroy$)).subscribe(data=>this.isUploading.set(data));
-    this.serviceGeneral.promptImages$.pipe(takeUntil(this.destroy$)).subscribe(data=>this.setPromptImagesFromObservable(data));
-    this.serviceGeneral.promptBills$.pipe(takeUntil(this.destroy$)).subscribe(data=>this.setPromptBillsFromObservable(data));
-    this.serviceGeneral.promptData$.pipe(takeUntil(this.destroy$)).subscribe(data=>this.setPromptDataFromObservable(data));
+    this.subscribeUntilDestroyed(this.serviceGeneral.promptImages$, data => this.handlePromptsObservable(data, 'promptsImages', 'itemPromptImages', TypePromptEnum.IMAGE_PROMPT));
+    this.subscribeUntilDestroyed(this.serviceGeneral.promptBills$, data => this.handlePromptsObservable(data, 'promptsBills', 'itemPromptBills', TypePromptEnum.BILL_PROMPT));
+    this.subscribeUntilDestroyed(this.serviceGeneral.promptData$, data => this.handlePromptsObservable(data, 'promptsData', 'itemPromptData', TypePromptEnum.DATA_PROMPT));
     this.httpClient.getTemplates().subscribe(data=>this.templates=data);
     this.httpClient.getPromptsFromRepository().subscribe(data=>{
       this.itemPrompt=  this.setItemsForPrompt(data)
@@ -65,6 +69,10 @@ export class BillMenu implements OnInit, OnDestroy{
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  private subscribeUntilDestroyed<T>(obs: Observable<T>, handler: (v: T) => void) {
+    obs.pipe(takeUntil(this.destroy$)).subscribe(handler);
   }
 
   handleMenuClick(event:any){
@@ -144,28 +152,11 @@ export class BillMenu implements OnInit, OnDestroy{
     }
   }
 
-  private setPromptImagesFromObservable(prompts: Array<PromptGenerationImageInterface>){
-    if(prompts.length>0){
-      this.promptsImages= prompts;
-      this.itemPromptImages=  this.setItemsForPrompt(prompts);
-      this.bfsSearchNodeFromObservable(this.itemPromptImages, TypePromptEnum.IMAGE_PROMPT);
-    }
-  }
-
-  private setPromptBillsFromObservable(prompts: Array<PromptGenerationImageInterface>){
-    if(prompts.length>0){
-      this.promptsBills= prompts;
-      this.itemPromptBills=  this.setItemsForPrompt(prompts);
-      this.bfsSearchNodeFromObservable(this.itemPromptBills, TypePromptEnum.BILL_PROMPT);
-    }
-  }
-
-  private setPromptDataFromObservable(prompts: Array<PromptGenerationImageInterface>){
-    if(prompts.length>0){
-      this.promptsData= prompts;
-      this.itemPromptData=  this.setItemsForPrompt(prompts);
-      this.bfsSearchNodeFromObservable(this.itemPromptData, TypePromptEnum.DATA_PROMPT);
-    }
+  private handlePromptsObservable(prompts: Array<PromptGenerationImageInterface>, assignTargetKey: 'promptsImages'|'promptsBills'|'promptsData', itemTargetKey: 'itemPromptImages'|'itemPromptBills'|'itemPromptData', typePrompt: string){
+    if(!prompts || prompts.length === 0) return;
+    (this as any)[assignTargetKey] = prompts;
+    (this as any)[itemTargetKey] = this.setItemsForPrompt(prompts);
+    this.bfsSearchNodeFromObservable((this as any)[itemTargetKey], typePrompt);
   }
 
   private bfsSearchNodeFromObservable(promptsMenu: MenuItem[], typePrompt: string){

@@ -6,7 +6,7 @@ import { ChatBox } from '../chat-box/chat-box';
 import { SavePromptDbInterface } from '../models/save-prompt-db-interface';
 import { PromptGenerationImageInterface} from '../models/prompt-generation-image-interface';
 import { ExecutingRestFulService } from '../service/executing-rest-ful-service';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil, Observable } from 'rxjs';
 import { SyntheticDataInterface } from '../models/synthetic-data-interface';
 import { getHeaderDialogToBillData, getExportFormatToBillData, getSaveFormartPromptToBillData } from '../utils/dialog-parameters-utils';
 import { informationDataGenerationHelp } from '../utils/infor-help-tour-utils';
@@ -46,9 +46,9 @@ export class BillData implements OnInit, OnDestroy{
     this.headerDialog= getHeaderDialogToBillData();
     this.itemsExportPrompt= getExportFormatToBillData();
     this.itemsSavePrompt= getSaveFormartPromptToBillData();
-    this.serviceGeneral.statusMessage$.pipe(takeUntil(this.destroy$)).subscribe(status=>this.statusMessage.set(status));
-    this.serviceGeneral.responseMessagePrompt$.pipe(takeUntil(this.destroy$)).subscribe(token=>this.responseMessage.update(currentValue=>currentValue + token));
-    this.serviceGeneral.selectedPrompt$.pipe(takeUntil(this.destroy$)).subscribe(data=>this.prompt.set(data));
+    this.subscribeUntilDestroyed(this.serviceGeneral.statusMessage$, status => this.statusMessage.set(status));
+    this.subscribeUntilDestroyed(this.serviceGeneral.responseMessagePrompt$, token => this.responseMessage.update(currentValue => currentValue + token));
+    this.subscribeUntilDestroyed(this.serviceGeneral.selectedPrompt$, data => this.prompt.set(data));
     this.httpService.getPromptExtractionFromRepository().subscribe(data=>this.promptExtrationInfo=data['prompt']);
   }
 
@@ -61,15 +61,14 @@ export class BillData implements OnInit, OnDestroy{
 
   submitPrompt(): void {
     if (this.prompt().length >= 10) {
-      this.sendPromptToGenerateData();
+      this.prepareAndExecute();
     }
   }
 
   submitExtractJson(): void {
     const newPrompt= JSON.stringify(this.promptExtrationInfo.concat(this.responseMessage()));
-    this.setVariableBeforeSendingPrompt();
-    this.prompt.set(JSON.parse(newPrompt)) ; 
-    this.executingPrompt();
+    const parsed = JSON.parse(newPrompt);
+    this.prepareAndExecute(parsed);
   }
 
   promptEmitter(value: string){
@@ -81,17 +80,20 @@ export class BillData implements OnInit, OnDestroy{
   }
 
   getSavePromptEmitterInDB($event: SavePromptDbInterface){
-    if($event.typePrompt=="Prompt imagen"){
-      let request = this.getPromptGenerationRequest($event.prompt, $event.name)
-      this.executingRestFulService.savePromptImage(request);
-    }
-    if($event.typePrompt=="Prompt datos"){
-      let request = this.getPromptGenerationRequest($event.prompt, $event.name)
-      this.executingRestFulService.savePromptData(request);
-    }
-    if($event.typePrompt=="Dato sintético"){
-      this.saveSyntheticData($event);
-    }
+    const actions: Record<string, () => void> = {
+      'Prompt imagen': () => {
+        const request = this.getPromptGenerationRequest($event.prompt, $event.name);
+        this.executingRestFulService.savePromptImage(request);
+      },
+      'Prompt datos': () => {
+        const request = this.getPromptGenerationRequest($event.prompt, $event.name);
+        this.executingRestFulService.savePromptData(request);
+      },
+      'Dato sintético': () => this.saveSyntheticData($event),
+    };
+
+    const action = actions[$event.typePrompt];
+    if (action) action();
     console.log($event);
   }
 
@@ -111,9 +113,24 @@ export class BillData implements OnInit, OnDestroy{
     this.responseMessage.set('');
   }
 
+  private subscribeUntilDestroyed<T>(obs: Observable<T>, handler: (v: T) => void) {
+    obs.pipe(takeUntil(this.destroy$)).subscribe(handler);
+  }
+
+  private prepareAndExecute(optionalPrompt?: string) {
+    if (optionalPrompt !== undefined) {
+      try {
+        this.prompt.set(optionalPrompt as any);
+      } catch (e) {
+        this.prompt.set(optionalPrompt as any);
+      }
+    }
+    this.setVariableBeforeSendingPrompt();
+    this.sendPromptToGenerateData();
+  }
+
   private executingPrompt(){
     const request= this.getRequestGenerationData();
-    //this.serviceGeneral.setActivateChatClientStream(true);
     this.serviceGeneral.setActivateChatClientStreamPrueba(request);
     setTimeout(() => {
       this.updatePromptToGenerateData(request);
@@ -140,21 +157,6 @@ export class BillData implements OnInit, OnDestroy{
     this.prompt.set('');
     this.serviceGeneral.setResizeInput(true);
     this.serviceGeneral.setIsUploadingAnimation(true);
-    
-    /*
-    this.httpService.updatePromptForGenerationData(request).subscribe({
-      next: (data) => {
-        this.prompt.set('');
-        this.serviceGeneral.setResizeInput(true);
-        this.serviceGeneral.setIsUploadingAnimation(true);
-      },
-      error: (err) => {
-        console.error('Error fetching data:', err);
-      },
-      complete: () => {
-        console.log('Request completed.');
-      }
-    })*/
   }
 
   private sendingFileAndPrompt(){
