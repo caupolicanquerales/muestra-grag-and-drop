@@ -58,7 +58,7 @@ export class ExecutingRestFulService {
   }
 
   saveBasicTemplate(request: BasicTemplateInterface){
-    this.handlePromptAction(this.httpService.saveBasicTemplate(request), RefreshFlagObservableEnum.REFRESH_PGD,
+    this.handlePromptAction(this.httpService.saveBasicTemplate(request), RefreshFlagObservableEnum.REFRESH_BT,
       this.msgSuccessSaveTemplate, this.errorSaveTemplate);
   }
 
@@ -106,7 +106,7 @@ export class ExecutingRestFulService {
         this.setRefreshObservable(refreshKey);
       },
       error: () => {
-        this.getToastMessageOptions('error', 'Hubo un error en el guardado del prompt');
+        this.getToastMessageOptions('error', msgError);
       },
       complete: () => {
         console.log('Request completed.');
@@ -115,23 +115,18 @@ export class ExecutingRestFulService {
   }
 
   private setRefreshObservable(refreshKey: string){
-    if (refreshKey === RefreshFlagObservableEnum.REFRESH_PB) {
-          this.serviceGeneral.setRefreshPromptBills(refreshKey);
-    } else if(refreshKey === RefreshFlagObservableEnum.REFRESH_PD) {
-      this.serviceGeneral.setRefreshPromptData(refreshKey);
-    } else if(refreshKey ===  RefreshFlagObservableEnum.REFRESH_PI){
-      this.serviceGeneral.setRefreshPromptImages(refreshKey);
-    }else if(refreshKey ===  RefreshFlagObservableEnum.REFRESH_PS){
-      this.serviceGeneral.setRefreshPromptSystem(refreshKey);
-    }else if(refreshKey ===  RefreshFlagObservableEnum.REFRESH_SD){
-      this.serviceGeneral.setRefreshSyntheticData(refreshKey);
-    }else if(refreshKey ===  RefreshFlagObservableEnum.REFRESH_PGD){
-      this.serviceGeneral.setRefreshPromptGlobalDefect(refreshKey);
-    }else if(refreshKey ===  RefreshFlagObservableEnum.REFRESH_BT){
-       this.serviceGeneral.setRefreshBasicTemplate(refreshKey);
-    }else if(refreshKey ===  RefreshFlagObservableEnum.REFRESH_PUD){
-      this.serviceGeneral.setRefreshPublicityData(refreshKey);
-    }
+    const map: Record<string, (key: string) => void> = {
+      [RefreshFlagObservableEnum.REFRESH_PB]: (key) => this.serviceGeneral.setRefreshPromptBills(key),
+      [RefreshFlagObservableEnum.REFRESH_PD]: (key) => this.serviceGeneral.setRefreshPromptData(key),
+      [RefreshFlagObservableEnum.REFRESH_PI]: (key) => this.serviceGeneral.setRefreshPromptImages(key),
+      [RefreshFlagObservableEnum.REFRESH_PS]: (key) => this.serviceGeneral.setRefreshPromptSystem(key),
+      [RefreshFlagObservableEnum.REFRESH_SD]: (key) => this.serviceGeneral.setRefreshSyntheticData(key),
+      [RefreshFlagObservableEnum.REFRESH_PGD]: (key) => this.serviceGeneral.setRefreshPromptGlobalDefect(key),
+      [RefreshFlagObservableEnum.REFRESH_BT]: (key) => this.serviceGeneral.setRefreshBasicTemplate(key),
+      [RefreshFlagObservableEnum.REFRESH_PUD]: (key) => this.serviceGeneral.setRefreshPublicityData(key),
+    };
+    const handler = map[refreshKey];
+    if (handler) handler(refreshKey);
   }
 
 getBasicTemplateById(request: BasicTemplateInterface): void{
@@ -150,62 +145,51 @@ getBasicTemplateById(request: BasicTemplateInterface): void{
 }
 
   getAllPromptImages(){
-    this.httpService.getPromptGenerationImage().subscribe(response=>{
-      this.serviceGeneral.setPromptImages(response.prompts);      
-    });
+    this.fetchList(this.httpService.getPromptGenerationImage(), r => r?.prompts, l => this.serviceGeneral.setPromptImages(l));
   }
 
   getAllPromptBill(){
-    this.httpService.getPromptGenerationBill().subscribe(response=>{
-      this.serviceGeneral.setPromptBills(response.prompts);      
-    });
+    this.fetchList(this.httpService.getPromptGenerationBill(), r => r?.prompts, l => this.serviceGeneral.setPromptBills(l));
   }
 
   getAllPromptData(){
-    this.httpService.getPromptGenerationData().subscribe(response=>{
-      this.serviceGeneral.setPromptData(response.prompts);      
-    });
+    this.fetchList(this.httpService.getPromptGenerationData(), r => r?.prompts, l => this.serviceGeneral.setPromptData(l));
   }
 
   getAllSyntheticData(){
-    this.httpService.getSyntheticDataGeneration().subscribe(response=>{
-      this.serviceGeneral.setSyntheticData(response.synthetics);      
-    });
+    this.fetchList(this.httpService.getSyntheticDataGeneration(), r => r?.synthetics, l => this.serviceGeneral.setSyntheticData(l));
   }
 
   getAllBasicTemplate(){
-    this.httpService.getBasicTemplateGeneration().subscribe(response=>{
-      this.serviceGeneral.setBasicTemplateData(response.basicTemplates);      
-    });
+    this.fetchList(this.httpService.getBasicTemplateGeneration(), r => r?.basicTemplates, l => this.serviceGeneral.setBasicTemplateData(l));
   }
 
   getAllPromptGlobalDefect(){
-    this.httpService.getPromptGlobalDefect().subscribe(response=>{
-      this.serviceGeneral.setPromptGlobalDefect(response.prompts);      
-    });
+    this.fetchList(this.httpService.getPromptGlobalDefect(), r => r?.prompts, l => this.serviceGeneral.setPromptGlobalDefect(l));
   }
 
   getAllGlobalDefects(){
-    this.httpService.getGlobalDefects().subscribe(data=>{
-      this.serviceGeneral.setGlobalDefect(data.defects);
-    });
+    this.fetchList(this.httpService.getGlobalDefects(), r => r?.defects, l => this.serviceGeneral.setGlobalDefect(l));
   }
 
   getAllPromptSystem(){
-    this.httpService.getPromptGenerationSystem().subscribe(response=>{
-      this.serviceGeneral.setPromptSystem(response.prompts);
-    });
+    this.fetchList(this.httpService.getPromptGenerationSystem(), r => r?.prompts, l => this.serviceGeneral.setPromptSystem(l));
   }
 
   getAllPublicityData(){
-    this.httpService.getPublicitycDataGeneration().subscribe(response=>{
-      this.serviceGeneral.setPublicityData(response.synthetics);
-    });
+    this.fetchList(this.httpService.getPublicitycDataGeneration(), r => r?.synthetics, l => this.serviceGeneral.setPublicityData(l));
   }
 
   private getToastMessageOptions(state: string, details: string){
     const message= getToastMessageOption(state,details);
     this.serviceGeneral.setToastMessage(message);
+  }
+
+  private fetchList<R, T>(observable: Observable<R>, selector: (r: R) => T[] | null | undefined, setter: (list: T[]) => void): void {
+    observable.subscribe(response => {
+      const result = selector(response) ?? [];
+      setter(result);
+    });
   }
   
 }

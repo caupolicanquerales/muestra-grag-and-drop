@@ -8,9 +8,15 @@
 .dashboard-main {
     display: flex;
     flex: 1; 
-    grid-template-columns: 1fr; 
     gap: 1.5rem; 
-    padding-top: 1%;
+    padding: 1%;
+    overflow: hidden; 
+    align-items: flex-start; 
+}
+
+bill-menu {
+    flex-shrink: 0; 
+    width: 250px; 
 }
 
 .dashboard-card {

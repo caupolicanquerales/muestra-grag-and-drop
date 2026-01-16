@@ -36,13 +36,18 @@ export class BillMenu implements OnInit, OnDestroy{
   private eraseAction: string= "Borrar";
   private handlerFunction: any;
   private destroy$ = new Subject<void>();
+  private menuLoaded = false;
 
   constructor(private serviceGeneral: ServiceGeneral, private httpClient:HttpClientService,
     private executingRestFulService: ExecutingRestFulService ){}
 
   ngOnInit(): void {
-    this.httpClient.getMenuConfigFromRepository().subscribe(data=> this.items=data);
     this.handlerFunction = (event:any) => this.handleMenuClick(event);
+    this.httpClient.getMenuConfigFromRepository().subscribe(data=> {
+      this.items = data;
+      this.menuLoaded = true;
+      this.refreshMenu();
+    });
     const restCalls = [
       () => this.executingRestFulService.getAllPromptImages(),
       () => this.executingRestFulService.getAllPromptBill(),
@@ -153,16 +158,26 @@ export class BillMenu implements OnInit, OnDestroy{
   }
 
   private handlePromptsObservable(prompts: Array<PromptGenerationImageInterface>, assignTargetKey: 'promptsImages'|'promptsBills'|'promptsData', itemTargetKey: 'itemPromptImages'|'itemPromptBills'|'itemPromptData', typePrompt: string){
-    if(!prompts || prompts.length === 0) return;
-    (this as any)[assignTargetKey] = prompts;
-    (this as any)[itemTargetKey] = this.setItemsForPrompt(prompts);
-    this.bfsSearchNodeFromObservable((this as any)[itemTargetKey], typePrompt);
+    const safePrompts = Array.isArray(prompts) ? prompts : [];
+    (this as any)[assignTargetKey] = safePrompts;
+    (this as any)[itemTargetKey] = this.setItemsForPrompt(safePrompts);
+    if (this.menuLoaded) {
+      this.bfsSearchNodeFromObservable((this as any)[itemTargetKey], typePrompt);
+    }
   }
 
   private bfsSearchNodeFromObservable(promptsMenu: MenuItem[], typePrompt: string){
+    if (!this.items || this.items.length === 0) return;
     const freshItemsCopy: MenuItem[] = JSON.parse(JSON.stringify(this.items));
     let tree={ label:'mother', items: freshItemsCopy }
     const newItems = bfsSearchNodeToInsertFunctionCommand(tree, this.handlerFunction, promptsMenu, typePrompt);
     this.items= newItems;
+  }
+
+  private refreshMenu(): void {
+    if (!this.menuLoaded) return;
+    this.bfsSearchNodeFromObservable(this.itemPromptImages, TypePromptEnum.IMAGE_PROMPT);
+    this.bfsSearchNodeFromObservable(this.itemPromptBills, TypePromptEnum.BILL_PROMPT);
+    this.bfsSearchNodeFromObservable(this.itemPromptData, TypePromptEnum.DATA_PROMPT);
   }
 }
