@@ -25,9 +25,11 @@
             (drop)="uploadComponentRef.onDrop($event)"
             (dragover)="uploadComponentRef.onDragOver($event)"
             (dragleave)="uploadComponentRef.onDragLeave($event)"
+            [ngClass]="{ 'has-files': ((uploadComponentRef?.selectedFiles?.length ?? 0) > 0) }"
             >
               <upload-document-chat
                 [formatFiles]="formatFiles"
+                [deleteFiles]="deleteFiles"
                 (selectedFilesEmitter)="selectedFilesEvent($event)"
                 #uploadComponentRef
               ></upload-document-chat>

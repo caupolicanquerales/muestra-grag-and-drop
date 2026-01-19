@@ -28,6 +28,7 @@ export class ChatBox implements OnInit, OnDestroy{
   promptInput = signal('');
   private destroy$ = new Subject<void>();
   private readonly joyrideService = inject(JoyrideService);
+  deleteFiles: boolean= false
 
   @Input()
   titleData: string='';
@@ -63,6 +64,12 @@ export class ChatBox implements OnInit, OnDestroy{
         }, 0);
     }
   }
+  @Input()
+   set deleteFilesFromOutside(value: boolean | undefined) {
+    if (value != undefined) {
+        this.deleteFiles= value;
+    }
+  }
 
   @Output()
   submitExtractJsonEmitter: EventEmitter<string>= new EventEmitter<string>();
@@ -78,6 +85,7 @@ export class ChatBox implements OnInit, OnDestroy{
 
   @Output()
   savePromptEmitterInDB: EventEmitter<SavePromptDbInterface>= new EventEmitter<SavePromptDbInterface>();
+
 
   textAreaRef: any;
   isFocused = signal(false);
@@ -142,6 +150,7 @@ export class ChatBox implements OnInit, OnDestroy{
   }
 
   selectedFilesEvent($event:Array<File>):void{
+    this.deleteFiles= false;
     this.selectedFilesEmitter.emit($event);
   }
 
@@ -186,6 +195,7 @@ export class ChatBox implements OnInit, OnDestroy{
 
   emitEraseText($event: any){
         this.promptInput.set('');
+        this.deleteFiles= true;
         setTimeout(() => {
             this.resizeTextarea();
         }, 0);

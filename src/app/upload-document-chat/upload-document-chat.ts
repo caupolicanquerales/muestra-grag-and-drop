@@ -13,17 +13,27 @@ export class UploadDocumentChat implements OnInit{
 
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
-  @Input()
-  formatFiles: string= "";
-
-  @Output()
-  selectedFilesEmitter: EventEmitter<Array<File>>= new EventEmitter<Array<File>>();
-
   isDraggingOver = false;
   selectedFiles: Array<File> = [];
   readonly MAX_SIZE = 5 * 1024 * 1024;
   private formats: Array<string>=[];
   multipleFiles: boolean= true;
+
+  @Output()
+  selectedFilesEmitter: EventEmitter<Array<File>>= new EventEmitter<Array<File>>();
+
+  @Input()
+  formatFiles: string= "";
+
+  @Input()
+  set deleteFiles(value: boolean | undefined) {
+    if (value != undefined && value) {
+        setTimeout(() => {
+            this.selectedFiles = [];
+            this.selectedFilesEmitter.emit(this.selectedFiles);
+        }, 0);
+    }
+  }
 
   ngOnInit(): void {
     this.formats= this.formatFiles.split(",");

@@ -13,6 +13,7 @@
     [headerDialog]="headerDialog"
     [helpButton]="true"
     [informationHelpTour]="informationDataGenerationHelp"
+    [deleteFilesFromOutside]="deleteFilesFromOutside()"
     (submitPromptEmitter)="submitPrompt()"
     (promptEmitter)="promptEmitter($event)"
     (selectedFilesEmitter)="getSelectedFiles($event)"

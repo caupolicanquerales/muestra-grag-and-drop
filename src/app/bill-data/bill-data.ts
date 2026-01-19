@@ -36,6 +36,7 @@ export class BillData implements OnInit, OnDestroy{
   headerDialog: Array<any>= [];
   private destroy$ = new Subject<void>();
   informationDataGenerationHelp: any= informationDataGenerationHelp();
+  deleteFilesFromOutside = signal(false);
 
   
   constructor(private httpService :HttpClientService,private serviceGeneral: ServiceGeneral,
@@ -61,6 +62,7 @@ export class BillData implements OnInit, OnDestroy{
 
   submitPrompt(): void {
     if (this.prompt().length >= 10) {
+      this.deleteFilesFromOutside.set(false);
       this.prepareAndExecute();
     }
   }
@@ -164,6 +166,7 @@ export class BillData implements OnInit, OnDestroy{
     this.httpService.sendingFileForGenerationData(request).subscribe({
       next: (data) => {
         this.selectedFiles=[];
+        this.deleteFilesFromOutside.set(true);
         this.executingPrompt();
       },
       error: (err) => {
