@@ -92,3 +92,7 @@ const  promptOptions = [
    'Prompt dato' , 
   'Prompt sistema' ,
   'Otros Prompt' ];
+
+export function extractArrayNamePrompt(data: Array<PromptGenerationImageInterface> | Array<SyntheticDataInterface> | Array<BasicTemplateInterface>){
+    return data.map((item: any)=> item?.name);
+} 

@@ -137,7 +137,7 @@
                         </span>
                     } @else if (promptNameControl?.errors?.['forbiddenName']) {
                         <span [style]="{'color': 'red'}">
-                            Nombre no permitido {{ promptNameControl?.errors?.['forbiddenName'].value.promptName }}.
+                            Nombre duplicado {{ promptNameControl?.errors?.['forbiddenName'].value.promptName }}.
                         </span>
                     }
                 </span>

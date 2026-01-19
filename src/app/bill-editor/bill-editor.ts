@@ -11,13 +11,14 @@ import { Subject, takeUntil, Observable } from 'rxjs';
 import { SyntheticDataInterface } from '../models/synthetic-data-interface';
 import { PromptAndDataToValidateInterface } from '../models/prompts-and-data-to-validate-interface';
 import { getHeaderDialogToBillEditor, getExportFormatToBillEditor, getSaveFormartPromptForSystem, getSaveFormartPromptForData, getSaveFormartPromptForOther, getHeaderDialogToSystem, getHeaderDialogToData } from '../utils/dialog-parameters-utils';
-import { buildMainNode, disablePrompts, setChildInTree } from '../utils/tree-prompt-utils';
+import { buildMainNode, disablePrompts, extractArrayNamePrompt, setChildInTree } from '../utils/tree-prompt-utils';
 import { TreeModule } from 'primeng/tree';
 import { TreeNode } from 'primeng/api';
 import { getMapOrder } from '../utils/bfs-search-node-utils'
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { BasicTemplateInterface } from '../models/basic-template-interface';
 import { TypePromptEnum } from '../enums/type-prompt-enum';
+import { composeHtmlCssTemplate, getBasicTemplateInterfaceFromEvent } from '../utils/basic-template-utils';
 
 @Component({
   selector: 'bill-editor',
@@ -79,6 +80,7 @@ export class BillEditor implements OnInit, OnDestroy {
     sources.forEach(s =>
       this.subscribeUntilDestroyed(s.obs as Observable<any>, data => {
         this.backUpTree = setChildInTree(this.tree, this.backUpTree, s.type, data, this.orderMap);
+        this.promptAndDataToValidate[s.type]= extractArrayNamePrompt(data);
         this.tree = this.setDisablePrompts();
       })
     );
@@ -254,16 +256,11 @@ export class BillEditor implements OnInit, OnDestroy {
   }
 
   private getBasicTemplateInterface($event:any):BasicTemplateInterface{
-    return {
-        id: $event.id,
-        htmlString: "",
-        cssString: "",
-        name: ""
-      }; 
+    return getBasicTemplateInterfaceFromEvent($event);
   }
   private setBasicTemplateToEditor(data: any){
     if(data && data?.["cssString"] && data?.["htmlString"]){
-     const template= `<style>${data?.["cssString"]}</style>${data?.["htmlString"]}`;
+     const template= composeHtmlCssTemplate(data);
      this.htmlCss= template;
      this.setTimeout(template);
     } 

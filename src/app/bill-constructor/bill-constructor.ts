@@ -11,6 +11,7 @@ import { buildMainNode, getMainNode } from '../utils/tree-prompt-utils';
 import { ExecutingRestFulService } from '../service/executing-rest-ful-service';
 import { removeColorContent } from '../utils/operation-string-utils';
 import { TypePromptEnum } from '../enums/type-prompt-enum';
+import { composeHtmlCssTemplate, getBasicTemplateInterfaceFromEvent } from '../utils/basic-template-utils';
 import { ChatButtons } from '../chat-buttons/chat-buttons';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { FormsModule } from '@angular/forms';
@@ -144,17 +145,12 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
   }
 
   private getBasicTemplateInterface($event:any):BasicTemplateInterface{
-    return {
-        id: $event.id,
-        htmlString: "",
-        cssString: "",
-        name: ""
-      }; 
+    return getBasicTemplateInterfaceFromEvent($event);
   }
 
   private setBasicTemplateToEditor(data: any, index: string){
     if(data && data?.["cssString"] && data?.["htmlString"]){
-     const template= `<style>${data?.["cssString"]}</style>${data?.["htmlString"]}`;
+     const template= composeHtmlCssTemplate(data);
      this.insertStringIntoEditor(template, index);
     } 
   }

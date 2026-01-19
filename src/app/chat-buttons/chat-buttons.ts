@@ -4,11 +4,10 @@ import { FormGroup,FormControl, Validators, ReactiveFormsModule } from '@angular
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { PopoverModule } from 'primeng/popover';
-import { PromptGenerationImageInterface } from '../models/prompt-generation-image-interface';
-import { SyntheticDataInterface } from '../models/synthetic-data-interface';
 import { nameValidatorInArray } from '../utils/validation-utils';
 import { PromptAndDataToValidateInterface } from '../models/prompts-and-data-to-validate-interface';
 import { TooltipModule } from 'primeng/tooltip';
+import { TypePromptEnum } from '../enums/type-prompt-enum';
 
 @Component({
   selector: 'chat-buttons',
@@ -63,7 +62,6 @@ export class ChatButtons implements OnInit{
   headerDialogTitle: string="";
   promptForm!: FormGroup;
   private savePromptDb:string= "";
-  private arrayToValidation: Array<PromptGenerationImageInterface> | Array<SyntheticDataInterface>=[];
 
   constructor(){}
 
@@ -75,8 +73,6 @@ export class ChatButtons implements OnInit{
         Validators.minLength(5),
         Validators.maxLength(25)
       ])
-    }, {
-      validators: [nameValidatorInArray([])] 
     });
   }
 
@@ -119,9 +115,18 @@ export class ChatButtons implements OnInit{
     this.savePromptDb= item.format;
     let format: string= item.format;
     const array= this.getArrayNameToValidate(format);
-    this.promptForm.setValidators(nameValidatorInArray(array));
+    const ctrl = this.promptNameControl as FormControl;
+    if (ctrl) {
+      ctrl.setValidators([
+        Validators.required,
+        Validators.minLength(5),
+        Validators.maxLength(25),
+        nameValidatorInArray(array)
+      ]);
+      ctrl.markAsTouched();
+      ctrl.updateValueAndValidity({ emitEvent: true });
+    }
     setTimeout(() => {
-        this.promptForm.updateValueAndValidity({ emitEvent: true });
         this.visible = true;
     }, 0);
   }
@@ -169,11 +174,15 @@ export class ChatButtons implements OnInit{
 
   private getArrayNameToValidate(format: string) {
     const map: Record<string, any> = {
-      'Prompt imagen': this.arrayPromptAndData.prompt_imagen,
-      'Prompt datos': this.arrayPromptAndData.prompt_datos,
-      'Prompt facturas': this.arrayPromptAndData.prompt_facturas,
-      'Dato sintético': this.arrayPromptAndData.dato_sintético
+      'Prompt imagen': this.arrayPromptAndData[TypePromptEnum.IMAGE_PROMPT],
+      'Prompt datos': this.arrayPromptAndData[TypePromptEnum.DATA_PROMPT],
+      'Prompt facturas': this.arrayPromptAndData[TypePromptEnum.BILL_PROMPT],
+      'Dato sintético': this.arrayPromptAndData[TypePromptEnum.SYNTHETIC_DATA],
+      'Template básico': this.arrayPromptAndData[TypePromptEnum.BASIC_TEMPLATE],
+      'Prompt defecto global': this.arrayPromptAndData[TypePromptEnum.GLOBAL_DEFECT_PROMPT],
+      'Prompt publicidad': this.arrayPromptAndData[TypePromptEnum.PUBLICITY_DATA],
+      'Prompt sistema': this.arrayPromptAndData[TypePromptEnum.SYSTEM_PROMPT]
     };
-    return map[format] ?? this.arrayPromptAndData.dato_sintético;
+    return map[format] ?? this.arrayPromptAndData[TypePromptEnum.SYNTHETIC_DATA];
   }
 }

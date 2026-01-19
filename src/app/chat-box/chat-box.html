@@ -77,6 +77,8 @@
               *ngIf="statusMessage()"
               [itemsExportPrompt]="itemsExportPrompt"
               [itemsSavePrompt]="itemsSavePrompt"
+              [headerDialog]="headerDialog"
+              [arrayPromptAndData]="arrayPromptAndData"
               (submitCopyTextEmitter)="submitCopyText($event)"
               (submitDownloadFileEmitter)="exportInformation($event)"
               (submitSavePromptEmitter)="emitSavePrompt($event)"

@@ -1,4 +1,4 @@
-import { Component, signal, OnInit, WritableSignal, OnDestroy, ChangeDetectionStrategy, inject } from '@angular/core';
+import { Component, signal, OnInit, WritableSignal, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { HttpClientService } from '../service/http-client-service';
 import { GenerationDataInterface } from '../models/generation-data-interface';
 import { ServiceGeneral } from '../service/service-general';
@@ -10,6 +10,9 @@ import { Subject, takeUntil, Observable } from 'rxjs';
 import { SyntheticDataInterface } from '../models/synthetic-data-interface';
 import { getHeaderDialogToBillData, getExportFormatToBillData, getSaveFormartPromptToBillData } from '../utils/dialog-parameters-utils';
 import { informationDataGenerationHelp } from '../utils/infor-help-tour-utils';
+import { PromptAndDataToValidateInterface } from '../models/prompts-and-data-to-validate-interface';
+import { TypePromptEnum } from '../enums/type-prompt-enum';
+import { extractArrayNamePrompt } from '../utils/tree-prompt-utils';
 
 @Component({
   selector: 'bill-data',
@@ -37,6 +40,7 @@ export class BillData implements OnInit, OnDestroy{
   private destroy$ = new Subject<void>();
   informationDataGenerationHelp: any= informationDataGenerationHelp();
   deleteFilesFromOutside = signal(false);
+  promptAndDataToValidate: PromptAndDataToValidateInterface={};
 
   
   constructor(private httpService :HttpClientService,private serviceGeneral: ServiceGeneral,
@@ -51,6 +55,15 @@ export class BillData implements OnInit, OnDestroy{
     this.subscribeUntilDestroyed(this.serviceGeneral.responseMessagePrompt$, token => this.responseMessage.update(currentValue => currentValue + token));
     this.subscribeUntilDestroyed(this.serviceGeneral.selectedPrompt$, data => this.prompt.set(data));
     this.httpService.getPromptExtractionFromRepository().subscribe(data=>this.promptExtrationInfo=data['prompt']);
+    const sources = [
+          { obs: this.serviceGeneral.promptImages$, type: TypePromptEnum.IMAGE_PROMPT },
+          { obs: this.serviceGeneral.promptData$, type: TypePromptEnum.DATA_PROMPT },
+          { obs: this.serviceGeneral.syntheticData$, type: TypePromptEnum.SYNTHETIC_DATA }
+        ];
+     sources.forEach(s =>
+          this.subscribeUntilDestroyed(s.obs as Observable<any>, data => {
+            this.promptAndDataToValidate[s.type]= extractArrayNamePrompt(data);
+          }));
   }
 
   ngOnDestroy(): void {

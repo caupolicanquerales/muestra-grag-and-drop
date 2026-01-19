@@ -13,6 +13,7 @@ import { removeTagHtmlToText } from '../utils/operation-string-utils'
 import { Subject, takeUntil } from 'rxjs';
 import { TooltipModule } from 'primeng/tooltip';
 import { JoyrideModule, JoyrideService } from 'ngx-joyride';
+import { PromptAndDataToValidateInterface } from '../models/prompts-and-data-to-validate-interface';
 
 @Component({
   selector: 'chat-box',
@@ -70,6 +71,9 @@ export class ChatBox implements OnInit, OnDestroy{
         this.deleteFiles= value;
     }
   }
+  @Input()
+  arrayPromptAndData: PromptAndDataToValidateInterface={};
+
 
   @Output()
   submitExtractJsonEmitter: EventEmitter<string>= new EventEmitter<string>();

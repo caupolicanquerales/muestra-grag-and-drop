@@ -15,6 +15,7 @@ import { ExecutingRestFulService } from '../service/executing-rest-ful-service';
 import { DialogTemplate } from '../dialog-template/dialog-template';
 import { GenerationImageInterface } from '../models/generation-image-interface';
 import { TypePromptEnum } from '../enums/type-prompt-enum';
+import { getBasicTemplateInterfaceFromEvent } from '../utils/basic-template-utils';
 import { JoyrideModule, JoyrideService } from 'ngx-joyride';
 import { templateHelp } from '../utils/infor-help-tour-utils';
 
@@ -107,12 +108,7 @@ export class BillTemplate implements OnInit, OnDestroy{
   }
 
   private getBasicTemplateInterface($event:any):BasicTemplateInterface{
-    return {
-        id: $event.id,
-        htmlString: "",
-        cssString: "",
-        name: ""
-      }; 
+    return getBasicTemplateInterfaceFromEvent($event);
   }
 
   emitSavePrompt($event: any){

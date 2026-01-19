@@ -1,17 +1,24 @@
 import { AbstractControl, ValidationErrors, ValidatorFn } from "@angular/forms";
-import { PromptGenerationImageInterface } from "../models/prompt-generation-image-interface";
-import { SyntheticDataInterface } from "../models/synthetic-data-interface";
 
-
-export function nameValidatorInArray(array: Array<PromptGenerationImageInterface> | Array<SyntheticDataInterface> | undefined): ValidatorFn {
+export function nameValidatorInArray(array: Array<string> | undefined): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
-
-    if ((!control.value.promptName || control?.value?.promptName=="") || array==undefined) {
-        return null; 
+    if (!array || array.length === 0) {
+      return null;
     }
-    const forbidden =array.filter(item=>item.name.toLowerCase()==control.value.promptName.toLowerCase());
-    return forbidden.length!=0 
-        ? { 'forbiddenName': { value: control.value } }  
-        : null;
+
+    const value = typeof control.value === 'string'
+      ? control.value
+      : control?.value?.promptName;
+
+    if (!value || value === '') {
+      return null;
+    }
+
+    const normalizedValue = String(value).toLowerCase();
+    const forbidden = array.some(item => item?.toLowerCase() === normalizedValue);
+
+    return forbidden
+      ? { forbiddenName: { value: { promptName: value } } }
+      : null;
   };
 }
