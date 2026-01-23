@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, HostListener, inject, Input, OnDestroy, OnInit, Output, signal, ViewChild, WritableSignal } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, effect, EventEmitter, HostListener, inject, Input, OnDestroy, OnInit, Output, signal, ViewChild, WritableSignal } from '@angular/core';
 import { SafeHtmlPipePipe } from '../pipes/safe-html-pipe-pipe';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -14,12 +14,13 @@ import { Subject, takeUntil } from 'rxjs';
 import { TooltipModule } from 'primeng/tooltip';
 import { JoyrideModule, JoyrideService } from 'ngx-joyride';
 import { PromptAndDataToValidateInterface } from '../models/prompts-and-data-to-validate-interface';
+import { VisualizerCanvas } from '../visualizer-canvas/visualizer-canvas';
 
 @Component({
   selector: 'chat-box',
   standalone:true,
   imports: [CommonModule,SafeHtmlPipePipe,FormsModule,NgClass,ButtonModule, UploadDocumentChat,
-    ChatButtons, TooltipModule, JoyrideModule],
+    ChatButtons, TooltipModule, JoyrideModule, VisualizerCanvas],
   templateUrl: './chat-box.html',
   styleUrl: './chat-box.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -73,7 +74,12 @@ export class ChatBox implements OnInit, OnDestroy{
   }
   @Input()
   arrayPromptAndData: PromptAndDataToValidateInterface={};
-
+  @Input() 
+  reverseLayout: boolean = false;
+  @Input()
+  showImage: WritableSignal<boolean> = signal(false);
+  @Input()
+  base64String: WritableSignal<string> = signal('');
 
   @Output()
   submitExtractJsonEmitter: EventEmitter<string>= new EventEmitter<string>();
@@ -94,7 +100,18 @@ export class ChatBox implements OnInit, OnDestroy{
   textAreaRef: any;
   isFocused = signal(false);
 
-  constructor(private serviceGeneral: ServiceGeneral, private cd: ChangeDetectorRef){}
+  constructor(private serviceGeneral: ServiceGeneral, private cd: ChangeDetectorRef){
+    effect(() => {
+      const message = this.responseMessage();
+      const imageActive = this.showImage();
+      if (message && this.reverseLayout) {
+        const delay = imageActive ? 150 : 50;
+        setTimeout(() => {
+          this.scrollToBottom();
+        }, delay);
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.serviceGeneral.resizeInput$.pipe(takeUntil(this.destroy$)).subscribe(data=> this.resizeTextAreAfter(data));
@@ -203,6 +220,17 @@ export class ChatBox implements OnInit, OnDestroy{
         setTimeout(() => {
             this.resizeTextarea();
         }, 0);
+  }
+
+  private scrollToBottom(): void {
+    const contentElement = document.getElementById("response");
+    const scrollContainer = contentElement?.parentElement; 
+    if (scrollContainer) {
+      scrollContainer.scrollTo({
+        top: scrollContainer.scrollHeight,
+        behavior: 'smooth'
+      });
+    }
   }
   
 }

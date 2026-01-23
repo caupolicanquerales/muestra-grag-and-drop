@@ -1,6 +1,6 @@
 <div class="main-wrapper">
       <div class="card-container" 
-           [ngClass]="{'ring-4 ring-secondary-teal': isFocused()}"
+           [ngClass]="{'ring-4 ring-secondary-teal': isFocused(), 'layout-reversed': reverseLayout}"
            joyrideStep="modeStep" 
           [title]="informationHelpTour['title']" 
           [text]="informationHelpTour['text']">
@@ -70,21 +70,28 @@
               />
           </div>
         </div>
- 
-        <div *ngIf="statusMessage()" class="status-message">
-          <div id="response" class="response-text" [innerHTML]="responseMessage() | safeHtml"></div>
-            <chat-buttons
-              *ngIf="statusMessage()"
-              [itemsExportPrompt]="itemsExportPrompt"
-              [itemsSavePrompt]="itemsSavePrompt"
-              [headerDialog]="headerDialog"
-              [arrayPromptAndData]="arrayPromptAndData"
-              (submitCopyTextEmitter)="submitCopyText($event)"
-              (submitDownloadFileEmitter)="exportInformation($event)"
-              (submitSavePromptEmitter)="emitSavePrompt($event)"
-            ></chat-buttons>  
-        </div>
-      </div>
+
+        @if (statusMessage() || showImage()) {
+          <div class="status-message">
+              <div id="response" class="response-text" [innerHTML]="responseMessage() | safeHtml"></div>
+              @if(showImage()){
+                <div class="image-fixed">
+                  <visualizer-canvas
+                      [base64String]="base64String()"
+                  ></visualizer-canvas>  
+                </div>
+              }     
+              <chat-buttons
+                  [itemsExportPrompt]="itemsExportPrompt"
+                  [itemsSavePrompt]="itemsSavePrompt"
+                  [headerDialog]="headerDialog"
+                  [arrayPromptAndData]="arrayPromptAndData"
+                  (submitCopyTextEmitter)="submitCopyText($event)"
+                  (submitDownloadFileEmitter)="exportInformation($event)"
+                  (submitSavePromptEmitter)="emitSavePrompt($event)"
+                ></chat-buttons>    
+          </div>  
+        }
     </div>
 
     

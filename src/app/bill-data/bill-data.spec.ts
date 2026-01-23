@@ -30,6 +30,7 @@ class FakeChatBox {
   @Input() informationHelpTour: any = {};
   @Input() arrayPromptAndData: any = {};
   @Input() deleteFilesFromOutside = false;
+  @Input() reverseLayout = false;
   @Output() submitPromptEmitter = new EventEmitter<string>();
   @Output() promptEmitter = new EventEmitter<string>();
   @Output() selectedFilesEmitter = new EventEmitter<Array<File>>();
