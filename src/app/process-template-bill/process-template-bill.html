@@ -10,17 +10,10 @@
             [labelExtractButton]="labelExtractButton" 
             [helpButton]="true"
             [informationHelpTour]="informationImageGenerationHelp"
+            [reverseLayout]="true"
+            [showImage]="showImage"
+            [base64String]="base64String"
             (submitPromptEmitter)="submitPrompt()"
             (promptEmitter)="promptEmitter($event)"
           ></chat-box>
-
-          @if(showImage()){
-              <div class="dashboard-card-2 width-bill">
-                <div class="list-container bg-gray-100 p-6 rounded-3xl shadow-2xl image-fixed">
-                  <visualizer-canvas
-                      [base64String]="base64String()"
-                  ></visualizer-canvas>  
-                </div>
-              </div>
-          }
     </div>

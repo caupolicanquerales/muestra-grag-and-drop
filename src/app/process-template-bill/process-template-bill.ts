@@ -5,7 +5,6 @@ import { GenerationImageInterface } from '../models/generation-image-interface';
 import { HttpClientService } from '../service/http-client-service';
 import { ServiceGeneral } from '../service/service-general';
 import { Subject, takeUntil } from 'rxjs';
-import { VisualizerCanvas } from '../visualizer-canvas/visualizer-canvas';
 import { informationImageGenerationHelp } from '../utils/infor-help-tour-utils';
 
 interface Item {
@@ -17,7 +16,7 @@ interface Item {
 @Component({
   selector: 'process-template-bill',
   standalone: true,
-  imports: [ CommonModule, ChatBox, VisualizerCanvas],
+  imports: [ CommonModule, ChatBox/*, VisualizerCanvas*/],
   templateUrl: './process-template-bill.html',
   styleUrl: './process-template-bill.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
