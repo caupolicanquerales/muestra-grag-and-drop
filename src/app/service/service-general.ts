@@ -120,6 +120,11 @@ export class ServiceGeneral {
   private chatClientStreamPrueba = new BehaviorSubject<GenerationDataInterface>({prompt:''});
   chatClientStreamPrueba$: Observable<GenerationDataInterface> = this.chatClientStreamPrueba.asObservable();
   
+  private chatClientStreamAgent = new BehaviorSubject<GenerationDataInterface>({prompt:''});
+  chatClientStreamAgent$: Observable<GenerationDataInterface> = this.chatClientStreamAgent.asObservable();
+  
+  private executingImageStreamAgent = new BehaviorSubject<boolean>(false);
+  executingImageStreamAgent$: Observable<boolean> = this.executingImageStreamAgent.asObservable();
 
   setChangeComponent(component:string): void{
     this.changeComponent.next(component);
@@ -265,4 +270,11 @@ export class ServiceGeneral {
     this.chatClientStreamPrueba.next(promptChatClient);
   }
 
+  setActivateChatClientStreamAgent(promptChatClient:GenerationDataInterface): void{
+    this.chatClientStreamAgent.next(promptChatClient);
+  }
+
+  setExecutingImageStreamAgent(executingImageStream:boolean): void{
+    this.executingImageStreamAgent.next(executingImageStream);
+  }
 }

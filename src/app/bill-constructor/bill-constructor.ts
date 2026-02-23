@@ -31,9 +31,12 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
   @ViewChildren('editorRef') editorRefs!: QueryList<ElementRef<HTMLDivElement>>;
 
   titleData: string= "Constructor";
-  radioButton1: string ="Prompt de sistema"
-  radioButton2: string ="Prompt de sistema y publicidad"
+  radioButton1: string ="Sin publicidad";
+  radioButton2: string ="Con publicidad"
+  agentButton1: string ="Sin agente"
+  agentButton2: string ="Con agente"
   selectedOption: string= '';
+  selectedAgent: string= '';
   isFocused = signal(false);
   tree: TreeNode[]= [buildMainNode('Prompts', true)];
   editors = signal<EditorConfig[]>([]);
@@ -50,6 +53,7 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
   
   ngOnInit(): void {
     this.selectedOption=this.radioButton1;
+    this.selectedAgent=this.agentButton1;
     this.editors.set(getEditors());
     this.handleDataUpdate('0', TypePromptEnum.BASIC_TEMPLATE, this.serviceGeneral.basicTemplateData$);
     this.handleDataUpdate('1', TypePromptEnum.SYNTHETIC_DATA, this.serviceGeneral.syntheticData$);
@@ -78,9 +82,11 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
   }
 
   resizeAllTextareas() {
-    this.editorRefs.forEach((editor) => {
-      this.adjustHeight(editor.nativeElement);
-    });
+    if(this.editorRefs!=undefined){
+        this.editorRefs.forEach((editor) => {
+        this.adjustHeight(editor.nativeElement);
+      });
+    }
   }
 
   private adjustHeight(el: HTMLDivElement) {
@@ -196,12 +202,16 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
 
   onRadioChange($event:any){
     let backup=this.setEditorBackup();
-    if(this.selectedOption==this.radioButton1){
-      let typePrompts= orderSystem();  
-      this.setEditors(backup, typePrompts);
+    if(this.selectedAgent==this.agentButton1){
+      if(this.selectedOption==this.radioButton1){
+        let typePrompts= orderSystem();  
+        this.setEditors(backup, typePrompts);
+      }else{
+        let typePrompts= orderSystemWithPublicity();
+        this.setEditors(backup, typePrompts);
+      }
     }else{
-      let typePrompts= orderSystemWithPublicity();
-      this.setEditors(backup, typePrompts);
+
     }
     this.resizeAllTextareas();
   }
@@ -225,6 +235,17 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
   }
 
   generateImage($event: any){
+    if(this.selectedAgent==this.agentButton1){
+      this.setSystemPromptAndRedirection();
+    }else{
+      let mapPrompt: Map<string,string>= this. extractAllContent(["0"]);
+      let prompt= mapPrompt.get("0") || '';
+      this.serviceGeneral.setSelectedPromptBill(prompt);
+      this.serviceGeneral.setChangeComponent('bill-agent-data');
+    } 
+  }
+
+  private setSystemPromptAndRedirection(){
     let prompt= '';
     if(this.selectedOption==this.radioButton1){
       let mapPrompt: Map<string,string>= this. extractAllContent(["0","1","3"]);
@@ -238,6 +259,7 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
     this.serviceGeneral.setSelectedPromptBill(prompt);
     this.serviceGeneral.setChangeComponent('show-template');
   }
+
 
   startTour() {
     const dynamicSteps = this.editors().map(item => `treeStep_${item.id}`);

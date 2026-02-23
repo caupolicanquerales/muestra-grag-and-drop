@@ -20,17 +20,33 @@
             ></chat-buttons>
         </div>
         <div class="flex-options">
-            <div class="radio-button">
-                <p-radiobutton name="promptOption" [inputId]="selectedOption" [value]="radioButton1" 
-                [(ngModel)]="selectedOption" size="small"
-                (change)="onRadioChange($event)" />
-                <label for="ingredient1" class="ml-2">{{radioButton1}}</label>
+            <div>
+                <div class="radio-button">
+                    <p-radiobutton name="promptOption" [inputId]="selectedOption" [value]="radioButton1" 
+                    [(ngModel)]="selectedOption" size="small"
+                    (change)="onRadioChange($event)" />
+                    <label for="ingredient1" class="ml-2">{{radioButton1}}</label>
+                </div>
+                <div class="radio-button">
+                    <p-radiobutton name="promptOption" [inputId]="selectedOption" [value]="radioButton2" 
+                    [(ngModel)]="selectedOption" size="small" 
+                    (change)="onRadioChange($event)"/>
+                    <label for="ingredient2" class="ml-2">{{radioButton2}}</label>
+                </div>
             </div>
-            <div class="radio-button">
-                <p-radiobutton name="promptOption" [inputId]="selectedOption" [value]="radioButton2" 
-                [(ngModel)]="selectedOption" size="small" 
-                (change)="onRadioChange($event)"/>
-                <label for="ingredient2" class="ml-2">{{radioButton2}}</label>
+            <div>
+                <div class="radio-button">
+                    <p-radiobutton name="agentOption" [inputId]="selectedAgent" [value]="agentButton1" 
+                    [(ngModel)]="selectedAgent" size="small"
+                    (change)="onRadioChange($event)" />
+                    <label for="agentButton1" class="ml-2">{{agentButton1}}</label>
+                </div>
+                <div class="radio-button">
+                    <p-radiobutton name="agentOption" [inputId]="selectedAgent" [value]="agentButton2" 
+                    [(ngModel)]="selectedAgent" size="small" 
+                    (change)="onRadioChange($event)"/>
+                    <label for="agentButton2" class="ml-2">{{agentButton2}}</label>
+                </div>
             </div>
         </div>
     </div>

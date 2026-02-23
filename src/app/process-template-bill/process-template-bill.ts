@@ -16,7 +16,7 @@ interface Item {
 @Component({
   selector: 'process-template-bill',
   standalone: true,
-  imports: [ CommonModule, ChatBox/*, VisualizerCanvas*/],
+  imports: [ CommonModule, ChatBox],
   templateUrl: './process-template-bill.html',
   styleUrl: './process-template-bill.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

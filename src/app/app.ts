@@ -40,6 +40,7 @@ export class App implements OnInit, OnDestroy, AfterViewInit{
 
   private destroyRef = inject(DestroyRef);
   private sseSubscription?: Subscription;
+  private sseSubscriptionAgent?: Subscription;
   
   constructor(private serviceGeneral: ServiceGeneral, private receiveData:ReceiveDataService,
     private httpClient: HttpClientService, private convertBase64Byte: ConvertBase64ByteService,
@@ -57,9 +58,11 @@ export class App implements OnInit, OnDestroy, AfterViewInit{
     this.subscribeUntilDestroyed(this.serviceGeneral.imageIds$, data => this.imageIds = data);
     this.subscribeUntilDestroyed(this.serviceGeneral.toastMessage$, data => this.messageService.add(data));
     this.subscribeUntilDestroyed(this.serviceGeneral.chatClientStreamPrueba$, data => this.setSubscriptionToDataReceiver(data));
+    this.subscribeUntilDestroyed(this.serviceGeneral.chatClientStreamAgent$, data => this.setSubscriptionToDataReceiverAgent(data));
     this.subscribeUntilDestroyed(this.serviceGeneral.activateBasicTemplateStream$, data => this.setSubscriptionToBasicTemplateReceiver(data));
     this.serviceGeneral.activateUploadDocumentStream$.pipe(takeUntil(this.destroy$)).pipe(take(2)).subscribe(data=>this.setSubscriptionToFileReceiver(data));
     this.subscribeUntilDestroyed(this.serviceGeneral.executingImageStream$, data => this.setSubscriptionToImageReceiver(data));
+    this.subscribeUntilDestroyed(this.serviceGeneral.executingImageStreamAgent$, data => this.setSubscriptionToImageReceiverAgent(data));
     this.serviceGeneral.changeComponent$.pipe(takeUntil(this.destroy$)).subscribe(data=>{
       if(data!=''){
         this.loadComponent(data);
@@ -92,31 +95,31 @@ export class App implements OnInit, OnDestroy, AfterViewInit{
     if (this.sseSubscription) {
         this.sseSubscription.unsubscribe();
     }
-
     if (request && request.prompt!='') {
         this.sseSubscription = this.receiveData.getDataStream(request)
             .pipe(
                 takeUntilDestroyed(this.destroyRef), 
                 finalize(() => console.log('Observable stream fully finalized'))
             )
-            .subscribe({
-                next: (token) => {
-                    this.serviceGeneral.setStatusMessage(true);
-                    this.serviceGeneral.setIsUploadingAnimation(false);
-                    this.serviceGeneral.setResponseMessagePrompt(token.data.message);
-                },
-                error: (err) => {
-                    this.serviceGeneral.setStatusMessage(false);
-                    this.serviceGeneral.setIsUploadingAnimation(false);
-                    this.serviceGeneral.setResponseMessagePrompt('Error: Could not complete the request.');
-                },
-                complete: () => {
-                    console.log('Stream completed via backend signal');
-                }
-            });
+            .subscribe(this.dataReceiverObserver);
         this.subscriptions.add(this.sseSubscription);
     }
-}
+  }
+
+  private setSubscriptionToDataReceiverAgent(request: GenerationDataInterface) {
+    if (this.sseSubscriptionAgent) {
+        this.sseSubscriptionAgent.unsubscribe();
+    }
+    if (request && request.prompt!='') {
+        this.sseSubscriptionAgent = this.receiveData.getDataStreamAgent(request)
+            .pipe(
+                takeUntilDestroyed(this.destroyRef), 
+                finalize(() => console.log('Observable stream fully finalized'))
+            )
+            .subscribe(this.dataReceiverObserverAgent);
+        this.subscriptions.add(this.sseSubscriptionAgent);
+    }
+  }
 
   private setSubscriptionToFileReceiver(executing: boolean): void{
     if(executing){
@@ -157,6 +160,26 @@ export class App implements OnInit, OnDestroy, AfterViewInit{
     if(executing){
       this.subscriptionsImage.add(
         this.receiveData.getDataStreamImage().subscribe({
+            next: (response) => {
+              if(response!="Image generation started for prompt"){
+                this.setToastMessage('success', 'Imagen generada');       
+                this.saveImageInRedis(response);
+              }
+            },
+            error: (err) =>{
+              console.log(err);
+              this.setToastMessage('error', err);
+              this.serviceGeneral.setIsUploadingAnimation(false);
+            },
+          })
+        );
+    }
+  }
+
+  private setSubscriptionToImageReceiverAgent(executing:boolean):void{
+    if(executing){
+      this.subscriptionsImage.add(
+        this.receiveData.getDataStreamImageAgent().subscribe({
             next: (response) => {
               if(response!="Image generation started for prompt"){
                 this.setToastMessage('success', 'Imagen generada');       
@@ -225,5 +248,46 @@ export class App implements OnInit, OnDestroy, AfterViewInit{
     } catch (error) {
       this.setToastMessage("warn", 'Error en la estructura del json de respuesta'); 
     }  
+  }
+
+  private dataReceiverObserver = {
+    next: (token: any) => {
+        this.setObservablesInNext(token);
+    },
+    error: (err: any) => {
+        this.setObservablesInError();
+    },
+    complete: () => {
+        console.log('Stream completed via backend signal');
+    }
+  };
+
+  private dataReceiverObserverAgent = {
+    next: (token: any) => {
+        this.setObservablesInNextAgent(token)
+    },
+    error: (err: any) => {
+        this.setObservablesInError();
+    },
+    complete: () => {
+        console.log('Stream completed via backend signal');
+    }
+  };
+
+  private setObservablesInError(){
+    this.serviceGeneral.setStatusMessage(false);
+    this.serviceGeneral.setIsUploadingAnimation(false);
+    this.serviceGeneral.setResponseMessagePrompt('Error: Could not complete the request.');
+  }
+  
+  private setObservablesInNext(token: any){
+    this.serviceGeneral.setStatusMessage(true);
+    this.serviceGeneral.setIsUploadingAnimation(false);
+    this.serviceGeneral.setResponseMessagePrompt(token.data.message);
+  }
+
+  private setObservablesInNextAgent(token: any){
+    this.serviceGeneral.setStatusMessage(true);
+    this.serviceGeneral.setResponseMessagePrompt(token.data.message);
   }
 }

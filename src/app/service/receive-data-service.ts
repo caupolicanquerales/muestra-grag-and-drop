@@ -21,6 +21,10 @@ export class ReceiveDataService {
 
   private readonly DATA_URL_IMAGE = 'http://localhost:8081/image/stream-image';
 
+  private readonly DATA_URL_CHAT_AGENT = 'http://localhost:8085/agent-chat/chat-stream';
+  
+    private readonly DATA_URL_IMAGE_AGENT = 'http://localhost:8086/agent-image/stream-image';
+
   constructor(private sseService: SseService, private sseFileService: SseFileService,
     private sseImageService: SseImageService, private sseBasicTemplateService: SseBasicTemplateService) {}
   
@@ -40,4 +44,11 @@ export class ReceiveDataService {
       return this.sseService.connectPost(this.DATA_URL_CHAT,prompt);
   }
 
+  public getDataStreamAgent(prompt:GenerationDataInterface): Observable<ServerSentEvent<DataMessage>> {
+      return this.sseService.connectPost(this.DATA_URL_CHAT_AGENT,prompt);
+  }
+
+  public getDataStreamImageAgent(): Observable<any> {
+      return this.sseImageService.connect(this.DATA_URL_IMAGE_AGENT);
+  }
 }

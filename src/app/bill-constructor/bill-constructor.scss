@@ -94,8 +94,16 @@
 
 .flex-options {
     display: flex;
+    flex-direction: column; 
+    align-items: flex-start;
+    gap: 0.75rem;                      
+}
+
+.flex-options > div {
+    display: flex;
     align-items: center;
-    gap: 1rem;                      
+    gap: 1rem;
+    flex-wrap: wrap;
 }
 
 .title-header {

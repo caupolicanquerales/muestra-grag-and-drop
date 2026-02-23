@@ -1,0 +1,14 @@
+<div class="chat-container">
+    <chat-box
+    [prompt]="prompt()"
+    [responseMessage]="responseMessage"
+    [statusMessage]="statusMessage"
+    [titleData]="titleData"
+    [helpButton]="true"
+    [reverseLayout]="true"
+    [showImage]="showImage"
+    [base64String]="base64String"
+    (submitPromptEmitter)="submitPrompt()"
+    (promptEmitter)="promptEmitter($event)"
+  ></chat-box>
+</div>
