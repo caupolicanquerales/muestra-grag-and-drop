@@ -16,6 +16,8 @@ import { getMapComponentToDisplay } from './utils/map-component-utils';
 import { getToastMessageOption } from './utils/toast-message-option-utils';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { GenerationDataInterface } from './models/generation-data-interface';
+import { GenerationDataAgentInterface } from './models/generation-data-agent-interface';
+import { GenerationImageInterface } from './models/generation-image-interface';
 
 
 @Component({
@@ -61,7 +63,6 @@ export class App implements OnInit, OnDestroy, AfterViewInit{
     this.subscribeUntilDestroyed(this.serviceGeneral.chatClientStreamAgent$, data => this.setSubscriptionToDataReceiverAgent(data));
     this.subscribeUntilDestroyed(this.serviceGeneral.activateBasicTemplateStream$, data => this.setSubscriptionToBasicTemplateReceiver(data));
     this.serviceGeneral.activateUploadDocumentStream$.pipe(takeUntil(this.destroy$)).pipe(take(2)).subscribe(data=>this.setSubscriptionToFileReceiver(data));
-    this.subscribeUntilDestroyed(this.serviceGeneral.executingImageStream$, data => this.setSubscriptionToImageReceiver(data));
     this.subscribeUntilDestroyed(this.serviceGeneral.executingImageStreamAgent$, data => this.setSubscriptionToImageReceiverAgent(data));
     this.serviceGeneral.changeComponent$.pipe(takeUntil(this.destroy$)).subscribe(data=>{
       if(data!=''){
@@ -106,7 +107,7 @@ export class App implements OnInit, OnDestroy, AfterViewInit{
     }
   }
 
-  private setSubscriptionToDataReceiverAgent(request: GenerationDataInterface) {
+  private setSubscriptionToDataReceiverAgent(request: GenerationDataAgentInterface) {
     if (this.sseSubscriptionAgent) {
         this.sseSubscriptionAgent.unsubscribe();
     }
@@ -138,10 +139,10 @@ export class App implements OnInit, OnDestroy, AfterViewInit{
     }
   }
 
-  private setSubscriptionToBasicTemplateReceiver(executing: boolean): void{
+  private setSubscriptionToBasicTemplateReceiver(executing: FormData | null): void{
     if(executing){
       this.subscriptionsFile.add(
-        this.receiveData.getDataStreamBasicTemplate().subscribe({
+        this.receiveData.getDataStreamBasicTemplate(executing).subscribe({
           next: (response) => {
             if(response!=this.flagToStartBasicTemplate){
               this.catchErrorInJsonTransformation(response);
@@ -156,30 +157,10 @@ export class App implements OnInit, OnDestroy, AfterViewInit{
     }
   }
 
-  private setSubscriptionToImageReceiver(executing:boolean):void{
+  private setSubscriptionToImageReceiverAgent(executing:GenerationImageInterface | null):void{
     if(executing){
       this.subscriptionsImage.add(
-        this.receiveData.getDataStreamImage().subscribe({
-            next: (response) => {
-              if(response!="Image generation started for prompt"){
-                this.setToastMessage('success', 'Imagen generada');       
-                this.saveImageInRedis(response);
-              }
-            },
-            error: (err) =>{
-              console.log(err);
-              this.setToastMessage('error', err);
-              this.serviceGeneral.setIsUploadingAnimation(false);
-            },
-          })
-        );
-    }
-  }
-
-  private setSubscriptionToImageReceiverAgent(executing:boolean):void{
-    if(executing){
-      this.subscriptionsImage.add(
-        this.receiveData.getDataStreamImageAgent().subscribe({
+        this.receiveData.getDataStreamImageAgent(executing).subscribe({
             next: (response) => {
               if(response!="Image generation started for prompt"){
                 this.setToastMessage('success', 'Imagen generada');       
@@ -287,7 +268,16 @@ export class App implements OnInit, OnDestroy, AfterViewInit{
   }
 
   private setObservablesInNextAgent(token: any){
-    this.serviceGeneral.setStatusMessage(true);
-    this.serviceGeneral.setResponseMessagePrompt(token.data.message);
+    if(token.event === 'new-image'){
+      this.serviceGeneral.setStatusMessage(false);
+      this.saveImageInRedis(token.data.message);
+    }else{
+      if(token.data.message === 'new-message-COMPLETED'){
+        this.serviceGeneral.setIsUploadingAnimation(false);
+      }else{
+        this.serviceGeneral.setStatusMessage(true);
+        this.serviceGeneral.setResponseMessagePrompt(token.data.message);
+      }
+    }
   }
 }

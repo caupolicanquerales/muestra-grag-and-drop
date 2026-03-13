@@ -7,6 +7,8 @@ import { SseFileService } from './sse-file-service';
 import { SseImageService } from './sse-image-service';
 import { SseBasicTemplateService } from './sse-basic-template-service';
 import { GenerationDataInterface } from '../models/generation-data-interface';
+import { GenerationDataAgentInterface } from '../models/generation-data-agent-interface';
+import { GenerationImageInterface } from '../models/generation-image-interface';
 
 @Injectable({
   providedIn: 'root'
@@ -17,13 +19,11 @@ export class ReceiveDataService {
   
   private readonly DATA_URL_FILE = 'http://localhost:8080/qdrant/stream-file';
 
-  private readonly DATA_URL_BASIC_TEMPLATE = 'http://localhost:8081/basic-template/stream-basic-template';
+  private readonly DATA_URL_BASIC_TEMPLATE = 'http://localhost:8090/sub-agent-basic-template/chat-stream';
 
-  private readonly DATA_URL_IMAGE = 'http://localhost:8081/image/stream-image';
+  private readonly DATA_URL_IMAGE_AGENT = 'http://localhost:8086/sub-agent-image/stream-image';
 
-  private readonly DATA_URL_CHAT_AGENT = 'http://localhost:8085/agent-chat/chat-stream';
-  
-    private readonly DATA_URL_IMAGE_AGENT = 'http://localhost:8086/agent-image/stream-image';
+  private readonly DATA_URL_SUB_CHAT_AGENT_MANAGER = 'http://localhost:8085/sub-agent-manager-chat/chat-stream';
 
   constructor(private sseService: SseService, private sseFileService: SseFileService,
     private sseImageService: SseImageService, private sseBasicTemplateService: SseBasicTemplateService) {}
@@ -32,23 +32,19 @@ export class ReceiveDataService {
       return this.sseFileService.connect(this.DATA_URL_FILE);
   }
 
-  public getDataStreamBasicTemplate(): Observable<any> {
-      return this.sseBasicTemplateService.connect(this.DATA_URL_BASIC_TEMPLATE);
-  }
-
-  public getDataStreamImage(): Observable<any> {
-      return this.sseImageService.connect(this.DATA_URL_IMAGE);
+  public getDataStreamBasicTemplate(body: FormData = new FormData()): Observable<any> {
+      return this.sseBasicTemplateService.connect(this.DATA_URL_BASIC_TEMPLATE, body);
   }
 
   public getDataStream(prompt:GenerationDataInterface): Observable<ServerSentEvent<DataMessage>> {
       return this.sseService.connectPost(this.DATA_URL_CHAT,prompt);
   }
 
-  public getDataStreamAgent(prompt:GenerationDataInterface): Observable<ServerSentEvent<DataMessage>> {
-      return this.sseService.connectPost(this.DATA_URL_CHAT_AGENT,prompt);
+  public getDataStreamAgent(prompt:GenerationDataAgentInterface): Observable<ServerSentEvent<DataMessage>> {
+      return this.sseService.connectPost(this.DATA_URL_SUB_CHAT_AGENT_MANAGER,prompt);
   }
 
-  public getDataStreamImageAgent(): Observable<any> {
-      return this.sseImageService.connect(this.DATA_URL_IMAGE_AGENT);
+  public getDataStreamImageAgent(prompt: GenerationImageInterface): Observable<any> {
+      return this.sseImageService.connect(this.DATA_URL_IMAGE_AGENT, prompt);
   }
 }

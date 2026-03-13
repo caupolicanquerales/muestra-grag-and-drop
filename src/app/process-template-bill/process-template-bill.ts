@@ -2,7 +2,6 @@ import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, signal, Writable
 import { CommonModule } from '@angular/common';
 import { ChatBox } from '../chat-box/chat-box';
 import { GenerationImageInterface } from '../models/generation-image-interface';
-import { HttpClientService } from '../service/http-client-service';
 import { ServiceGeneral } from '../service/service-general';
 import { Subject, takeUntil } from 'rxjs';
 import { informationImageGenerationHelp } from '../utils/infor-help-tour-utils';
@@ -35,7 +34,7 @@ export class ProcessTemplateBill implements OnInit, OnDestroy{
   private destroy$ = new Subject<void>();
   informationImageGenerationHelp: any= informationImageGenerationHelp();
   
-  constructor(private httpService :HttpClientService,private serviceGeneral: ServiceGeneral){}
+  constructor(private serviceGeneral: ServiceGeneral){}
 
   ngOnInit(): void {
     this.serviceGeneral.selectedPromptBill$.pipe(takeUntil(this.destroy$)).subscribe(data=>this.prompt.set(data));
@@ -53,6 +52,7 @@ export class ProcessTemplateBill implements OnInit, OnDestroy{
     this.serviceGeneral.setImageGenerated('');
     this.serviceGeneral.setSelectedPromptBill("");
     this.serviceGeneral.setSelectedPrompt("");
+    this.serviceGeneral.setExecutingImageStreamAgent(null);
     this.destroy$.next();
     this.destroy$.complete();
   }
@@ -75,31 +75,17 @@ export class ProcessTemplateBill implements OnInit, OnDestroy{
 
   private executingPrompt(){
     const request= this.getRequestGenerationData();
-    this.setPrompt(request); 
+    this.prompt.set('');
+    this.serviceGeneral.setResizeInput(true);
+    this.serviceGeneral.setIsUploadingAnimation(true);
+    this.serviceGeneral.setExecutingImageStreamAgent(request);
+    this.serviceGeneral.setSelectedPromptImage('');
   }
 
   private getRequestGenerationData():GenerationImageInterface{
     return {
-      prompt: [this.prompt()]
+      prompt: this.prompt()
     }
-  }
-   
-  private setPrompt(request: GenerationImageInterface): void{
-    this.httpService.setPromptForGenerationImage(request).subscribe({
-      next: (data) => {
-        this.prompt.set('');
-        this.serviceGeneral.setResizeInput(true);
-        this.serviceGeneral.setIsUploadingAnimation(true);
-        this.serviceGeneral.setExecutingImageStream(true);
-        this.serviceGeneral.setSelectedPromptImage('');
-      },
-      error: (err) => {
-        console.error('Error fetching data:', err);
-      },
-      complete: () => {
-        console.log('Request completed.');
-      }
-    });
   }
 
   promptEmitter(value: string){

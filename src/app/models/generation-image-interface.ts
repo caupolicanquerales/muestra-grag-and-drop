@@ -1,3 +1,3 @@
 export interface GenerationImageInterface {
-    prompt: Array<string>
+    prompt: string
 }

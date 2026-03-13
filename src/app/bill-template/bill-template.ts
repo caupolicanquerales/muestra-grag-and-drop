@@ -2,7 +2,6 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, OnDestroy, OnInit, signal, WritableSignal } from '@angular/core';
 import { BillSkeleton } from '../bill-skeleton/bill-skeleton';
 import { UploadDocument } from '../upload-document/upload-document';
-import { HttpClientService } from '../service/http-client-service';
 import { ServiceGeneral } from '../service/service-general';
 import { Subject, takeUntil } from 'rxjs';
 import { TableModule } from 'primeng/table';
@@ -13,7 +12,6 @@ import { getHeaderDialogToBasicTemplate, getSaveFormartBasicTemplate } from '../
 import { BasicTemplateInterface } from '../models/basic-template-interface';
 import { ExecutingRestFulService } from '../service/executing-rest-ful-service';
 import { DialogTemplate } from '../dialog-template/dialog-template';
-import { GenerationImageInterface } from '../models/generation-image-interface';
 import { TypePromptEnum } from '../enums/type-prompt-enum';
 import { getBasicTemplateInterfaceFromEvent } from '../utils/basic-template-utils';
 import { JoyrideModule, JoyrideService } from 'ngx-joyride';
@@ -53,7 +51,7 @@ export class BillTemplate implements OnInit, OnDestroy{
   private readonly joyrideService = inject(JoyrideService);
   templateHelp: any= templateHelp();
 
-  constructor(private httpService :HttpClientService,private serviceGeneral: ServiceGeneral,
+  constructor(private serviceGeneral: ServiceGeneral,
     private executingRestFulService: ExecutingRestFulService){}
 
   ngOnInit(): void {
@@ -67,13 +65,13 @@ export class BillTemplate implements OnInit, OnDestroy{
     this.serviceGeneral.basicTemplate$.pipe(takeUntil(this.destroy$)).subscribe(data=>{
       this.htmlString.set(data?.["htmlString"]);
       this.cssString.set(data?.["cssString"]);
-      this.serviceGeneral.setActivateBasicTemplateStream(false);
+      this.serviceGeneral.setActivateBasicTemplateStream(null);
     });
   }
 
   ngOnDestroy(): void {
     this.serviceGeneral.setBasicTemplate('');
-    this.serviceGeneral.setActivateBasicTemplateStream(false);
+    this.serviceGeneral.setActivateBasicTemplateStream(null);
     this.destroy$.next();
     this.destroy$.complete();
   }
@@ -123,32 +121,10 @@ export class BillTemplate implements OnInit, OnDestroy{
     }
   }
 
-  private executingSaveFile(request:FormData ){
-    this.httpService.sendingFileForBasicTemplate(request).subscribe({
-      next: (event) => {
-        this.allowButton.set(false);
-        this.serviceGeneral.setIsUploadingAnimation(true);
-        const request= this.getRequestGenerationData();
-        this.updatePromptToGenerateBasicTemplate(request);
-      },
-      error: (error) => {
-        console.error('Upload failed:', error);
-      }
-    });
-  }
-  
-  private updatePromptToGenerateBasicTemplate(request: GenerationImageInterface): void{
-    this.httpService.updatePromptForBasicTemplate(request).subscribe({
-      next: (data) => {
-        this.serviceGeneral.setActivateBasicTemplateStream(true);
-      },
-      error: (err) => {
-        console.error('Error fetching data:', err);
-      },
-      complete: () => {
-        console.log('Request completed.');
-      }
-    })
+  private executingSaveFile(request:FormData){
+    this.allowButton.set(false);
+    this.serviceGeneral.setIsUploadingAnimation(true);
+    this.serviceGeneral.setActivateBasicTemplateStream(request);
   }
 
   private setFormData(selectedFiles: FileList): FormData{
@@ -158,12 +134,6 @@ export class BillTemplate implements OnInit, OnDestroy{
     }
     return formData;  
   }
-
-  private getRequestGenerationData():GenerationImageInterface{
-      return {
-        prompt: ["Extract the information from the HTML and SCSS files into two strings. Return the result strictly as a raw JSON object using this exact structure: {'htmlString': '', 'cssString': ''}. Do not use Markdown code blocks (no ```json or ```python). Do not include any conversational text. Ensure all keys and strings use double quotes for valid JSON compatibility."]
-      };
-    }
 
   startTour() {
       this.joyrideService.startTour({ steps: ['modeStep'] });

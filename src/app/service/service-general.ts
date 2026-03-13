@@ -6,6 +6,8 @@ import { SyntheticDataInterface } from '../models/synthetic-data-interface';
 import { BasicTemplateInterface } from '../models/basic-template-interface';
 import { GlobalDefectInterface } from '../models/global-defect-interface';
 import { GenerationDataInterface } from '../models/generation-data-interface';
+import { GenerationDataAgentInterface } from '../models/generation-data-agent-interface';
+import { GenerationImageInterface } from '../models/generation-image-interface';
 
 @Injectable({
   providedIn: 'root'
@@ -38,9 +40,6 @@ export class ServiceGeneral {
 
   private imageBase64 = new BehaviorSubject<string>('');
   imageBase64$: Observable<string> = this.imageBase64.asObservable();
-
-  private executingImageStream = new BehaviorSubject<boolean>(false);
-  executingImageStream$: Observable<boolean> = this.executingImageStream.asObservable();
 
   private executingBasicTemplateStream = new BehaviorSubject<boolean>(false);
   executingBasicTemplateStream$: Observable<boolean> = this.executingBasicTemplateStream.asObservable();
@@ -99,8 +98,8 @@ export class ServiceGeneral {
   private refreshPromptSystem = new BehaviorSubject<string>('');
   refreshPromptSystem$: Observable<string> = this.refreshPromptSystem.asObservable();
 
-  private activateBasicTemplateStream = new BehaviorSubject<boolean>(false);
-  activateBasicTemplateStream$: Observable<boolean> = this.activateBasicTemplateStream.asObservable();
+  private activateBasicTemplateStream = new BehaviorSubject<FormData | null>(null);
+  activateBasicTemplateStream$: Observable<FormData | null> = this.activateBasicTemplateStream.asObservable();
 
   private activateUploadDocumentStream = new BehaviorSubject<boolean>(false);
   activateUploadDocumentStream$: Observable<boolean> = this.activateUploadDocumentStream.asObservable();
@@ -120,11 +119,11 @@ export class ServiceGeneral {
   private chatClientStreamPrueba = new BehaviorSubject<GenerationDataInterface>({prompt:''});
   chatClientStreamPrueba$: Observable<GenerationDataInterface> = this.chatClientStreamPrueba.asObservable();
   
-  private chatClientStreamAgent = new BehaviorSubject<GenerationDataInterface>({prompt:''});
-  chatClientStreamAgent$: Observable<GenerationDataInterface> = this.chatClientStreamAgent.asObservable();
+  private chatClientStreamAgent = new BehaviorSubject<GenerationDataAgentInterface>({prompt:'', conversationId: ''});
+  chatClientStreamAgent$: Observable<GenerationDataAgentInterface> = this.chatClientStreamAgent.asObservable();
   
-  private executingImageStreamAgent = new BehaviorSubject<boolean>(false);
-  executingImageStreamAgent$: Observable<boolean> = this.executingImageStreamAgent.asObservable();
+  private executingImageStreamAgent = new BehaviorSubject<GenerationImageInterface | null>(null);
+  executingImageStreamAgent$: Observable<GenerationImageInterface | null> = this.executingImageStreamAgent.asObservable();
 
   setChangeComponent(component:string): void{
     this.changeComponent.next(component);
@@ -160,10 +159,6 @@ export class ServiceGeneral {
 
   setImageBase64(imageBase64:string): void{
     this.imageBase64.next(imageBase64);
-  }
-
-  setExecutingImageStream(executingImageStream:boolean): void{
-    this.executingImageStream.next(executingImageStream);
   }
 
   setExecutingBasicTemplatStream(executingBasicTemplateStream:boolean): void{
@@ -246,7 +241,7 @@ export class ServiceGeneral {
     this.refreshPromptSystem.next(refresh);
   }
 
-  setActivateBasicTemplateStream(activateBasicTemplate:boolean): void{
+  setActivateBasicTemplateStream(activateBasicTemplate:FormData | null): void{
     this.activateBasicTemplateStream.next(activateBasicTemplate);
   }
 
@@ -270,11 +265,11 @@ export class ServiceGeneral {
     this.chatClientStreamPrueba.next(promptChatClient);
   }
 
-  setActivateChatClientStreamAgent(promptChatClient:GenerationDataInterface): void{
+  setActivateChatClientStreamAgent(promptChatClient:GenerationDataAgentInterface): void{
     this.chatClientStreamAgent.next(promptChatClient);
   }
 
-  setExecutingImageStreamAgent(executingImageStream:boolean): void{
+  setExecutingImageStreamAgent(executingImageStream:GenerationImageInterface | null): void{
     this.executingImageStreamAgent.next(executingImageStream);
   }
 }

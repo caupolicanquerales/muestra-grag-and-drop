@@ -4,7 +4,6 @@ import { Observable } from 'rxjs';
 import { GenerationDataInterface } from '../models/generation-data-interface';
 import { GenerationDataResponseInterface } from '../models/generation-data-response-interface';
 import { MenuItem } from 'primeng/api';
-import { GenerationImageInterface } from '../models/generation-image-interface';
 import { RedisRequestInterface } from '../models/redis-request-interface';
 import { RedisResponseInterface } from '../models/redis-response-interface';
 import { RedisResponseWithImageInterface } from '../models/Redis-response-with-image-interface';
@@ -22,7 +21,6 @@ import { MongoResponseGlobalDefectInterface } from '../models/mongo-response-all
 export class HttpClientService {
 
   private urlRoot = 'http://localhost:8080/';
-  private urlRootImage = 'http://localhost:8081/';
   private urlRootRedis = 'http://localhost:8082/';
   private urlRootMongo = 'http://localhost:8083/';
   private urlTemplates= 'assets/configMenu/templates.json';
@@ -39,28 +37,12 @@ export class HttpClientService {
     return this.http.post<GenerationDataResponseInterface>(this.urlRoot+'generation/prompt', request);
   }
 
-  updatePromptForBasicTemplate(request: GenerationImageInterface): Observable<GenerationDataResponseInterface> {
-    return this.http.post<GenerationDataResponseInterface>(this.urlRootImage+'basic-template/prompt', request);
-  }
-
   sendingFileForGenerationData(request: FormData): Observable<GenerationDataResponseInterface> {
     return this.http.post<GenerationDataResponseInterface>(this.urlRoot+'generation/sending-files', request);
   }
 
-  sendingFileForBasicTemplate(request: FormData): Observable<GenerationDataResponseInterface> {
-    return this.http.post<GenerationDataResponseInterface>(this.urlRootImage+'basic-template/sending-files', request);
-  }
-
   saveFileForGenerationData(request: FormData): Observable<GenerationDataResponseInterface> {
     return this.http.post<GenerationDataResponseInterface>(this.urlRoot+'qdrant/save-file', request);
-  }
-
-  updatePromptForGenerationImage(request: GenerationImageInterface): Observable<GenerationDataResponseInterface> {
-    return this.http.post<GenerationDataResponseInterface>(this.urlRootImage+'image/prompt', request);
-  }
-
-  setPromptForGenerationImage(request: GenerationImageInterface): Observable<GenerationDataResponseInterface> {
-    return this.http.post<GenerationDataResponseInterface>(this.urlRootImage+'image/set-prompt', request);
   }
 
   saveImageInRedis(request: FormData): Observable<RedisResponseInterface> {

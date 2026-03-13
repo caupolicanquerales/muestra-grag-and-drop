@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit, signal, WritableSignal } from '@angular/c
 import { ChatBox } from '../chat-box/chat-box';
 import { Observable, Subject, takeUntil } from 'rxjs';
 import { ServiceGeneral } from '../service/service-general';
-import { GenerationDataInterface } from '../models/generation-data-interface';
+import { GenerationDataAgentInterface } from '../models/generation-data-agent-interface';
 
 @Component({
   selector: 'bill-agent-data',
@@ -20,13 +20,14 @@ export class BillAgentData implements OnInit, OnDestroy{
   private destroy$ = new Subject<void>();
   showImage: WritableSignal<boolean> = signal(false);
   base64String: WritableSignal<string> = signal('');
+  conversationId: string = this.generateId();
 
   constructor(private serviceGeneral: ServiceGeneral){}
   
   ngOnInit(): void {
     this.subscribeUntilDestroyed(this.serviceGeneral.selectedPromptBill$, data => this.prompt.set(data));
     this.subscribeUntilDestroyed(this.serviceGeneral.statusMessage$, status => this.statusMessage.set(status));
-    this.subscribeUntilDestroyed(this.serviceGeneral.responseMessagePrompt$, token => this.responseMessage.update(currentValue => currentValue + token));
+    this.subscribeUntilDestroyed(this.serviceGeneral.responseMessagePrompt$, token => this.setResponseMessage(token));
     this.subscribeUntilDestroyed(this.serviceGeneral.imageGenerated$, image => this.setImageinChatBox(image));
   }
 
@@ -53,16 +54,24 @@ export class BillAgentData implements OnInit, OnDestroy{
   private executingPrompt(){
     const request= this.getRequestGenerationData();
     this.serviceGeneral.setActivateChatClientStreamAgent(request);
-    this.serviceGeneral.setExecutingImageStreamAgent(true);
+    //this.serviceGeneral.setExecutingImageStreamAgent(true);
     setTimeout(() => {
       this.updatePromptToGenerateData();
     }, 50); 
   }
 
-  private getRequestGenerationData():GenerationDataInterface{
+  private getRequestGenerationData():GenerationDataAgentInterface{
+    const prefix = this.containsHtmlOrCss(this.prompt()) ? '[INPUT_FORMAT: RAW_CODE] ' : '';
     return {
-      prompt: "[INPUT_FORMAT: RAW_CODE]" + this.prompt()
+      prompt: prefix + this.prompt(),
+      conversationId: this.conversationId
     }
+  }
+
+  private containsHtmlOrCss(text: string): boolean {
+    const htmlPattern = /<[a-zA-Z][^>]*>/;
+    const cssPattern = /[a-zA-Z#.*[\]]+\s*\{[^}]*:[^}]*\}/;
+    return htmlPattern.test(text) || cssPattern.test(text);
   }
 
   private updatePromptToGenerateData(): void{
@@ -80,5 +89,14 @@ export class BillAgentData implements OnInit, OnDestroy{
       this.showImage.set(true);
       this.base64String.set(image);
     }
+  }
+
+  generateId(): string {
+    return crypto.randomUUID();
+  }
+
+  setResponseMessage( token: string): void {
+    this.showImage.set(false);
+    this.responseMessage.update(currentValue => currentValue + token);
   }
 }

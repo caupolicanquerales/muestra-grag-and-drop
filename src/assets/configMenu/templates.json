@@ -2,15 +2,15 @@
     "Generador": [
         {
             "label": "Prompt nuevo",
-            "templateName": "generate-data"
+            "templateName": "bill-agent-data"
         },
         {
             "label": "Prompt imagen",
-            "templateName": "generate-data"
+            "templateName": "bill-agent-data"
         },
         {
             "label": "Prompt dato",
-            "templateName": "generate-data"
+            "templateName": "bill-agent-data"
         }
     ],
     "Facturas":[
