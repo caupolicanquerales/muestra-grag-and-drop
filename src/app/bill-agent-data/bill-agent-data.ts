@@ -54,24 +54,16 @@ export class BillAgentData implements OnInit, OnDestroy{
   private executingPrompt(){
     const request= this.getRequestGenerationData();
     this.serviceGeneral.setActivateChatClientStreamAgent(request);
-    //this.serviceGeneral.setExecutingImageStreamAgent(true);
     setTimeout(() => {
       this.updatePromptToGenerateData();
     }, 50); 
   }
 
   private getRequestGenerationData():GenerationDataAgentInterface{
-    const prefix = this.containsHtmlOrCss(this.prompt()) ? '[INPUT_FORMAT: RAW_CODE] ' : '';
     return {
-      prompt: prefix + this.prompt(),
+      prompt: this.prompt(),
       conversationId: this.conversationId
     }
-  }
-
-  private containsHtmlOrCss(text: string): boolean {
-    const htmlPattern = /<[a-zA-Z][^>]*>/;
-    const cssPattern = /[a-zA-Z#.*[\]]+\s*\{[^}]*:[^}]*\}/;
-    return htmlPattern.test(text) || cssPattern.test(text);
   }
 
   private updatePromptToGenerateData(): void{

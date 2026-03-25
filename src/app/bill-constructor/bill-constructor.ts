@@ -15,7 +15,7 @@ import { composeHtmlCssTemplate, getBasicTemplateInterfaceFromEvent } from '../u
 import { ChatButtons } from '../chat-buttons/chat-buttons';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { FormsModule } from '@angular/forms';
-import { getSystemPromptWithoutPublicity, getSystemPromptWithPublicity } from '../utils/system-prompt-utils';
+import { getSystemPromptWithoutPublicity, getSystemPromptWithPublicity, getUserPromptSubAgent } from '../utils/system-prompt-utils';
 import { EditorConfig, getEditors, orderSystem, orderSystemWithPublicity, systemPromptHelp, textHelp, titlesHelp } from '../utils/bill-constructor-utils';
 import { JoyrideModule, JoyrideService } from 'ngx-joyride';
 
@@ -33,8 +33,8 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
   titleData: string= "Constructor";
   radioButton1: string ="Sin publicidad";
   radioButton2: string ="Con publicidad"
-  agentButton1: string ="Sin agente"
-  agentButton2: string ="Con agente"
+  //agentButton1: string ="Sin agente"
+  //agentButton2: string ="Con agente"
   selectedOption: string= '';
   selectedAgent: string= '';
   isFocused = signal(false);
@@ -53,7 +53,6 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
   
   ngOnInit(): void {
     this.selectedOption=this.radioButton1;
-    this.selectedAgent=this.agentButton1;
     this.editors.set(getEditors());
     this.handleDataUpdate('0', TypePromptEnum.BASIC_TEMPLATE, this.serviceGeneral.basicTemplateData$);
     this.handleDataUpdate('1', TypePromptEnum.SYNTHETIC_DATA, this.serviceGeneral.syntheticData$);
@@ -202,16 +201,12 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
 
   onRadioChange($event:any){
     let backup=this.setEditorBackup();
-    if(this.selectedAgent==this.agentButton1){
-      if(this.selectedOption==this.radioButton1){
-        let typePrompts= orderSystem();  
-        this.setEditors(backup, typePrompts);
-      }else{
-        let typePrompts= orderSystemWithPublicity();
-        this.setEditors(backup, typePrompts);
-      }
+    if(this.selectedOption==this.radioButton1){
+      let typePrompts= orderSystem();  
+      this.setEditors(backup, typePrompts);
     }else{
-
+      let typePrompts= orderSystemWithPublicity();
+      this.setEditors(backup, typePrompts);
     }
     this.resizeAllTextareas();
   }
@@ -235,29 +230,21 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
   }
 
   generateImage($event: any){
-    if(this.selectedAgent==this.agentButton1){
-      this.setSystemPromptAndRedirection();
-    }else{
-      let mapPrompt: Map<string,string>= this. extractAllContent(["0"]);
-      let prompt= mapPrompt.get("0") || '';
-      this.serviceGeneral.setSelectedPromptBill(prompt);
+      this.setUserPrompt();
       this.serviceGeneral.setChangeComponent('bill-agent-data');
-    } 
   }
 
-  private setSystemPromptAndRedirection(){
+  private setUserPrompt(){
     let prompt= '';
-    if(this.selectedOption==this.radioButton1){
-      let mapPrompt: Map<string,string>= this. extractAllContent(["0","1","3"]);
-      let systemPrompt= getSystemPromptWithoutPublicity(mapPrompt.get("0"),mapPrompt.get("1"),mapPrompt.get("3"));
-      prompt= JSON.stringify(systemPrompt);  
-    }else{
+    let mapPrompt: Map<string,string>= this. extractAllContent(["0","1"]);
+    let systemPrompt= getUserPromptSubAgent(mapPrompt.get("0"),mapPrompt.get("1"));
+    prompt= JSON.stringify(systemPrompt);  
+    /*
       let mapPrompt: Map<string,string>= this. extractAllContent(["0","1","2","3"]);
       let systemPrompt= getSystemPromptWithPublicity(mapPrompt.get("0"),mapPrompt.get("1"),mapPrompt.get("2"), mapPrompt.get("3"));
       prompt= JSON.stringify(systemPrompt);  
-    }
+    */
     this.serviceGeneral.setSelectedPromptBill(prompt);
-    this.serviceGeneral.setChangeComponent('show-template');
   }
 
 
