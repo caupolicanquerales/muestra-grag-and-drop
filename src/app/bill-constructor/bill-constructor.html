@@ -34,22 +34,6 @@
                     <label for="ingredient2" class="ml-2">{{radioButton2}}</label>
                 </div>
             </div>
-            <!-- 
-            <div>
-                <div class="radio-button">
-                    <p-radiobutton name="agentOption" [inputId]="selectedAgent" [value]="agentButton1" 
-                    [(ngModel)]="selectedAgent" size="small"
-                    (change)="onRadioChange($event)" />
-                    <label for="agentButton1" class="ml-2">{{agentButton1}}</label>
-                </div>
-                <div class="radio-button">
-                    <p-radiobutton name="agentOption" [inputId]="selectedAgent" [value]="agentButton2" 
-                    [(ngModel)]="selectedAgent" size="small" 
-                    (change)="onRadioChange($event)"/>
-                    <label for="agentButton2" class="ml-2">{{agentButton2}}</label>
-                </div>
-            </div>
-            -->
         </div>
     </div>
     <div class="card-container" >
@@ -67,6 +51,9 @@
             <hr>
             }
             @if (last) {
+                <div class="card">
+                    <textarea rows="5" pTextarea [(ngModel)]="promptUser"  placeholder="{{placeHolderPromptUser}}" [disabled]="allowPromptUser" fluid></textarea>
+                </div>
                 <div class="button-editor">
                     <chat-buttons
                     [eraseButton]="false"

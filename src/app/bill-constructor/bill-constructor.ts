@@ -33,8 +33,6 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
   titleData: string= "Constructor";
   radioButton1: string ="Sin publicidad";
   radioButton2: string ="Con publicidad"
-  //agentButton1: string ="Sin agente"
-  //agentButton2: string ="Con agente"
   selectedOption: string= '';
   selectedAgent: string= '';
   isFocused = signal(false);
@@ -47,6 +45,9 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
   titlesHelp: any= titlesHelp();
   textHelp: any= textHelp();
   promptSystemHelp: any= systemPromptHelp();
+  promptUser: string= '';
+  placeHolderPromptUser: string= 'Escribe aquí el prompt del usuario para la generación de la imagen...';
+  allowPromptUser: boolean= true;
 
   constructor(private serviceGeneral: ServiceGeneral,
     private executingRestFulService: ExecutingRestFulService){}
@@ -57,7 +58,6 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
     this.handleDataUpdate('0', TypePromptEnum.BASIC_TEMPLATE, this.serviceGeneral.basicTemplateData$);
     this.handleDataUpdate('1', TypePromptEnum.SYNTHETIC_DATA, this.serviceGeneral.syntheticData$);
     this.handleDataUpdate('2', TypePromptEnum.PUBLICITY_DATA, this.serviceGeneral.publicityData$);
-    this.handleDataUpdate('3', TypePromptEnum.SYSTEM_PROMPT, this.serviceGeneral.promptSystem$);
     this.subscribeUntilDestroyed(this.serviceGeneral.basicTemplate$, data => this.setBasicTemplateToEditor(data, this.index));
   }
 
@@ -69,6 +69,7 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
 
   ngAfterViewInit() {
     setTimeout(() => {
+      this.onRadioChange(null);
       this.editorRefs.forEach(editor => {
         this.adjustHeight(editor.nativeElement);
       });
@@ -113,6 +114,7 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
   }
 
   updatePromptFromContentEditable(event: Event, editorId: string): void {
+    console.log('Content updated in editor', editorId);
     const target = event.target as HTMLDivElement;
     const newValue = target.innerText;
     this.adjustHeight(target);
@@ -161,6 +163,7 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
   }
   
   private insertingInformationInTextarea($event: any, index: string){
+    this.allowPromptUser = !(index=='1');
     this.insertStringIntoEditor('', index);  
     const coloredSpan = removeColorContent($event?.data, "rgb(0, 0, 0)");
     this.insertStringIntoEditor(coloredSpan, index);
@@ -196,6 +199,7 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
 }
 
   emitEraseText($event: any, index: string){
+    this.allowPromptUser = (index=='1');
     this.insertStringIntoEditor('', index);
   }
 
@@ -237,7 +241,7 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
   private setUserPrompt(){
     let prompt= '';
     let mapPrompt: Map<string,string>= this. extractAllContent(["0","1"]);
-    let systemPrompt= getUserPromptSubAgent(mapPrompt.get("0"),mapPrompt.get("1"));
+    let systemPrompt= getUserPromptSubAgent(mapPrompt.get("0"),mapPrompt.get("1"), this.promptUser);
     prompt= JSON.stringify(systemPrompt);  
     /*
       let mapPrompt: Map<string,string>= this. extractAllContent(["0","1","2","3"]);

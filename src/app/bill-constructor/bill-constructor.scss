@@ -73,6 +73,16 @@
     background: var(--secondary-teal);
 }
 
+.card {
+    width: 100%;
+    padding-top: 2%;
+
+    textarea {
+        width: 100%;
+        box-sizing: border-box;
+    }
+}
+
 .button-editor{
     display: flex;
     justify-content: flex-end;

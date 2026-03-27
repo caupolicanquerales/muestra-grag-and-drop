@@ -11,8 +11,8 @@ export function getEditors():EditorConfig[]{
     return [
         { id: '0', tree: [], styledPrompt: '', typePrompt:''},
         { id: '1', tree: [], styledPrompt: '', typePrompt:'' },
-        { id: '2', tree: [], styledPrompt: '', typePrompt:'' },
-        { id: '3', tree: [], styledPrompt: '', typePrompt:'' }
+        { id: '2', tree: [], styledPrompt: '', typePrompt:'' }
+        //{ id: '3', tree: [], styledPrompt: '', typePrompt:'' }
       ]
 }
 

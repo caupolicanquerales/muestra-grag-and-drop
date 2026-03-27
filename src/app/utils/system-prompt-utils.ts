@@ -24,12 +24,15 @@ function getSystemPrompt(systemPrompt: string | undefined, userPrompt: string | 
     }
 }
 
-export function getUserPromptSubAgent(basicTemplate: string | undefined, syntheticData?: string | undefined): UserPromptSubAgentObject{
+export function getUserPromptSubAgent(basicTemplate: string | undefined, syntheticData?: string | undefined,
+  promptUser?: string | undefined): UserPromptSubAgentObject{
   const prefix = containsHtmlOrCss(basicTemplate || '') ? '[INPUT_FORMAT: RAW_CODE] ' : '';
-  const prefixRawData = isJson(syntheticData || '')?  '[INPUT_DATA: RAW_DATA] ' : '';;
+  const prefixRawData = isJson(syntheticData || '')?  '[INPUT_DATA: RAW_DATA] ' : '';
+  const prefixUserPrompt = promptUser!='' ? '[INPUT_PROMPT_USER: RAW_PROMPT_USER] ' : '';
   return {
           html:prefix + basicTemplate,
           data: prefixRawData+ syntheticData,
+          userPrompt: prefixUserPrompt + promptUser
         }
 }
 
