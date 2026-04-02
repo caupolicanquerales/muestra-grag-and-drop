@@ -53,6 +53,7 @@ export class BillAgentData implements OnInit, OnDestroy{
 
   private executingPrompt(){
     const request= this.getRequestGenerationData();
+    console.log(request);
     this.serviceGeneral.setActivateChatClientStreamAgent(request);
     setTimeout(() => {
       this.updatePromptToGenerateData();

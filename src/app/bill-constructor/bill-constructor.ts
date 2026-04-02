@@ -163,7 +163,7 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
   }
   
   private insertingInformationInTextarea($event: any, index: string){
-    this.allowPromptUser = !(index=='1');
+    this.allowPromptUser = (index=='1')?false: this.allowPromptUser;
     this.insertStringIntoEditor('', index);  
     const coloredSpan = removeColorContent($event?.data, "rgb(0, 0, 0)");
     this.insertStringIntoEditor(coloredSpan, index);
@@ -240,14 +240,15 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
 
   private setUserPrompt(){
     let prompt= '';
-    let mapPrompt: Map<string,string>= this. extractAllContent(["0","1"]);
-    let systemPrompt= getUserPromptSubAgent(mapPrompt.get("0"),mapPrompt.get("1"), this.promptUser);
-    prompt= JSON.stringify(systemPrompt);  
-    /*
-      let mapPrompt: Map<string,string>= this. extractAllContent(["0","1","2","3"]);
-      let systemPrompt= getSystemPromptWithPublicity(mapPrompt.get("0"),mapPrompt.get("1"),mapPrompt.get("2"), mapPrompt.get("3"));
-      prompt= JSON.stringify(systemPrompt);  
-    */
+    if(this.selectedOption==this.radioButton1){
+      let mapPrompt: Map<string,string>= this. extractAllContent(["0","1"]);
+      let systemPrompt= getUserPromptSubAgent(mapPrompt.get("0"),mapPrompt.get("1"), this.promptUser);
+      prompt= JSON.stringify(systemPrompt);
+    }else{
+      let mapPrompt: Map<string,string>= this. extractAllContent(["0","1","2"]);
+      let systemPrompt= getUserPromptSubAgent(mapPrompt.get("0"),mapPrompt.get("1"), mapPrompt.get("2"), this.promptUser);
+      prompt= JSON.stringify(systemPrompt);
+    }
     this.serviceGeneral.setSelectedPromptBill(prompt);
   }
 

@@ -10,6 +10,7 @@ interface SystemPromptObject {
 export interface UserPromptSubAgentObject {
     html?: string,
     data?: string
+    publicity?: string,
     userPrompt?: string
 }
 
