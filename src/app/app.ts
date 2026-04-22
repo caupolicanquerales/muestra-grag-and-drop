@@ -270,7 +270,14 @@ export class App implements OnInit, OnDestroy, AfterViewInit{
   private setObservablesInNextAgent(token: any){
     if(token.event === 'new-image'){
       this.serviceGeneral.setStatusMessage(false);
+      this.serviceGeneral.setIsUploadingAnimation(false);
       this.saveImageInRedis(token.data.message);
+    }else if(token.event === 'new-basic-template'){
+      this.serviceGeneral.setStatusMessage(false);
+      if("Basic template is starting for prompt"!==token.data.message){
+        this.serviceGeneral.setIsUploadingAnimation(false);
+        this.serviceGeneral.setBasicTemplateGenerated(token.data.message);
+      }
     }else{
       if(token.data.message === 'new-message-COMPLETED'){
         this.serviceGeneral.setIsUploadingAnimation(false);

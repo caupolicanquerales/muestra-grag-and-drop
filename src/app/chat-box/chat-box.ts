@@ -15,12 +15,13 @@ import { TooltipModule } from 'primeng/tooltip';
 import { JoyrideModule, JoyrideService } from 'ngx-joyride';
 import { PromptAndDataToValidateInterface } from '../models/prompts-and-data-to-validate-interface';
 import { VisualizerCanvas } from '../visualizer-canvas/visualizer-canvas';
+import { BillSkeleton } from '../bill-skeleton/bill-skeleton';
 
 @Component({
   selector: 'chat-box',
   standalone:true,
   imports: [CommonModule,SafeHtmlPipePipe,FormsModule,NgClass,ButtonModule, UploadDocumentChat,
-    ChatButtons, TooltipModule, JoyrideModule, VisualizerCanvas],
+    ChatButtons, TooltipModule, JoyrideModule, VisualizerCanvas, BillSkeleton],
   templateUrl: './chat-box.html',
   styleUrl: './chat-box.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -79,7 +80,13 @@ export class ChatBox implements OnInit, OnDestroy{
   @Input()
   showImage: WritableSignal<boolean> = signal(false);
   @Input()
+  showTemplate: WritableSignal<boolean> = signal(false);
+  @Input()
   base64String: WritableSignal<string> = signal('');
+  @Input()
+  htmlString: WritableSignal<string> = signal('');
+  @Input()
+  cssString: WritableSignal<string> = signal('');
 
   @Output()
   submitExtractJsonEmitter: EventEmitter<string>= new EventEmitter<string>();

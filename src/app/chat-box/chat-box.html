@@ -71,8 +71,8 @@
           </div>
         </div>
 
-        @if (statusMessage() || showImage()) {
-          <div class="status-message">
+        @if (statusMessage() || showImage() || showTemplate()) {
+           <div class="status-message">
               <div id="response" class="response-text" [innerHTML]="responseMessage() | safeHtml"></div>
               @if(showImage()){
                 <div class="image-fixed">
@@ -80,6 +80,12 @@
                       [base64String]="base64String()"
                   ></visualizer-canvas>  
                 </div>
+              }
+              @if(showTemplate()){
+                <bill-skeleton
+                  [htmlString]="htmlString()"
+                  [scssString]="cssString()"
+                ></bill-skeleton>
               }     
               <chat-buttons
                   [itemsExportPrompt]="itemsExportPrompt"
@@ -89,9 +95,10 @@
                   (submitCopyTextEmitter)="submitCopyText($event)"
                   (submitDownloadFileEmitter)="exportInformation($event)"
                   (submitSavePromptEmitter)="emitSavePrompt($event)"
-                ></chat-buttons>    
-          </div>  
-        }
+                ></chat-buttons>
+            </div>   
+          }
     </div>
+  </div>
 
     

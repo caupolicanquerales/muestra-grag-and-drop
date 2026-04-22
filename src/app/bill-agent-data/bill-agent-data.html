@@ -7,8 +7,14 @@
     [helpButton]="true"
     [reverseLayout]="true"
     [showImage]="showImage"
+    [showTemplate]="showTemplate"
     [base64String]="base64String"
+    [htmlString]="htmlString"
+    [cssString]="cssString"
+    [itemsSavePrompt]="itemsSavePrompt"
+    [headerDialog]="headerDialog"
     (submitPromptEmitter)="submitPrompt()"
     (promptEmitter)="promptEmitter($event)"
+    (savePromptEmitterInDB)="savePromptInDB($event)"
   ></chat-box>
 </div>

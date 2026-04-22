@@ -113,6 +113,9 @@ export class ServiceGeneral {
   private imageGenerated = new BehaviorSubject<string>('');
   imageGenerated$: Observable<string> = this.imageGenerated.asObservable();
 
+  private basicTemplateGenerated = new BehaviorSubject<string>('');
+  basicTemplateGenerated$: Observable<string> = this.basicTemplateGenerated.asObservable();
+
   private globalDefect = new BehaviorSubject<Array<GlobalDefectInterface>>([]);
   globalDefect$: Observable<Array<GlobalDefectInterface>> = this.globalDefect.asObservable();
 
@@ -259,6 +262,10 @@ export class ServiceGeneral {
 
   setImageGenerated(image:string): void{
     this.imageGenerated.next(image);
+  }
+
+  setBasicTemplateGenerated(basicTemplate:string): void{
+    this.basicTemplateGenerated.next(basicTemplate);
   }
 
   setActivateChatClientStreamPrueba(promptChatClient:GenerationDataInterface): void{
