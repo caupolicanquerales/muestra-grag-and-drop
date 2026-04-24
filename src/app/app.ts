@@ -18,6 +18,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { GenerationDataInterface } from './models/generation-data-interface';
 import { GenerationDataAgentInterface } from './models/generation-data-agent-interface';
 import { GenerationImageInterface } from './models/generation-image-interface';
+import { GenerationTemplateJsonInfoInterface } from './models/generation-template-json-info-interface';
 
 
 @Component({
@@ -39,6 +40,7 @@ export class App implements OnInit, OnDestroy, AfterViewInit{
   private mimeType: string = 'image/png';
   private destroy$ = new Subject<void>();
   private flagToStartBasicTemplate: string= "Basic Template generation started for prompt";
+  private flagToStartAnalyzingTemplate: string= "Analyzing template is starting for prompt";
 
   private destroyRef = inject(DestroyRef);
   private sseSubscription?: Subscription;
@@ -62,6 +64,7 @@ export class App implements OnInit, OnDestroy, AfterViewInit{
     this.subscribeUntilDestroyed(this.serviceGeneral.chatClientStreamPrueba$, data => this.setSubscriptionToDataReceiver(data));
     this.subscribeUntilDestroyed(this.serviceGeneral.chatClientStreamAgent$, data => this.setSubscriptionToDataReceiverAgent(data));
     this.subscribeUntilDestroyed(this.serviceGeneral.activateBasicTemplateStream$, data => this.setSubscriptionToBasicTemplateReceiver(data));
+    this.subscribeUntilDestroyed(this.serviceGeneral.activateBasicTemplateJsonStream$, data => this.setSubscriptionToBasicTemplateJsonReceiver(data));
     this.serviceGeneral.activateUploadDocumentStream$.pipe(takeUntil(this.destroy$)).pipe(take(2)).subscribe(data=>this.setSubscriptionToFileReceiver(data));
     this.subscribeUntilDestroyed(this.serviceGeneral.executingImageStreamAgent$, data => this.setSubscriptionToImageReceiverAgent(data));
     this.serviceGeneral.changeComponent$.pipe(takeUntil(this.destroy$)).subscribe(data=>{
@@ -157,6 +160,24 @@ export class App implements OnInit, OnDestroy, AfterViewInit{
     }
   }
 
+  private setSubscriptionToBasicTemplateJsonReceiver(executing: GenerationTemplateJsonInfoInterface | null): void{
+    if(executing){
+      this.subscriptionsFile.add(
+        this.receiveData.getDataStreamBasicTemplateJson(executing).subscribe({
+          next: (response) => {
+            if(response!=this.flagToStartBasicTemplate){
+              this.catchErrorInJsonTransformationTemplateInfo(response);
+            }
+          },
+          error: (err) =>{
+            this.setToastMessage('error', 'Error en el procesamiento de los archivos');
+            this.serviceGeneral.setIsUploadingAnimation(false);
+          },
+        })
+      );
+    }
+  }
+
   private setSubscriptionToImageReceiverAgent(executing:GenerationImageInterface | null):void{
     if(executing){
       this.subscriptionsImage.add(
@@ -226,6 +247,19 @@ export class App implements OnInit, OnDestroy, AfterViewInit{
       const result= JSON.parse(cleanJson);
       this.serviceGeneral.setBasicTemplate(result); 
       this.setToastMessage('success', 'Archivos correctamente procesados'); 
+    } catch (error) {
+      this.setToastMessage("warn", 'Error en la estructura del json de respuesta'); 
+    }  
+  }
+
+  private catchErrorInJsonTransformationTemplateInfo(cleanJson: string){
+    try {
+      if(cleanJson!=this.flagToStartAnalyzingTemplate){
+        this.serviceGeneral.setIsUploadingAnimation(false);
+        const result= JSON.parse(cleanJson);
+        this.serviceGeneral.setBasicTemplateJsonInfo(result); 
+        this.setToastMessage('success', 'Información correctamente procesada'); 
+      } 
     } catch (error) {
       this.setToastMessage("warn", 'Error en la estructura del json de respuesta'); 
     }  

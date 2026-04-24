@@ -76,6 +76,30 @@
             (click)="helpEvent('help-text')" 
             ></p-button>
         }
+        @if(returnAllowButton){
+            <p-button 
+            icon="pi pi-arrow-left" 
+            class="submit-button-shape"
+            [rounded]="true" 
+            [text]="true"
+            severity="secondary" 
+            pTooltip="Regresar"
+            tooltipPosition="top"
+            (click)="returnEvent('return-text')" 
+            ></p-button>
+        }
+        @if(processAllowButton){
+            <p-button 
+            icon="pi pi-arrow-right" 
+            class="submit-button-shape"
+            [rounded]="true" 
+            [text]="true"
+            severity="secondary" 
+            pTooltip="Procesar"
+            tooltipPosition="top"
+            (click)="processEvent('process-text')" 
+            ></p-button>
+        }
     </div>
 
  <p-popover #op

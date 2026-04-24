@@ -16,11 +16,14 @@ import { TypePromptEnum } from '../enums/type-prompt-enum';
 import { getBasicTemplateInterfaceFromEvent } from '../utils/basic-template-utils';
 import { JoyrideModule, JoyrideService } from 'ngx-joyride';
 import { templateHelp } from '../utils/infor-help-tour-utils';
+import { BillJsonSkeleton } from '../bill-json-skeleton/bill-json-skeleton';
+import { EditorConfig } from '../utils/bill-constructor-utils';
+import { GenerationTemplateJsonInfoInterface } from '../models/generation-template-json-info-interface';
 
 @Component({
   selector: 'bill-template',
   imports: [CommonModule, BillSkeleton, UploadDocument, TableModule, ButtonModule, ChatButtons,
-    DialogTemplate, JoyrideModule],
+    DialogTemplate, JoyrideModule, BillJsonSkeleton],
   standalone: true,
   templateUrl: './bill-template.html',
   styleUrl: './bill-template.scss',
@@ -35,6 +38,8 @@ export class BillTemplate implements OnInit, OnDestroy{
   formatFileMessage: string= $localize`@@formatFileMessageBill`
   htmlString= signal("");
   cssString= signal("");
+  showTableAndUploadTemplate= signal(true);
+  showJsonInformation= signal(false);
   selectedFiles: Array<File> = [];
   selectedFilesTemplate: WritableSignal<FileList | null> = signal(null);
   private destroy$ = new Subject<void>();
@@ -49,7 +54,9 @@ export class BillTemplate implements OnInit, OnDestroy{
   actionButtonName: string= "Eliminar";
   displayInfoInSelectedItem: Array<string>=["id","name"];
   private readonly joyrideService = inject(JoyrideService);
+  private requestToGetTemplate: any= {};
   templateHelp: any= templateHelp();
+  JsonArray: Array<EditorConfig> = [];
 
   constructor(private serviceGeneral: ServiceGeneral,
     private executingRestFulService: ExecutingRestFulService){}
@@ -67,6 +74,7 @@ export class BillTemplate implements OnInit, OnDestroy{
       this.cssString.set(data?.["cssString"]);
       this.serviceGeneral.setActivateBasicTemplateStream(null);
     });
+    this.serviceGeneral.basicTemplateJsonInfo$.pipe(takeUntil(this.destroy$)).subscribe(data=>this.processJsonInformation(data));
   }
 
   ngOnDestroy(): void {
@@ -91,8 +99,8 @@ export class BillTemplate implements OnInit, OnDestroy{
 
   selectTemplate($event:any):void{
     this.serviceGeneral.setIsUploadingAnimation(true);
-    let request= this.getBasicTemplateInterface($event);
-    this.executingRestFulService.getBasicTemplateById(request);
+    this.requestToGetTemplate= this.getBasicTemplateInterface($event);
+    this.executingRestFulService.getBasicTemplateById(this.requestToGetTemplate);
   }
 
   deleteTemplate($event:any):void{
@@ -120,6 +128,46 @@ export class BillTemplate implements OnInit, OnDestroy{
       this.executingRestFulService.saveBasicTemplate(request);
     }
   }
+
+  emitProcessText($event: string){
+    let request: GenerationTemplateJsonInfoInterface={
+      id: this.requestToGetTemplate.id
+    }
+    this.serviceGeneral.setActivateBasicTemplateJsonStream(request);
+    this.serviceGeneral.setIsUploadingAnimation(true);
+  }
+
+  processJsonInformation($event: any){
+    if (!$event || Object.keys($event).length === 0) return;
+
+    const sections: Array<{ key: string; id: string; typePrompt: string }> = [
+      { key: 'dataString',      id: '1', typePrompt: 'Data'      },
+      { key: 'publicityString', id: '2', typePrompt: 'Publicity' },
+      { key: 'imagesString',    id: '3', typePrompt: 'Images'    },
+    ];
+
+    this.JsonArray = sections.map(({ key, id, typePrompt }) => ({
+      id,
+      tree: [],
+      styledPrompt: this.setJsonFormat($event?.[key] ?? '{}'),
+      typePrompt,
+    }));
+
+    this.showTableAndUploadTemplate.set(false);
+    this.showJsonInformation.set(true);
+  }
+
+  private setJsonFormat(data: string): string{
+    const jsonObj = JSON.parse(data);
+    const formattedJson = JSON.stringify(jsonObj, null, 2);
+    return formattedJson;
+  }
+
+  emitReturnText($event: string){
+    this.showTableAndUploadTemplate.set(true);
+    this.showJsonInformation.set(false);
+    this.JsonArray=[];
+   }
 
   private executingSaveFile(request:FormData){
     this.allowButton.set(false);

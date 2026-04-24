@@ -8,6 +8,7 @@ import { GlobalDefectInterface } from '../models/global-defect-interface';
 import { GenerationDataInterface } from '../models/generation-data-interface';
 import { GenerationDataAgentInterface } from '../models/generation-data-agent-interface';
 import { GenerationImageInterface } from '../models/generation-image-interface';
+import { GenerationTemplateJsonInfoInterface } from '../models/generation-template-json-info-interface';
 
 @Injectable({
   providedIn: 'root'
@@ -101,6 +102,9 @@ export class ServiceGeneral {
   private activateBasicTemplateStream = new BehaviorSubject<FormData | null>(null);
   activateBasicTemplateStream$: Observable<FormData | null> = this.activateBasicTemplateStream.asObservable();
 
+  private activateBasicTemplateJsonStream = new BehaviorSubject<GenerationTemplateJsonInfoInterface | null>(null);
+  activateBasicTemplateJsonStream$: Observable<GenerationTemplateJsonInfoInterface | null> = this.activateBasicTemplateJsonStream.asObservable();
+
   private activateUploadDocumentStream = new BehaviorSubject<boolean>(false);
   activateUploadDocumentStream$: Observable<boolean> = this.activateUploadDocumentStream.asObservable();
 
@@ -109,6 +113,9 @@ export class ServiceGeneral {
 
   private basicTemplate = new BehaviorSubject<any>({});
   basicTemplate$: Observable<any> = this.basicTemplate.asObservable();
+
+  private basicTemplateJsonInfo = new BehaviorSubject<any>({});
+  basicTemplateJsonInfo$: Observable<any> = this.basicTemplateJsonInfo.asObservable();
 
   private imageGenerated = new BehaviorSubject<string>('');
   imageGenerated$: Observable<string> = this.imageGenerated.asObservable();
@@ -248,6 +255,10 @@ export class ServiceGeneral {
     this.activateBasicTemplateStream.next(activateBasicTemplate);
   }
 
+  setActivateBasicTemplateJsonStream(activateBasicTemplateJson:GenerationTemplateJsonInfoInterface | null): void{
+    this.activateBasicTemplateJsonStream.next(activateBasicTemplateJson);
+  }
+
   setActivateUploadDocumentStream(activateUploadDocument:boolean): void{
     this.activateUploadDocumentStream.next(activateUploadDocument);
   }
@@ -258,6 +269,11 @@ export class ServiceGeneral {
 
   setBasicTemplate(basicTemplate:any): void{
     this.basicTemplate.next(basicTemplate);
+  }
+
+
+  setBasicTemplateJsonInfo(basicTemplateJsonInfo:any): void{
+    this.basicTemplateJsonInfo.next(basicTemplateJsonInfo);
   }
 
   setImageGenerated(image:string): void{

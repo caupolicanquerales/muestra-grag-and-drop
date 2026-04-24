@@ -114,7 +114,6 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
   }
 
   updatePromptFromContentEditable(event: Event, editorId: string): void {
-    console.log('Content updated in editor', editorId);
     const target = event.target as HTMLDivElement;
     const newValue = target.innerText;
     this.adjustHeight(target);

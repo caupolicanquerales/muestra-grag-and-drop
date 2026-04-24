@@ -41,6 +41,10 @@ export class ChatButtons implements OnInit{
   @Input()
   helpButton: boolean= false;
   @Input()
+  processButton: boolean= false;
+  @Input()
+  returnButton: boolean= false;
+  @Input()
   arrayPromptAndData: PromptAndDataToValidateInterface={};
 
   @Output()
@@ -57,6 +61,10 @@ export class ChatButtons implements OnInit{
   submitGeneratePrompt: EventEmitter<string>= new EventEmitter<string>();
   @Output()
   submitHelpTextEmitter: EventEmitter<string>= new EventEmitter<string>();
+  @Output()
+  submitProcessTextEmitter: EventEmitter<string>= new EventEmitter<string>();
+  @Output()
+  submitReturnTextEmitter: EventEmitter<string>= new EventEmitter<string>();
 
   visible: boolean= false;
   headerDialogTitle: string="";
@@ -108,6 +116,14 @@ export class ChatButtons implements OnInit{
     return this.helpButton;
   }
 
+  get processAllowButton(){
+    return this.processButton;
+  }
+
+  get returnAllowButton(){
+    return this.returnButton;
+  }
+
   showDialog(item: any, event: Event){
     event.stopPropagation();
     const header=this.headerDialog.filter(header=>header.format==item.format);
@@ -149,6 +165,14 @@ export class ChatButtons implements OnInit{
 
   generatePromptEvent($event: string){
     this.submitGeneratePrompt.emit($event);
+  }
+
+  processEvent($event: string){
+    this.submitProcessTextEmitter.emit($event);
+  }
+
+  returnEvent($event: string){
+    this.submitReturnTextEmitter.emit($event);
   }
 
   selectItem(member:any){}
