@@ -141,9 +141,9 @@ export class BillTemplate implements OnInit, OnDestroy{
     if (!$event || Object.keys($event).length === 0) return;
 
     const sections: Array<{ key: string; id: string; typePrompt: string }> = [
-      { key: 'dataString',      id: '1', typePrompt: 'Data'      },
-      { key: 'publicityString', id: '2', typePrompt: 'Publicity' },
-      { key: 'imagesString',    id: '3', typePrompt: 'Images'    },
+      { key: 'dataString',      id: '1', typePrompt: TypePromptEnum.SYNTHETIC_DATA },
+      { key: 'publicityString', id: '2', typePrompt: TypePromptEnum.PUBLICITY_DATA },
+      { key: 'imagesString',    id: '3', typePrompt: TypePromptEnum.IMAGES_DATA    },
     ];
 
     this.JsonArray = sections.map(({ key, id, typePrompt }) => ({

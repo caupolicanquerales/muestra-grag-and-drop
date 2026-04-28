@@ -1,88 +1,194 @@
 .main-wrapper {
     min-height: 85vh;
-    background-color: var(--gray-bg);
-    align-items: center;
-    justify-content: center;
-    padding: 1rem;
+    background-color: #f8f9fb;
+    padding: 1.5rem;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    min-width: 55rem;
 }
 
- .card-container {
+/* ── Header ── */
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.5rem;
     width: 100%;
-    max-width: 60rem;
-    padding: 2rem; 
-    background-color: white;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-    border-radius: 1rem; 
-    border-top: 4px solid var(--secondary-teal); 
-    transition: all 0.3s ease-in-out;
+    margin-bottom: 1.25rem;
+}
+
+.title-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.title-text {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #1e293b;
+    letter-spacing: -0.01em;
+}
+
+/* ── Segmented toggle ── */
+.segment-control {
+    display: flex;
+    background: #f1f5f9;
+    border-radius: 0.5rem;
+    padding: 0.2rem;
+    border: 1px solid #e2e8f0;
+    gap: 0.15rem;
+}
+
+.segment-btn {
+    padding: 0.35rem 1rem;
+    border: none;
+    border-radius: 0.35rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    background: transparent;
+    color: #64748b;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+    font-family: inherit;
+
+    &:hover:not(.segment-active) {
+        color: #334155;
+        background: #e9eef5;
+    }
+}
+
+.segment-active {
+    background: #ffffff;
+    color: #4f46e5;
+    font-weight: 600;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* ── Main card ── */
+.card-container {
+    width: 100%;
+    max-width: 100%;
+    padding: 1.5rem;
+    background-color: #ffffff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.07);
+    border-radius: 0.875rem;
+    border: 1px solid #e2e8f0;
+    border-top: 3px solid #4f46e5;
+    flex: 1;
+}
+
+/* ── Two-column layout ── */
+.editor-content-wrapper {
+    display: grid;
+    grid-template-columns: 22rem 1fr;
+    gap: 1.5rem;
+    align-items: flex-start;
+}
+
+/* ── Left tree panel ── */
+.p-selector-group {
+    max-height: 22rem;
+    overflow-y: auto;
+    overflow-x: hidden;
+    border: 1px solid #e9eef5;
+    border-radius: 0.75rem;
+    background: #f8f9fb;
+    flex-shrink: 0;
+}
+
+.p-selector-group::-webkit-scrollbar {
+    width: 5px;
+}
+
+.p-selector-group::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+/* ── Code panel ── */
+.code-panel {
+    border-radius: 0.75rem;
+    border: 1px solid #c7d0dd;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.code-toolbar {
+    display: flex;
+    align-items: center;
+    padding: 0.35rem 0.75rem;
+    background: #e8ecf2;
+    border-bottom: 1px solid #c7d0dd;
+    gap: 0.5rem;
+    min-height: 2.25rem;
+}
+
+.code-label {
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: #4f5d73;
+    margin-right: auto;
+}
+
+.code-toolbar ::ng-deep .p-button {
+    background: transparent !important;
+    border-color: transparent !important;
+    color: #4f5d73 !important;
+    box-shadow: none !important;
+    width: 1.75rem !important;
+    height: 1.75rem !important;
+
+    &:hover {
+        background: rgba(0,0,0,0.07) !important;
+        color: #1e293b !important;
+    }
 }
 
 .relative-container {
     display: flex;
     align-items: flex-start;
-    font-size: 16px;
-    line-height: 1.5;
-    flex-grow: 1; 
-    min-width: 35rem; 
+    font-size: 14px;
+    line-height: 1.6;
+    width: 100%;
+    overflow: hidden;
 }
 
 .prompt-input {
-    width: auto;
-    min-width: 100%; 
-    height: auto; 
-    flex-grow: 1; 
-    font-size: 1rem; 
-    padding: 1rem; 
-    padding-left: 40px; 
-    padding-right: 4rem; 
-    padding-top: 1rem; 
-    box-shadow: none;
+    width: 100%;
+    box-sizing: border-box;
+    display: block;
+    font-size: 0.825rem;
+    font-family: 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+    padding: 1rem;
+    overflow-y: hidden;
+    min-height: 22rem;
+    height: auto;
+    background: #f4f6f9;
+    color: #1e293b;
+    outline: none;
     border: none;
-    transition: border-color 0.15s ease-in-out; 
-    resize: none;
-    overflow: hidden;
-    outline: none;
-    pointer-events: auto; 
-    z-index: 0; 
-    background: aliceblue;
-    color: #333;
-    min-height: 15rem;
-    overflow-x: visible;
+    line-height: 1.7;
 }
 
-.prompt-input:focus {
-    outline: none;
+.input-focus-ring {
+    box-shadow: inset 0 0 0 2px #4f46e5;
 }
 
-.p-selector-group{
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    margin-bottom: 0;
-    flex-shrink: 0;
-    width: 14rem;
-}
-
-.title {
-    font-size: 1.875rem;
-    font-weight: 700;
-    color: var(--primary-blue);
-    margin-bottom: 0.5rem;
-    padding-bottom: 2%;
-}
-
-.editor-content-wrapper {
-    display: flex;
-    gap: 1.5rem;
-    align-items: flex-start;
-}
-
-.prueba{
+/* ── Bottom actions ── */
+.command-actions {
     display: flex;
     justify-content: flex-end;
-    margin-top: 1rem;
+    margin-top: 1.25rem;
 }
 
+/* ── Tree node overrides ── */
 :host ::ng-deep .error-node .p-treenode-label {
     color: #d32f2f !important;
 }
@@ -94,23 +200,4 @@
 :host ::ng-deep .error-node > .p-treenode-content {
     cursor: not-allowed;
     opacity: 0.8;
-}
-
-.header-container {
-    display: flex;
-    justify-content: space-between; 
-    align-items: center;            
-    gap: 1.5rem;                    
-    width: 100%;
-}
-
-.flex-options {
-    display: flex;
-    align-items: center;
-    gap: 1rem;                      
-}
-
-.radio-button {
-    display: flex;
-    align-items: center;
 }

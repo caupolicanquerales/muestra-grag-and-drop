@@ -1,6 +1,28 @@
-<div 
-    class="image-canvas-container"
-    [style.background-color]="canvasColor()"
-    [style.background-image]="getBackgroundImageStyle()"
->
+<div class="hero-wrapper" [style.background-color]="canvasColor()">
+
+  <div class="hero-text">
+    <span class="hero-badge">Impulsado por IA</span>
+    <h1 class="hero-headline">
+      Genera facturas<br>inteligentes,<br>
+      <span class="hero-highlight">sin esfuerzo.</span>
+    </h1>
+    <p class="hero-subtext">
+      Crea, personaliza y exporta plantillas de facturas profesionales
+      usando síntesis de datos y automatización de layouts con IA.
+    </p>
+    <div class="hero-pills">
+      <span class="pill">&#10003;&nbsp; Constructor de plantillas</span>
+      <span class="pill">&#10003;&nbsp; Datos sintéticos</span>
+      <span class="pill">&#10003;&nbsp; Generación de imágenes</span>
+    </div>
+    <button class="hero-cta">Comenzar ahora &rarr;</button>
+  </div>
+
+  <div class="hero-image-area">
+    <div
+      class="image-canvas-container"
+      [style.background-image]="getBackgroundImageStyle()"
+    ></div>
+  </div>
+
 </div>

@@ -24,12 +24,24 @@
   let-id="id"
   let-item="item"
   let-index="index"
+  let-typePrompt="item.typePrompt"
   >
   <div class="editor-content-wrapper">
-    <div class="textare-button-group">
-        <h2 class="title-text">
-            {{ item.typePrompt }}
-        </h2>
+    <div class="code-panel">
+        <div class="code-toolbar">
+            <span class="code-label">{{ item.typePrompt }}</span>
+            <chat-buttons
+                [eraseButton]="false"
+                [saveButton]="true"
+                [exportButton]="false"
+                [copyButton]="false"
+                [generateImageButton]="false"
+                [generatePromptButton]="false"
+                [itemsSavePrompt]="getItemsSavePrompt(typePrompt)"
+                [headerDialog]="getHeaderDialog(typePrompt)"
+                (submitSavePromptEmitter)="emitSavePrompt($event, id)"
+            ></chat-buttons>
+        </div>
         <div class="relative-container">
             <div 
                 #editorRef
@@ -42,17 +54,6 @@
                 [ngClass]="{'input-focus-ring': isFocused()}"
                 (blur)="isFocused.set(false)">
             </div>
-        </div>
-        <div class="button-editor">
-            <chat-buttons
-            [eraseButton]="false"
-            [saveButton]="true"
-            [exportButton]="false"
-            [copyButton]="false"
-            [generateImageButton]="false"
-            [generatePromptButton]="false"
-            (submitSavePromptEmitter)="emitSavePrompt($event, index)"
-            ></chat-buttons>
         </div>
     </div>
   </div>

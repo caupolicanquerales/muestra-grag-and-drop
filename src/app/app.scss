@@ -8,10 +8,10 @@
 .dashboard-main {
     display: flex;
     flex: 1; 
-    gap: 1.5rem; 
-    padding: 1%;
+    gap: 0;
+    padding: 0;
     overflow: hidden; 
-    align-items: flex-start; 
+    align-items: stretch; 
 }
 
 bill-menu {

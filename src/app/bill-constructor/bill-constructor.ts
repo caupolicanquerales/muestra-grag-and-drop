@@ -15,7 +15,7 @@ import { composeHtmlCssTemplate, getBasicTemplateInterfaceFromEvent } from '../u
 import { ChatButtons } from '../chat-buttons/chat-buttons';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { FormsModule } from '@angular/forms';
-import { getSystemPromptWithoutPublicity, getSystemPromptWithPublicity, getUserPromptSubAgent } from '../utils/system-prompt-utils';
+import {  getUserPromptSubAgent } from '../utils/system-prompt-utils';
 import { EditorConfig, getEditors, orderSystem, orderSystemWithPublicity, systemPromptHelp, textHelp, titlesHelp } from '../utils/bill-constructor-utils';
 import { JoyrideModule, JoyrideService } from 'ngx-joyride';
 
@@ -164,8 +164,23 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
   private insertingInformationInTextarea($event: any, index: string){
     this.allowPromptUser = (index=='1')?false: this.allowPromptUser;
     this.insertStringIntoEditor('', index);  
-    const coloredSpan = removeColorContent($event?.data, "rgb(0, 0, 0)");
+    const formattedData = this.formatDataIfJson($event?.data);
+    const coloredSpan = removeColorContent(formattedData, "rgb(0, 0, 0)");
     this.insertStringIntoEditor(coloredSpan, index);
+  }
+
+  private formatDataIfJson(data: string): string {
+    if (!data) return data;
+    try {
+      const parsed = JSON.parse(data);
+      const formatted = JSON.stringify(parsed, null, 2)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+      return `<pre style="white-space: pre-wrap; margin: 0; font-size: inherit;">${formatted}</pre>`;
+    } catch {
+      return data;
+    }
   }
 
   private insertStringIntoEditor(coloredSpan: string, editorId: string) {
@@ -241,7 +256,7 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
     let prompt= '';
     if(this.selectedOption==this.radioButton1){
       let mapPrompt: Map<string,string>= this. extractAllContent(["0","1"]);
-      let systemPrompt= getUserPromptSubAgent(mapPrompt.get("0"),mapPrompt.get("1"), this.promptUser);
+      let systemPrompt= getUserPromptSubAgent(mapPrompt.get("0"),mapPrompt.get("1"), undefined ,this.promptUser);
       prompt= JSON.stringify(systemPrompt);
     }else{
       let mapPrompt: Map<string,string>= this. extractAllContent(["0","1","2"]);

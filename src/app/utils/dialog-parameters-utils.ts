@@ -86,3 +86,20 @@ export function getHeaderDialogGlobalDefect(): Array<any> {
             headerDialog: "Prompt a ser guardado en defecto global"
         }];
 }
+
+export function getHeaderDialogJsonSkeleton(): Map<any, any> {
+    const map = new Map();
+    map.set(TypePromptEnum.SYNTHETIC_DATA, [{format: TypePromptEnum.SYNTHETIC_DATA,
+            headerDialog: "Información a ser guardado en dato sintético"}]);
+    map.set(TypePromptEnum.PUBLICITY_DATA, [{format: TypePromptEnum.PUBLICITY_DATA,
+            headerDialog: "Información a ser guardado en dato publicidad"}]);
+    return map;
+}
+
+export function getSaveFormartJsonSkeleton(): Map<any, any > {
+    const map = new Map();
+    map.set(TypePromptEnum.SYNTHETIC_DATA, [{format: TypePromptEnum.SYNTHETIC_DATA}]);
+    map.set(TypePromptEnum.PUBLICITY_DATA, [{format: TypePromptEnum.PUBLICITY_DATA}]);
+    return map;
+}
+

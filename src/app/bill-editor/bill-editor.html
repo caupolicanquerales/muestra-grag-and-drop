@@ -1,47 +1,55 @@
 <div class="main-wrapper">
-    <div class="card-container" >
-        <div class="header-container">
-            <h2 class="title">
-            {{ titleData }}
-            </h2>
-            <div class="flex-options">
-                @for (option of optionsRadioButton; track option.id) {
-                    <div class="radio-button">
-                    <p-radiobutton 
-                        name="promptOption" 
-                        [inputId]="option.id" 
-                        [value]="option.label" 
-                        [(ngModel)]="selectedOption" 
-                        size="small"
-                        (change)="onRadioChange($event)" />
-                    <label [for]="option.id" class="ml-2">
-                        {{ option.label }}
-                    </label>
-                    </div>
-                }
-            </div>
+    <div class="header-container">
+        <div class="title-header">
+            <h2 class="title-text">{{ titleData }}</h2>
         </div>
+        <div class="segment-control">
+            @for (option of optionsRadioButton; track option.id) {
+                <button
+                    class="segment-btn"
+                    [class.segment-active]="selectedOption === option.label"
+                    (click)="selectedOption = option.label; onRadioChange(null)">
+                    {{ option.label }}
+                </button>
+            }
+        </div>
+    </div>
+
+    <div class="card-container">
         <div class="editor-content-wrapper">
-             <div class="p-selector-group">
-                <p-tree [value]="tree" class="w-full md:w-[30rem]" 
+            <div class="p-selector-group">
+                <p-tree [value]="tree" class="w-full md:w-[30rem]"
                     selectionMode="single"
                     [(selection)]="selectedNode"
-                    (onNodeSelect)="nodeSelect($event)" >
+                    (onNodeSelect)="nodeSelect($event)">
                     <ng-template let-node pTemplate="default">
                         <span [ngStyle]="node.style" [class.p-disabled]="node.selectable === false">
                             {{ node.label }}
                         </span>
-                </ng-template>
+                    </ng-template>
                 </p-tree>
+            </div>
+
+            <div class="code-panel">
+                <div class="code-toolbar">
+                    <span class="code-label">{{ selectedOption }}</span>
+                    <chat-buttons
+                        [eraseButton]="true"
+                        [saveButton]="false"
+                        [exportButton]="false"
+                        [copyButton]="false"
+                        [generateImageButton]="false"
+                        [generatePromptButton]="false"
+                        (submitEraseTextEmitter)="emitEraseText($event)"
+                    ></chat-buttons>
                 </div>
                 <div class="relative-container">
-                    <div 
-                        id="prompt-editor" 
+                    <div
+                        id="prompt-editor"
                         #editorRef
                         [innerHTML]="styledPrompt"
-                        (input)="updatePromptFromContentEditable($event)" 
+                        (input)="updatePromptFromContentEditable($event)"
                         contenteditable="true"
-                        rows="4" 
                         maxlength="10000"
                         placeholder="placeHolder"
                         class="prompt-input"
@@ -49,22 +57,23 @@
                         (blur)="isFocused.set(false)">
                     </div>
                 </div>
+            </div>
         </div>
-        <div class="prueba">
+
+        <div class="command-actions">
             <chat-buttons
-            [itemsExportPrompt]="itemsExportPrompt"
-            [itemsSavePrompt]="itemsSavePrompt"
-            [headerDialog]="headerDialog"
-            [eraseButton]="true"
-            [generateImageButton]="generateImageButton"
-            [generatePromptButton]="generatePromptButton"
-            [arrayPromptAndData]="promptAndDataToValidate"
-            (submitDownloadFileEmitter)="exportInformation($event)"
-            (submitCopyTextEmitter)="submitCopyText($event)"
-            (submitSavePromptEmitter)="emitSavePrompt($event)"
-            (submitEraseTextEmitter)="emitEraseText($event)"
-            (submitGenerateImage)="generateImage($event)"
-            (submitGeneratePrompt)="generatePrompt($event)"
+                [itemsExportPrompt]="itemsExportPrompt"
+                [itemsSavePrompt]="itemsSavePrompt"
+                [headerDialog]="headerDialog"
+                [eraseButton]="false"
+                [generateImageButton]="generateImageButton"
+                [generatePromptButton]="generatePromptButton"
+                [arrayPromptAndData]="promptAndDataToValidate"
+                (submitDownloadFileEmitter)="exportInformation($event)"
+                (submitCopyTextEmitter)="submitCopyText($event)"
+                (submitSavePromptEmitter)="emitSavePrompt($event)"
+                (submitGenerateImage)="generateImage($event)"
+                (submitGeneratePrompt)="generatePrompt($event)"
             ></chat-buttons>
         </div>
     </div>
