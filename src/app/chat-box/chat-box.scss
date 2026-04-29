@@ -18,8 +18,8 @@
     background-color: var(--gray-bg);
     display: flex;
     align-items: flex-start;
-    justify-content: center;
-    padding: 2rem 1rem;
+    justify-content: flex-start;
+    padding: 1rem;
 }
 
 .card-container {
@@ -89,20 +89,37 @@
     border-radius: 10px;
 }
 
+/* ── Card header ── */
+.card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+.title-group { flex: 1; }
+.header-actions { display: flex; align-items: center; }
+
+.title-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.15rem;
+}
+
 .breadcrumb {
-    font-size: 0.72rem;
+    font-size: 0.68rem;
     font-weight: 500;
-    color: #94a3b8;
-    letter-spacing: 0.03em;
-    margin-bottom: 0.25rem;
-    margin-top: 0;
+    color: rgba(100,116,139,0.6);
+    letter-spacing: 0.04em;
+    margin: 0 0 0.3rem 0;
 }
 
 .title {
     font-size: 1.25rem;
     font-weight: 700;
     color: #1e293b;
-    margin-bottom: 0.2rem;
+    margin: 0;
     letter-spacing: -0.01em;
     font-family: inherit;
 }
@@ -110,9 +127,30 @@
 .subtitle {
     font-size: 0.8rem;
     color: var(--text-gray);
-    margin-bottom: 1.25rem;
+    margin: 0.2rem 0 0 0;
     letter-spacing: 0.01em;
 }
+
+/* Status badge */
+.status-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.78rem;
+    color: var(--text-gray);
+}
+.status-dot {
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+}
+.status-dot.online {
+    background-color: #22c55e;
+    box-shadow: 0 0 0 3px rgba(34,197,94,0.15);
+}
+.status-label { font-weight: 500; }
 
 .relative-container {
     display: flex;
@@ -124,12 +162,16 @@
 .input-and-icon-wrapper {
     flex-grow: 1;
     position: relative;
+    display: flex;
+    flex-direction: column;
     border: 1px solid var(--light-gray-border);
     border-radius: 0.75rem;
-    background-color: #ffffff;
-    transition: border-color 0.15s ease;
+    /* Step 1: light grey background to clearly signal interactive area */
+    background-color: #f9fafb;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
 
     &:focus-within {
+        background-color: #ffffff;
         border-color: var(--primary-indigo);
         box-shadow: 0 0 0 3px rgba(79,70,229,0.1);
     }
@@ -154,12 +196,14 @@ upload-document-chat {
 .prompt-input {
     width: 100%;
     flex-grow: 1;
+    min-height: 108px;
     font-size: 0.9375rem;
     font-family: inherit;
-    padding: 0.875rem 1rem 2.75rem 2.5rem;
+    /* leave bottom clear for the footer row */
+    padding: 0.875rem 1rem 0.75rem 1rem;
     box-shadow: none;
     border: none;
-    border-radius: 0.75rem;
+    border-radius: 0.75rem 0.75rem 0 0;
     resize: none;
     overflow: hidden;
     outline: none;
@@ -177,28 +221,32 @@ upload-document-chat {
     }
 }
 
-.input-focus-ring {
-    /* handled by .input-and-icon-wrapper:focus-within */
-}
+.input-focus-ring { /* handled by wrapper:focus-within */ }
 
-.feedback-container {
+/* ── Footer row – fixed-height action bar inside the input wrapper ── */
+.input-footer {
     display: flex;
-    justify-content: flex-end;
     align-items: center;
-    gap: 0.5rem;
-    position: absolute;
-    bottom: 0.6rem;
-    right: 0.75rem;
-    left: 0.75rem;
-    font-size: 0.75rem;
-    z-index: 2;
+    justify-content: space-between;
+    /* same horizontal padding as the textarea – ensures visual balance */
+    padding: 0.5rem 1rem;
+    border-top: 1px solid var(--light-gray-border);
+    background: transparent;
+    border-radius: 0 0 0.75rem 0.75rem;
+    min-height: 3rem;
+    box-sizing: border-box;
+    flex-shrink: 0;
 }
 
-.feedback-container span {
-    margin-right: auto;
+.input-footer .char-count {
     color: var(--text-gray);
     font-size: 0.72rem;
-    padding-left: 0.25rem;
+}
+
+.input-footer .footer-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 :host ::ng-deep .send-action-btn.p-button {

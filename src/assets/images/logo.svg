@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 68 56" fill="none">
+
+  <!-- Document body -->
+  <path d="M0 0 H19 L28 9 V56 H0 Z" fill="#dde3ed"/>
+  <!-- Fold corner -->
+  <path d="M19 0 L19 9 H28 Z" fill="#adb8cc"/>
+
+  <!-- Row 1: checkbox + lines -->
+  <rect x="3" y="13" width="5" height="5" rx="0.75" fill="#adb8cc"/>
+  <line x1="11"  y1="14.5" x2="21"  y2="14.5" stroke="#adb8cc" stroke-width="2"   stroke-linecap="round"/>
+  <line x1="11"  y1="17.5" x2="17"  y2="17.5" stroke="#adb8cc" stroke-width="1.5" stroke-linecap="round"/>
+
+  <!-- Row 2: checkbox + lines -->
+  <rect x="3" y="24" width="5" height="5" rx="0.75" fill="#adb8cc"/>
+  <line x1="11"  y1="25.5" x2="21"  y2="25.5" stroke="#adb8cc" stroke-width="2"   stroke-linecap="round"/>
+  <line x1="11"  y1="28.5" x2="16"  y2="28.5" stroke="#adb8cc" stroke-width="1.5" stroke-linecap="round"/>
+
+  <!-- Bottom text lines -->
+  <line x1="3" y1="37" x2="23" y2="37" stroke="#adb8cc" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="3" y1="41" x2="19" y2="41" stroke="#adb8cc" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="3" y1="45" x2="15" y2="45" stroke="#adb8cc" stroke-width="1.5" stroke-linecap="round"/>
+
+  <!-- Circuit trace 1: Green (top) -->
+  <circle cx="28" cy="15" r="2.5" fill="#22c55e"/>
+  <polyline points="28,15 37,15 37,6 51,6"
+            stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="44" cy="6" r="1.5" fill="#22c55e"/>
+  <circle cx="51" cy="6" r="2.5" fill="#22c55e"/>
+  <circle cx="58" cy="6" r="1.5" fill="#22c55e" opacity="0.5"/>
+
+  <!-- Circuit trace 2: Teal (middle) -->
+  <circle cx="28" cy="26" r="2.5" fill="#0ea5e9"/>
+  <polyline points="28,26 41,26 41,17 56,17 56,11 64,11"
+            stroke="#0ea5e9" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="48" cy="17" r="1.5" fill="#0ea5e9"/>
+  <circle cx="60" cy="17" r="1.5" fill="#0ea5e9" opacity="0.5"/>
+  <circle cx="64" cy="11" r="2.5" fill="#0ea5e9"/>
+
+  <!-- Circuit trace 3: Indigo/Purple (bottom) -->
+  <circle cx="28" cy="37" r="2.5" fill="#7c3aed"/>
+  <polyline points="28,37 36,37 36,47 50,47 50,41 62,41"
+            stroke="#7c3aed" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="41" cy="47" r="1.5" fill="#7c3aed"/>
+  <circle cx="56" cy="47" r="1.5" fill="#7c3aed" opacity="0.5"/>
+  <circle cx="62" cy="41" r="2.5" fill="#7c3aed"/>
+
+</svg>

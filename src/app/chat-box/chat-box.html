@@ -4,21 +4,29 @@
            joyrideStep="modeStep" 
           [title]="informationHelpTour['title']" 
           [text]="informationHelpTour['text']">
-        <p class="breadcrumb">Generador / Agente</p>
-        <h2 class="title">
-          {{ titleData }}
-        </h2>
-        <p class="subtitle">
-          {{ subTitleData }}
-        </p>
-        <chat-buttons
-            [eraseButton]="false"
-            [exportButton]="false"
-            [copyButton]="false"
-            [saveButton]="false"
-            [helpButton]="helpButton"
-            (submitHelpTextEmitter)="emitHelpTextEvent($event)"
-        ></chat-buttons>
+        <div class="card-header">
+          <div class="title-group">
+            <p class="breadcrumb">Generador / Agente</p>
+            <div class="title-row">
+              <h2 class="title">{{ titleData }}</h2>
+              <span class="status-badge">
+                <span class="status-dot online"></span>
+                <span class="status-label">En línea</span>
+              </span>
+            </div>
+            <p class="subtitle" *ngIf="subTitleData">{{ subTitleData }}</p>
+          </div>
+          <div class="header-actions">
+            <chat-buttons
+                [eraseButton]="false"
+                [exportButton]="false"
+                [copyButton]="false"
+                [saveButton]="false"
+                [helpButton]="helpButton"
+                (submitHelpTextEmitter)="emitHelpTextEvent($event)"
+            ></chat-buttons>
+          </div>
+        </div>
         <div class="p-fluid">
           <div class="relative-container">
             <div class="input-and-icon-wrapper"
@@ -41,15 +49,16 @@
                 #textAreaRef
                 rows="4" 
                 maxlength="10000"
-                placeholder={{placeHolder}}
+                placeholder="Escribe tu prompt para el agente aquí..."
                 class="prompt-input"
                 [ngClass]="{'input-focus-ring': isFocused()}"
                 (focus)="isFocused.set(true)"
                 (blur)="isFocused.set(false)">
               </textarea>
-              <div class="feedback-container"
+              <div class="input-footer"
                    [ngClass]="promptInput().length > 450 ? 'feedback-error' : 'feedback-normal'">
-                <span>{{ promptInput().length }} caracteres</span>
+                <span class="char-count">{{ promptInput().length }} caracteres</span>
+                <div class="footer-actions">
                   <chat-buttons
                     [eraseButton]="true"
                     [exportButton]="false"
@@ -57,15 +66,16 @@
                     [saveButton]="false"
                     (submitEraseTextEmitter)="emitEraseText($event)"
                   ></chat-buttons>
-                  <p-button 
-                    icon="pi pi-arrow-right" 
+                  <p-button
+                    icon="pi pi-arrow-right"
                     styleClass="send-action-btn"
-                    [rounded]="true" 
+                    [rounded]="true"
                     pTooltip="Generar"
                     tooltipPosition="top"
-                    (click)="submitPrompt()" 
+                    (click)="submitPrompt()"
                     [disabled]="promptInput().length < 10"
                   />
+                </div>
               </div>
             </div>
           </div>
