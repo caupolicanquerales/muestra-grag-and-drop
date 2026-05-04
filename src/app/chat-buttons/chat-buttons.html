@@ -138,37 +138,37 @@
           </div>
     </p-popover>
 
-     <p-dialog header="{{headerDialogTitle}}" [modal]="true" [(visible)]="visible" [style]="{ width: '25rem' }">
+     <p-dialog header="{{headerDialogTitle}}" [modal]="true" [(visible)]="visible" [style]="{ width: '32rem' }">
         <form [formGroup]="promptForm">
             <div class="flex items-center">
-                <input pInputText id="promptName" 
-                    class="flex-auto" 
-                    autocomplete="off" 
+                <input pInputText id="promptName"
+                    class="flex-auto"
+                    autocomplete="off"
                     placeholder="Nombre del prompt"
                     formControlName="promptName"/>
             </div>
             @if (promptNameControl?.invalid && (promptNameControl?.dirty || promptNameControl?.touched)) {
-                <span class="text-red-500 text-sm mt-1">
+                <div style="margin-top: 0.35rem;">
                     @if (promptNameControl?.errors?.['required']) {
-                        <span [style]="{'color': 'red'}">El nombre del prompt es requerido.</span>
+                        <span style="color: #ef4444; font-size: 0.8rem; font-family: 'Inter', 'Roboto', sans-serif;">El nombre del prompt es requerido.</span>
                     } @else if (promptNameControl?.errors?.['maxlength']) {
-                        <span [style]="{'color': 'red'}">
+                        <span style="color: #ef4444; font-size: 0.8rem; font-family: 'Inter', 'Roboto', sans-serif;">
                             Debe tener un máximo de {{ promptNameControl?.errors?.['maxlength'].requiredLength }} caracteres.
                         </span>
                     } @else if (promptNameControl?.errors?.['minlength']) {
-                        <span [style]="{'color': 'red'}">
+                        <span style="color: #ef4444; font-size: 0.8rem; font-family: 'Inter', 'Roboto', sans-serif;">
                             Debe tener como mínimo {{ promptNameControl?.errors?.['minlength'].requiredLength }} caracteres.
                         </span>
                     } @else if (promptNameControl?.errors?.['forbiddenName']) {
-                        <span [style]="{'color': 'red'}">
+                        <span style="color: #ef4444; font-size: 0.8rem; font-family: 'Inter', 'Roboto', sans-serif;">
                             Nombre duplicado {{ promptNameControl?.errors?.['forbiddenName'].value.promptName }}.
                         </span>
                     }
-                </span>
+                </div>
             }
             <div class="buttons-dialog flex justify-content-center">
                 <p-button label="Cancelar" severity="secondary" (click)="visible = false" />
-                <p-button label="Guardar" [disabled]="promptNameControl?.invalid"  (click)="emitSavePrompt('save-prompt')" />
+                <p-button label="Guardar" [disabled]="promptNameControl?.invalid" (click)="emitSavePrompt('save-prompt')" />
             </div>
         </form>
     </p-dialog>
