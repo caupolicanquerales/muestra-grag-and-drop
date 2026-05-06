@@ -87,6 +87,13 @@ export class ChatBox implements OnInit, OnDestroy{
   htmlString: WritableSignal<string> = signal('');
   @Input()
   cssString: WritableSignal<string> = signal('');
+  @Input()
+  copyButton: boolean= true;
+  @Input()
+  exportButton: boolean= true;
+  @Input()
+  saveButton: boolean= true;
+
 
   @Output()
   submitExtractJsonEmitter: EventEmitter<string>= new EventEmitter<string>();

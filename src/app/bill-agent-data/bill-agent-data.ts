@@ -33,7 +33,10 @@ export class BillAgentData implements OnInit, OnDestroy{
   itemsSavePromptMap:Map<any, any>=new Map();
   headerDialogMap: Map<any, any>=new Map();
   itemsSavePrompt: Array<any>=[];
-  headerDialog: Array<any>=[];  
+  headerDialog: Array<any>=[];
+  copyButton: boolean= true;  
+  exportButton: boolean= false;
+  saveButton: boolean= false;
 
   constructor(private serviceGeneral: ServiceGeneral,
     private executingRestFulService: ExecutingRestFulService
@@ -104,6 +107,9 @@ export class BillAgentData implements OnInit, OnDestroy{
       this.showTemplate.set(false);
       this.headerDialog= [];
       this.itemsSavePrompt= [];
+      this.copyButton= false;
+      this.exportButton= false;
+      this.saveButton= false;
       this.base64String.set(image);
     }
   }
@@ -115,6 +121,9 @@ export class BillAgentData implements OnInit, OnDestroy{
   setResponseMessage( token: string): void {
     this.showImage.set(false);
     this.showTemplate.set(false);
+    this.saveButton= true;
+    this.exportButton= true;
+    this.copyButton= true;
     this.headerDialog= this.headerDialogMap.get(TypePromptEnum.SYNTHETIC_DATA);
     this.itemsSavePrompt= this.itemsSavePromptMap.get(TypePromptEnum.SYNTHETIC_DATA);
     this.responseMessage.update(currentValue => currentValue + token);
@@ -128,6 +137,9 @@ export class BillAgentData implements OnInit, OnDestroy{
     if(template!=""){
       this.showTemplate.set(true);
       this.showImage.set(false);
+      this.copyButton= false;
+      this.exportButton= false;
+      this.saveButton= false;
       this.headerDialog= this.headerDialogMap.get(TypePromptEnum.BASIC_TEMPLATE);
       this.itemsSavePrompt= this.itemsSavePromptMap.get(TypePromptEnum.BASIC_TEMPLATE);
       const parsedTemplate = JSON.parse(template);
