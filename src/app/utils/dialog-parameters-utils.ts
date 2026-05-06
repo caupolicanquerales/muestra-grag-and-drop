@@ -93,6 +93,8 @@ export function getHeaderDialogJsonSkeleton(): Map<any, any> {
             headerDialog: "Información a ser guardado en dato sintético"}]);
     map.set(TypePromptEnum.PUBLICITY_DATA, [{format: TypePromptEnum.PUBLICITY_DATA,
             headerDialog: "Información a ser guardado en dato publicidad"}]);
+    map.set(TypePromptEnum.BASIC_TEMPLATE, [{format: TypePromptEnum.BASIC_TEMPLATE,
+            headerDialog: "Template basico a ser guardado"}]);  
     return map;
 }
 
@@ -100,6 +102,7 @@ export function getSaveFormartJsonSkeleton(): Map<any, any > {
     const map = new Map();
     map.set(TypePromptEnum.SYNTHETIC_DATA, [{format: TypePromptEnum.SYNTHETIC_DATA}]);
     map.set(TypePromptEnum.PUBLICITY_DATA, [{format: TypePromptEnum.PUBLICITY_DATA}]);
+    map.set(TypePromptEnum.BASIC_TEMPLATE, [{format: TypePromptEnum.BASIC_TEMPLATE}]);
     return map;
 }
 

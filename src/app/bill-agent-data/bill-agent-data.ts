@@ -3,11 +3,12 @@ import { ChatBox } from '../chat-box/chat-box';
 import { Observable, Subject, takeUntil } from 'rxjs';
 import { ServiceGeneral } from '../service/service-general';
 import { GenerationDataAgentInterface } from '../models/generation-data-agent-interface';
-import { getHeaderDialogToBasicTemplate, getSaveFormartBasicTemplate } from '../utils/dialog-parameters-utils';
+import { getHeaderDialogJsonSkeleton, getSaveFormartJsonSkeleton } from '../utils/dialog-parameters-utils';
 import { SavePromptDbInterface } from '../models/save-prompt-db-interface';
 import { TypePromptEnum } from '../enums/type-prompt-enum';
 import { BasicTemplateInterface } from '../models/basic-template-interface';
 import { ExecutingRestFulService } from '../service/executing-rest-ful-service';
+import { SyntheticDataInterface } from '../models/synthetic-data-interface';
 
 @Component({
   selector: 'bill-agent-data',
@@ -29,16 +30,20 @@ export class BillAgentData implements OnInit, OnDestroy{
   htmlString: WritableSignal<string> = signal('');
   cssString: WritableSignal<string> = signal('');
   conversationId: string = this.generateId();
+  itemsSavePromptMap:Map<any, any>=new Map();
+  headerDialogMap: Map<any, any>=new Map();
   itemsSavePrompt: Array<any>=[];
-  headerDialog: Array<any>=[];
+  headerDialog: Array<any>=[];  
 
   constructor(private serviceGeneral: ServiceGeneral,
     private executingRestFulService: ExecutingRestFulService
   ){}
   
   ngOnInit(): void {
+    this.itemsSavePromptMap= getSaveFormartJsonSkeleton();
+    this.headerDialogMap= getHeaderDialogJsonSkeleton();
     this.subscribeUntilDestroyed(this.serviceGeneral.selectedPromptBill$, data => this.prompt.set(data));
-    this.subscribeUntilDestroyed(this.serviceGeneral.statusMessage$, status => this.statusMessage.set(status));
+    this.subscribeUntilDestroyed(this.serviceGeneral.statusMessage$, status => this.setStatusMessage(status));
     this.subscribeUntilDestroyed(this.serviceGeneral.responseMessagePrompt$, token => this.setResponseMessage(token));
     this.subscribeUntilDestroyed(this.serviceGeneral.imageGenerated$, image => this.setImageinChatBox(image));
     this.subscribeUntilDestroyed(this.serviceGeneral.basicTemplateGenerated$, template => this.setTemplateInChatBox(template));
@@ -110,17 +115,21 @@ export class BillAgentData implements OnInit, OnDestroy{
   setResponseMessage( token: string): void {
     this.showImage.set(false);
     this.showTemplate.set(false);
-    this.headerDialog= [];
-    this.itemsSavePrompt= [];
+    this.headerDialog= this.headerDialogMap.get(TypePromptEnum.SYNTHETIC_DATA);
+    this.itemsSavePrompt= this.itemsSavePromptMap.get(TypePromptEnum.SYNTHETIC_DATA);
     this.responseMessage.update(currentValue => currentValue + token);
+    if(this.responseMessage().includes("||DONE||")){
+      this.responseMessage.update(currentValue => currentValue.replace("||DONE||", "").trim());
+      this.serviceGeneral.setIsUploadingAnimation(false);
+    }
   }
 
   private setTemplateInChatBox(template: string): void{
     if(template!=""){
       this.showTemplate.set(true);
       this.showImage.set(false);
-      this.headerDialog= getHeaderDialogToBasicTemplate();
-      this.itemsSavePrompt= getSaveFormartBasicTemplate();
+      this.headerDialog= this.headerDialogMap.get(TypePromptEnum.BASIC_TEMPLATE);
+      this.itemsSavePrompt= this.itemsSavePromptMap.get(TypePromptEnum.BASIC_TEMPLATE);
       const parsedTemplate = JSON.parse(template);
       this.htmlString.set(parsedTemplate?.["htmlString"]);
       this.cssString.set(parsedTemplate?.["cssString"]);
@@ -128,14 +137,42 @@ export class BillAgentData implements OnInit, OnDestroy{
   }
 
   savePromptInDB($event: SavePromptDbInterface): void{
-     if($event?.typePrompt==TypePromptEnum.BASIC_TEMPLATE){
-          let request: BasicTemplateInterface = {
-            id: null,
-            htmlString: this.htmlString(),
-            cssString: this.cssString(),
-            name: $event.name
-          };
-          this.executingRestFulService.saveBasicTemplate(request);
-        }
+    const actions: Record<string, () => void> = {
+    [TypePromptEnum.SYNTHETIC_DATA]: () => this.executingRestFulService.saveSyntheticData(this.getSyntheticRequest($event.name)),
+    [TypePromptEnum.BASIC_TEMPLATE]: () => this.executingRestFulService.saveBasicTemplate(this.getBasicTemplateRequest($event))};
+
+     const action = actions[$event?.typePrompt];
+     if (action) action();
+  }
+
+  setStatusMessage(status: boolean): void{
+    this.statusMessage.set(status);
+  }
+
+  private getSyntheticRequest(name: string): SyntheticDataInterface{
+    const textToCopy = this.responseMessage();
+    return {
+      id: null,
+      data: textToCopy,
+      name: name
+    } 
+  }
+
+  private getBasicTemplateRequest($event: SavePromptDbInterface): BasicTemplateInterface{
+    return {
+          id: null,
+          htmlString: this.htmlString(),
+          cssString: this.cssString(),
+          name: $event.name
+        };
+  }
+
+  async submitCopyText($event: string): Promise<void> {
+    const textToCopy = this.responseMessage();
+    try {
+      await navigator.clipboard.writeText(textToCopy);
+    } catch (e) {
+      console.error("Error, Trying to copy prompt-editor.",e);
+    }
   }
 }

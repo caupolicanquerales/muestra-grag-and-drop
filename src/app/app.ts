@@ -313,12 +313,8 @@ export class App implements OnInit, OnDestroy, AfterViewInit{
         this.serviceGeneral.setBasicTemplateGenerated(token.data.message);
       }
     }else{
-      if(token.data.message === 'new-message-COMPLETED'){
-        this.serviceGeneral.setIsUploadingAnimation(false);
-      }else{
-        this.serviceGeneral.setStatusMessage(true);
-        this.serviceGeneral.setResponseMessagePrompt(token.data.message);
-      }
+      this.serviceGeneral.setStatusMessage(true);
+      this.serviceGeneral.setResponseMessagePrompt(token.data.message);
     }
   }
 }
