@@ -101,7 +101,7 @@ export class HttpClientService {
     return this.http.post<PromptGenerationImageInterface>(this.urlRootMongo+'mongo/save-system-prompt',request);
   }
 
-  saveSynteticDataGeneration(request: SyntheticDataInterface): Observable<SyntheticDataInterface> {
+  saveSyntheticDataGeneration(request: SyntheticDataInterface): Observable<SyntheticDataInterface> {
     return this.http.post<SyntheticDataInterface>(this.urlRootMongo+'mongo/save-synthetic-data',request);
   }
 
@@ -117,12 +117,20 @@ export class HttpClientService {
     return this.http.post<PromptGenerationImageInterface>(this.urlRootMongo+'mongo/save-global-defect-prompt',request);
   }
 
+  saveImageVariablesDataGeneration(request: SyntheticDataInterface): Observable<SyntheticDataInterface> {
+    return this.http.post<SyntheticDataInterface>(this.urlRootMongo+'mongo/save-image-variables-data',request);
+  }
+
   getPromptGlobalDefect(): Observable<MongoResponseAllImagePromptInterface> {
     return this.http.get<MongoResponseAllImagePromptInterface>(this.urlRootMongo+'mongo/all-global-defect-prompt');
   }
 
   getBasicTemplateByIdInMongo(request: BasicTemplateInterface): Observable<BasicTemplateInterface> {
     return this.http.post<BasicTemplateInterface>(this.urlRootMongo+'mongo/get-basic-template', request);
+  }
+
+  saveImageVariablesDataByIdInMongo(request: SyntheticDataInterface): Observable<SyntheticDataInterface> {
+    return this.http.post<SyntheticDataInterface>(this.urlRootMongo+'mongo/get-image-variables-data',request);
   }
 
   deletePromptImageById(request: PromptGenerationImageInterface): Observable<any> {

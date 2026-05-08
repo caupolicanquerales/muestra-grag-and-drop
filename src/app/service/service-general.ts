@@ -117,6 +117,9 @@ export class ServiceGeneral {
   private basicTemplateJsonInfo = new BehaviorSubject<any>({});
   basicTemplateJsonInfo$: Observable<any> = this.basicTemplateJsonInfo.asObservable();
 
+  private imageVariablesData = new BehaviorSubject<any>({});
+  imageVariablesData$: Observable<any> = this.imageVariablesData.asObservable();
+
   private imageGenerated = new BehaviorSubject<string>('');
   imageGenerated$: Observable<string> = this.imageGenerated.asObservable();
 
@@ -271,7 +274,6 @@ export class ServiceGeneral {
     this.basicTemplate.next(basicTemplate);
   }
 
-
   setBasicTemplateJsonInfo(basicTemplateJsonInfo:any): void{
     this.basicTemplateJsonInfo.next(basicTemplateJsonInfo);
   }
@@ -294,5 +296,9 @@ export class ServiceGeneral {
 
   setExecutingImageStreamAgent(executingImageStream:GenerationImageInterface | null): void{
     this.executingImageStreamAgent.next(executingImageStream);
+  }
+
+  setImageVariablesData(imageVariablesData:any): void{
+    this.imageVariablesData.next(imageVariablesData);
   }
 }

@@ -64,6 +64,7 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
 
   ngOnDestroy(): void {
     this.serviceGeneral.setBasicTemplate('');
+    this.serviceGeneral.setImageVariablesData({});
     this.destroy$.next();
     this.destroy$.complete();
   }
@@ -107,7 +108,9 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
     if($event?.node?.data){
       if($event?.node?.data?.type==TypePromptEnum.BASIC_TEMPLATE){
         let request= this.getBasicTemplateInterface($event?.node?.data?.data);
+        let requestImageVariables= this.getImageVariableDataInterface($event?.node?.data?.data?.id);
         this.executingRestFulService.getBasicTemplateById(request);
+        this.executingRestFulService.getImageVariablesDataById(requestImageVariables);
       }else{
         this.insertingInformationInTextarea($event?.node?.data, index);
       }
@@ -257,5 +260,13 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
   startTour() {
     const dynamicSteps = this.editors().map(item => `treeStep_${item.id}`);
     this.joyrideService.startTour({ steps: ['modeStep', ...dynamicSteps] });
+  }
+
+  private getImageVariableDataInterface(templateID:string): SyntheticDataInterface {
+    return {
+      id: templateID,
+      data: '',
+      name: ''
+    };
   }
 }

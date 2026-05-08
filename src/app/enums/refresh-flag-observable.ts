@@ -6,5 +6,6 @@ export enum RefreshFlagObservableEnum {
   REFRESH_SD = 'refresh-synthetic-data',
   REFRESH_PUD = 'refresh-publicity-data',
   REFRESH_PGD = 'refresh-prompt-global-defect',
-  REFRESH_BT = 'refresh-basic-template'
+  REFRESH_BT = 'refresh-basic-template',
+  REFRESH_IVD = 'refresh-image-variables-data'
 }

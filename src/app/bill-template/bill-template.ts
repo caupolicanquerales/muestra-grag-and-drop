@@ -19,6 +19,7 @@ import { templateHelp } from '../utils/infor-help-tour-utils';
 import { BillJsonSkeleton } from '../bill-json-skeleton/bill-json-skeleton';
 import { EditorConfig } from '../utils/bill-constructor-utils';
 import { GenerationTemplateJsonInfoInterface } from '../models/generation-template-json-info-interface';
+import { SyntheticDataInterface } from '../models/synthetic-data-interface';
 
 @Component({
   selector: 'bill-template',
@@ -54,7 +55,7 @@ export class BillTemplate implements OnInit, OnDestroy{
   actionButtonName: string= "Eliminar";
   displayInfoInSelectedItem: Array<string>=["id","name"];
   private readonly joyrideService = inject(JoyrideService);
-  private requestToGetTemplate: any= {};
+  requestToGetTemplate: any= {};
   templateHelp: any= templateHelp();
   JsonArray: Array<EditorConfig> = [];
 
@@ -145,7 +146,7 @@ export class BillTemplate implements OnInit, OnDestroy{
       { key: 'publicityString', id: '2', typePrompt: TypePromptEnum.PUBLICITY_DATA },
       { key: 'imagesString',    id: '3', typePrompt: TypePromptEnum.IMAGES_DATA    },
     ];
-
+    this.saveJsonImageVariablesData($event);
     this.JsonArray = sections.map(({ key, id, typePrompt }) => ({
       id,
       tree: [],
@@ -155,6 +156,18 @@ export class BillTemplate implements OnInit, OnDestroy{
 
     this.showTableAndUploadTemplate.set(false);
     this.showJsonInformation.set(true);
+  }
+
+  private saveJsonImageVariablesData($event: any){
+    let imageVariables= $event?.['imagesString'] ?? '{}';
+      if(imageVariables != '{}'){
+        const request: SyntheticDataInterface={
+        id: this.requestToGetTemplate.id,
+        data: imageVariables,
+        name: ''
+      }
+      this.executingRestFulService.saveImageVariablesData(request);
+    } 
   }
 
   private setJsonFormat(data: string): string{

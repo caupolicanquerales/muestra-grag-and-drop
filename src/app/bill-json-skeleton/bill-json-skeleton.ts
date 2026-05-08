@@ -4,7 +4,6 @@ import { CommonModule, NgClass } from '@angular/common';
 import { ChatButtons } from '../chat-buttons/chat-buttons';
 import { getHeaderDialogJsonSkeleton, getSaveFormartJsonSkeleton } from '../utils/dialog-parameters-utils';
 import { TypePromptEnum } from '../enums/type-prompt-enum';
-import { PromptGenerationImageInterface } from '../models/prompt-generation-image-interface';
 import { ExecutingRestFulService } from '../service/executing-rest-ful-service';
 import { SyntheticDataInterface } from '../models/synthetic-data-interface';
 
@@ -48,13 +47,7 @@ export class BillJsonSkeleton implements OnInit {
   }
 
   emitSavePrompt($event: any, id: string): void {
-      const textToCopy = this.getTextToCopy(id);
-      const requestBase: PromptGenerationImageInterface = {
-        id: null,
-        prompt: textToCopy,
-        name: $event.name
-      };
-  
+      const textToCopy = this.getTextToCopy(id); 
       const actions: Record<string, () => void> = {
         [TypePromptEnum.SYNTHETIC_DATA]: () => this.executingRestFulService.saveSyntheticData(this.getSyntheticRequest(textToCopy, $event.name)),
         [TypePromptEnum.PUBLICITY_DATA]: () => this.executingRestFulService.savePublicityData(this.getSyntheticRequest(textToCopy, $event.name)),

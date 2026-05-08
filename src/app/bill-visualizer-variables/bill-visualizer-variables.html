@@ -1,0 +1,26 @@
+<div class="card-container">
+    <span class="card-section-title">{{titles}}</span>
+    @for (item of variables(); track item.id; let last = $last; let i = $index) { 
+        <ng-container *ngTemplateOutlet="editorTemplate; context: {
+                index: i, 
+                id: item.id, 
+                name: item.variable,
+        }"></ng-container>
+    }
+</div>
+
+<ng-template #editorTemplate 
+  let-name="name" 
+  let-id="id"
+  let-index="index"
+  >
+    <div class="card-content-wrapper">
+        <span class="variable-label">{{ name }}</span>
+        <chat-buttons
+            [copyButton]="true"
+            [exportButton]="false"
+            [saveButton]="false"
+            (submitCopyTextEmitter)="submitCopyText($event, name)"
+        ></chat-buttons>
+    </div>
+</ng-template>
