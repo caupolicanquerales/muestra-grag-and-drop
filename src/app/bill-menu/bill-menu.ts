@@ -11,10 +11,11 @@ import { ExecutingRestFulService } from '../service/executing-rest-ful-service';
 import { bfsSearchNodeToInsertFunctionCommand } from '../utils/bfs-search-node-utils';
 import { Subject, takeUntil, Observable } from 'rxjs';
 import { TypePromptEnum } from '../enums/type-prompt-enum';
+import { BillVisualizerVariables } from '../bill-visualizer-variables/bill-visualizer-variables';
 
 @Component({
   selector: 'bill-menu',
-  imports: [CommonModule, TieredMenuModule, AvatarModule, ProgressSpinnerModule],
+  imports: [CommonModule, TieredMenuModule, AvatarModule, ProgressSpinnerModule, BillVisualizerVariables],
   templateUrl: './bill-menu.html',
   styleUrl: './bill-menu.scss'
 })
@@ -32,6 +33,7 @@ export class BillMenu implements OnInit, OnDestroy{
   itemPromptData: MenuItem[] =  [];
   isUploading = signal(false);
   upMenu: boolean= true;
+  variables = signal<Array<any>>([]);
   private eraseOptionData: string= "Datos";
   private eraseAction: string= "Borrar";
   private handlerFunction: any;
@@ -65,6 +67,7 @@ export class BillMenu implements OnInit, OnDestroy{
     this.subscribeUntilDestroyed(this.serviceGeneral.promptImages$, data => this.handlePromptsObservable(data, 'promptsImages', 'itemPromptImages', TypePromptEnum.IMAGE_PROMPT));
     this.subscribeUntilDestroyed(this.serviceGeneral.promptBills$, data => this.handlePromptsObservable(data, 'promptsBills', 'itemPromptBills', TypePromptEnum.BILL_PROMPT));
     this.subscribeUntilDestroyed(this.serviceGeneral.promptData$, data => this.handlePromptsObservable(data, 'promptsData', 'itemPromptData', TypePromptEnum.DATA_PROMPT));
+    this.subscribeUntilDestroyed(this.serviceGeneral.imageVariablesData$, data => this.handleImageVariablesObservable(data));
     this.httpClient.getTemplates().subscribe(data=>this.templates=data);
     this.httpClient.getPromptsFromRepository().subscribe(data=>{
       this.itemPrompt=  this.setItemsForPrompt(data)
@@ -180,4 +183,20 @@ export class BillMenu implements OnInit, OnDestroy{
     this.bfsSearchNodeFromObservable(this.itemPromptBills, TypePromptEnum.BILL_PROMPT);
     this.bfsSearchNodeFromObservable(this.itemPromptData, TypePromptEnum.DATA_PROMPT);
   }
+
+  private handleImageVariablesObservable(data: any){
+    if(data && data.data && Object.keys(data.data).length > 0){
+      const parsedData = JSON.parse(data?.data);
+      let imageVariables = Object.keys(parsedData).map((key,index) => {
+        return {
+          id: index,
+          variable: key
+        };
+      });
+      this.variables.set(imageVariables);
+    }else{
+      this.variables.set([]);
+    }
+  }
+
 }

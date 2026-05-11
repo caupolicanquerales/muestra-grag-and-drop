@@ -2,7 +2,6 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, OnDestroy, OnInit, signal, WritableSignal } from '@angular/core';
 import { BillSkeleton } from '../bill-skeleton/bill-skeleton';
 import { UploadDocument } from '../upload-document/upload-document';
-import { HttpClientService } from '../service/http-client-service';
 import { ServiceGeneral } from '../service/service-general';
 import { Subject, takeUntil } from 'rxjs';
 import { TableModule } from 'primeng/table';
@@ -13,16 +12,19 @@ import { getHeaderDialogToBasicTemplate, getSaveFormartBasicTemplate } from '../
 import { BasicTemplateInterface } from '../models/basic-template-interface';
 import { ExecutingRestFulService } from '../service/executing-rest-ful-service';
 import { DialogTemplate } from '../dialog-template/dialog-template';
-import { GenerationImageInterface } from '../models/generation-image-interface';
 import { TypePromptEnum } from '../enums/type-prompt-enum';
 import { getBasicTemplateInterfaceFromEvent } from '../utils/basic-template-utils';
 import { JoyrideModule, JoyrideService } from 'ngx-joyride';
 import { templateHelp } from '../utils/infor-help-tour-utils';
+import { BillJsonSkeleton } from '../bill-json-skeleton/bill-json-skeleton';
+import { EditorConfig } from '../utils/bill-constructor-utils';
+import { GenerationTemplateJsonInfoInterface } from '../models/generation-template-json-info-interface';
+import { SyntheticDataInterface } from '../models/synthetic-data-interface';
 
 @Component({
   selector: 'bill-template',
   imports: [CommonModule, BillSkeleton, UploadDocument, TableModule, ButtonModule, ChatButtons,
-    DialogTemplate, JoyrideModule],
+    DialogTemplate, JoyrideModule, BillJsonSkeleton],
   standalone: true,
   templateUrl: './bill-template.html',
   styleUrl: './bill-template.scss',
@@ -37,6 +39,8 @@ export class BillTemplate implements OnInit, OnDestroy{
   formatFileMessage: string= $localize`@@formatFileMessageBill`
   htmlString= signal("");
   cssString= signal("");
+  showTableAndUploadTemplate= signal(true);
+  showJsonInformation= signal(false);
   selectedFiles: Array<File> = [];
   selectedFilesTemplate: WritableSignal<FileList | null> = signal(null);
   private destroy$ = new Subject<void>();
@@ -51,9 +55,11 @@ export class BillTemplate implements OnInit, OnDestroy{
   actionButtonName: string= "Eliminar";
   displayInfoInSelectedItem: Array<string>=["id","name"];
   private readonly joyrideService = inject(JoyrideService);
+  requestToGetTemplate: any= {};
   templateHelp: any= templateHelp();
+  JsonArray: Array<EditorConfig> = [];
 
-  constructor(private httpService :HttpClientService,private serviceGeneral: ServiceGeneral,
+  constructor(private serviceGeneral: ServiceGeneral,
     private executingRestFulService: ExecutingRestFulService){}
 
   ngOnInit(): void {
@@ -67,13 +73,14 @@ export class BillTemplate implements OnInit, OnDestroy{
     this.serviceGeneral.basicTemplate$.pipe(takeUntil(this.destroy$)).subscribe(data=>{
       this.htmlString.set(data?.["htmlString"]);
       this.cssString.set(data?.["cssString"]);
-      this.serviceGeneral.setActivateBasicTemplateStream(false);
+      this.serviceGeneral.setActivateBasicTemplateStream(null);
     });
+    this.serviceGeneral.basicTemplateJsonInfo$.pipe(takeUntil(this.destroy$)).subscribe(data=>this.processJsonInformation(data));
   }
 
   ngOnDestroy(): void {
     this.serviceGeneral.setBasicTemplate('');
-    this.serviceGeneral.setActivateBasicTemplateStream(false);
+    this.serviceGeneral.setActivateBasicTemplateStream(null);
     this.destroy$.next();
     this.destroy$.complete();
   }
@@ -93,8 +100,8 @@ export class BillTemplate implements OnInit, OnDestroy{
 
   selectTemplate($event:any):void{
     this.serviceGeneral.setIsUploadingAnimation(true);
-    let request= this.getBasicTemplateInterface($event);
-    this.executingRestFulService.getBasicTemplateById(request);
+    this.requestToGetTemplate= this.getBasicTemplateInterface($event);
+    this.executingRestFulService.getBasicTemplateById(this.requestToGetTemplate);
   }
 
   deleteTemplate($event:any):void{
@@ -123,32 +130,62 @@ export class BillTemplate implements OnInit, OnDestroy{
     }
   }
 
-  private executingSaveFile(request:FormData ){
-    this.httpService.sendingFileForBasicTemplate(request).subscribe({
-      next: (event) => {
-        this.allowButton.set(false);
-        this.serviceGeneral.setIsUploadingAnimation(true);
-        const request= this.getRequestGenerationData();
-        this.updatePromptToGenerateBasicTemplate(request);
-      },
-      error: (error) => {
-        console.error('Upload failed:', error);
-      }
-    });
+  emitProcessText($event: string){
+    let request: GenerationTemplateJsonInfoInterface={
+      id: this.requestToGetTemplate.id
+    }
+    this.serviceGeneral.setActivateBasicTemplateJsonStream(request);
+    this.serviceGeneral.setIsUploadingAnimation(true);
   }
-  
-  private updatePromptToGenerateBasicTemplate(request: GenerationImageInterface): void{
-    this.httpService.updatePromptForBasicTemplate(request).subscribe({
-      next: (data) => {
-        this.serviceGeneral.setActivateBasicTemplateStream(true);
-      },
-      error: (err) => {
-        console.error('Error fetching data:', err);
-      },
-      complete: () => {
-        console.log('Request completed.');
+
+  processJsonInformation($event: any){
+    if (!$event || Object.keys($event).length === 0) return;
+
+    const sections: Array<{ key: string; id: string; typePrompt: string }> = [
+      { key: 'dataString',      id: '1', typePrompt: TypePromptEnum.SYNTHETIC_DATA },
+      { key: 'publicityString', id: '2', typePrompt: TypePromptEnum.PUBLICITY_DATA },
+      { key: 'imagesString',    id: '3', typePrompt: TypePromptEnum.IMAGES_DATA    },
+    ];
+    this.saveJsonImageVariablesData($event);
+    this.JsonArray = sections.map(({ key, id, typePrompt }) => ({
+      id,
+      tree: [],
+      styledPrompt: this.setJsonFormat($event?.[key] ?? '{}'),
+      typePrompt,
+    }));
+
+    this.showTableAndUploadTemplate.set(false);
+    this.showJsonInformation.set(true);
+  }
+
+  private saveJsonImageVariablesData($event: any){
+    let imageVariables= $event?.['imagesString'] ?? '{}';
+      if(imageVariables != '{}'){
+        const request: SyntheticDataInterface={
+        id: this.requestToGetTemplate.id,
+        data: imageVariables,
+        name: ''
       }
-    })
+      this.executingRestFulService.saveImageVariablesData(request);
+    } 
+  }
+
+  private setJsonFormat(data: string): string{
+    const jsonObj = JSON.parse(data);
+    const formattedJson = JSON.stringify(jsonObj, null, 2);
+    return formattedJson;
+  }
+
+  emitReturnText($event: string){
+    this.showTableAndUploadTemplate.set(true);
+    this.showJsonInformation.set(false);
+    this.JsonArray=[];
+   }
+
+  private executingSaveFile(request:FormData){
+    this.allowButton.set(false);
+    this.serviceGeneral.setIsUploadingAnimation(true);
+    this.serviceGeneral.setActivateBasicTemplateStream(request);
   }
 
   private setFormData(selectedFiles: FileList): FormData{
@@ -158,12 +195,6 @@ export class BillTemplate implements OnInit, OnDestroy{
     }
     return formData;  
   }
-
-  private getRequestGenerationData():GenerationImageInterface{
-      return {
-        prompt: ["Extract the information from the HTML and SCSS files into two strings. Return the result strictly as a raw JSON object using this exact structure: {'htmlString': '', 'cssString': ''}. Do not use Markdown code blocks (no ```json or ```python). Do not include any conversational text. Ensure all keys and strings use double quotes for valid JSON compatibility."]
-      };
-    }
 
   startTour() {
       this.joyrideService.startTour({ steps: ['modeStep'] });

@@ -43,7 +43,7 @@ export class ExecutingRestFulService {
   }
 
   saveSyntheticData(request: SyntheticDataInterface){
-    this.handlePromptAction(this.httpService.saveSynteticDataGeneration(request), RefreshFlagObservableEnum.REFRESH_SD,
+    this.handlePromptAction(this.httpService.saveSyntheticDataGeneration(request), RefreshFlagObservableEnum.REFRESH_SD,
       this.msgSuccessSave, this.errorSave);
   }
 
@@ -60,6 +60,11 @@ export class ExecutingRestFulService {
   saveBasicTemplate(request: BasicTemplateInterface){
     this.handlePromptAction(this.httpService.saveBasicTemplate(request), RefreshFlagObservableEnum.REFRESH_BT,
       this.msgSuccessSaveTemplate, this.errorSaveTemplate);
+  }
+
+  saveImageVariablesData(request: SyntheticDataInterface){
+    this.handlePromptAction(this.httpService.saveImageVariablesDataGeneration(request), RefreshFlagObservableEnum.REFRESH_IVD,
+      this.msgSuccessSave, this.errorSave);
   }
 
   deletePromptImageById(request: PromptGenerationImageInterface){
@@ -138,6 +143,18 @@ getBasicTemplateById(request: BasicTemplateInterface): void{
     },
     error: (error) => {
       this.serviceGeneral.setIsUploadingAnimation(false);
+      console.error('Upload failed:', error);
+    }
+    }
+  );
+}
+
+getImageVariablesDataById(request: SyntheticDataInterface): void{
+    this.httpService.saveImageVariablesDataByIdInMongo(request).subscribe({
+    next: (data) => {
+      this.serviceGeneral.setImageVariablesData(data);
+    },
+    error: (error) => {
       console.error('Upload failed:', error);
     }
     }

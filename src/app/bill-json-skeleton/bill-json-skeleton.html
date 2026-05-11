@@ -1,0 +1,60 @@
+<div class="main-wrapper">
+    <div class="header-container">
+        <div class="title-header">
+            <h2 class="title-text">
+                {{ titleData }}
+            </h2>
+        </div>
+        <div class="card-container" >
+            @for (item of editors(); track item.id; let last = $last; let i = $index) { 
+                <ng-container *ngTemplateOutlet="editorTemplate; context: {
+                    index: i, 
+                    id: item.id, 
+                    promptValue: item.styledPrompt ,
+                    item: item
+                }
+                "></ng-container>
+            }
+        </div>
+    </div>
+</div>
+
+<ng-template #editorTemplate 
+  let-promptValue="promptValue" 
+  let-id="id"
+  let-item="item"
+  let-index="index"
+  let-typePrompt="item.typePrompt"
+  >
+  <div class="editor-content-wrapper">
+    <div class="code-panel">
+        <div class="code-toolbar">
+            <span class="code-label">{{ item.typePrompt }}</span>
+            <chat-buttons
+                [eraseButton]="false"
+                [saveButton]="true"
+                [exportButton]="false"
+                [copyButton]="false"
+                [generateImageButton]="false"
+                [generatePromptButton]="false"
+                [itemsSavePrompt]="getItemsSavePrompt(typePrompt)"
+                [headerDialog]="getHeaderDialog(typePrompt)"
+                (submitSavePromptEmitter)="emitSavePrompt($event, id)"
+            ></chat-buttons>
+        </div>
+        <div class="relative-container">
+            <div 
+                #editorRef
+                [id]="id" 
+                [innerHTML]="promptValue"
+                (input)="updatePromptFromContentEditable($event, item)" 
+                contenteditable="true"
+                placeholder="placeHolder"
+                class="prompt-input"
+                [ngClass]="{'input-focus-ring': isFocused()}"
+                (blur)="isFocused.set(false)">
+            </div>
+        </div>
+    </div>
+  </div>
+</ng-template>

@@ -1,0 +1,18 @@
+:host {
+    display: block;
+    width: 100%;
+}
+
+.chat-container {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    min-height: 100vh;
+    padding: 1rem;
+    box-sizing: border-box;
+}
+
+chat-box {
+    flex: 1;
+    min-width: 0;
+}

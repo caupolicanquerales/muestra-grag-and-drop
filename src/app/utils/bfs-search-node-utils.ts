@@ -31,8 +31,9 @@ export function searchNodeToDisableNode(tree: any[], nodeNames: Array<string>): 
       if(dimension!=undefined){
         for(let i=0;i<dimension;i++){
             if(nodeNames.includes(tree[0]['children'][i]['label'])){
-                tree[0]['children'][i]['style']= {'color':'red'};
-                tree[0]['children'][i]['collapsedIcon']="pi pi-ban";
+                tree[0]['children'][i]['style']= {'color':'#475569','fontStyle':'italic','opacity':'0.75'};
+                tree[0]['children'][i]['collapsedIcon']="pi pi-lock";
+                tree[0]['children'][i]['expandedIcon']="pi pi-lock";
                 tree[0]['children'][i]['selectable']=false;
                 tree[0]['children'][i]['children']=[];
             }

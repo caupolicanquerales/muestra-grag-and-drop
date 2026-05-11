@@ -1,0 +1,84 @@
+.card-container {
+  border-radius: 0.75rem;
+  padding: 0.75rem 0;
+  background: #f5f6f8;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.card-section-title {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #6b7280;
+  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+  margin-bottom: 0.25rem;
+}
+
+.card-content-wrapper {
+  background: #e8f5ee;
+  border: 1px solid #a8d5bc;
+  border-radius: 0.5rem;
+  padding: 0.45rem 0.5rem 0.45rem 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.25rem;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(34, 139, 87, 0.08);
+  transition: background 0.15s ease, border-color 0.15s ease;
+
+  /* Override PrimeNG 20 design tokens scoped to this card */
+  --p-button-secondary-background: #e8f5ee;
+  --p-button-secondary-hover-background: #d4eddf;
+  --p-button-secondary-active-background: #d4eddf;
+  --p-button-secondary-border-color: transparent;
+  --p-button-secondary-hover-border-color: transparent;
+  --p-button-secondary-active-border-color: transparent;
+  --p-button-secondary-focus-ring-color: transparent;
+  --p-button-secondary-focus-ring-width: 0;
+  --p-button-secondary-focus-ring-offset: 0;
+  --p-button-secondary-color: #155e3a;
+  --p-button-secondary-hover-color: #155e3a;
+
+  &:hover {
+    background: #d4eddf;
+    border-color: #7ec4a0;
+  }
+
+  ::ng-deep .p-button-group {
+    display: flex;
+    align-items: center;
+  }
+
+  ::ng-deep .submit-button-shape,
+  ::ng-deep .submit-button-shape.p-button,
+  ::ng-deep .submit-button-shape.p-button-secondary {
+    width: 1.5rem !important;
+    height: 1.5rem !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    border-radius: 0.25rem !important;
+    padding: 0 !important;
+
+    .p-button-icon {
+      font-size: 0.75rem !important;
+    }
+  }
+
+  ::ng-deep .p-button.p-button-rounded {
+    border-radius: 0.25rem !important;
+  }
+}
+
+.variable-label {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #155e3a;
+  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+  word-break: break-all;
+  flex: 1;
+}

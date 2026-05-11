@@ -16,6 +16,9 @@ import { getMapComponentToDisplay } from './utils/map-component-utils';
 import { getToastMessageOption } from './utils/toast-message-option-utils';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { GenerationDataInterface } from './models/generation-data-interface';
+import { GenerationDataAgentInterface } from './models/generation-data-agent-interface';
+import { GenerationImageInterface } from './models/generation-image-interface';
+import { GenerationTemplateJsonInfoInterface } from './models/generation-template-json-info-interface';
 
 
 @Component({
@@ -37,9 +40,11 @@ export class App implements OnInit, OnDestroy, AfterViewInit{
   private mimeType: string = 'image/png';
   private destroy$ = new Subject<void>();
   private flagToStartBasicTemplate: string= "Basic Template generation started for prompt";
+  private flagToStartAnalyzingTemplate: string= "Analyzing template is starting for prompt";
 
   private destroyRef = inject(DestroyRef);
   private sseSubscription?: Subscription;
+  private sseSubscriptionAgent?: Subscription;
   
   constructor(private serviceGeneral: ServiceGeneral, private receiveData:ReceiveDataService,
     private httpClient: HttpClientService, private convertBase64Byte: ConvertBase64ByteService,
@@ -57,9 +62,11 @@ export class App implements OnInit, OnDestroy, AfterViewInit{
     this.subscribeUntilDestroyed(this.serviceGeneral.imageIds$, data => this.imageIds = data);
     this.subscribeUntilDestroyed(this.serviceGeneral.toastMessage$, data => this.messageService.add(data));
     this.subscribeUntilDestroyed(this.serviceGeneral.chatClientStreamPrueba$, data => this.setSubscriptionToDataReceiver(data));
+    this.subscribeUntilDestroyed(this.serviceGeneral.chatClientStreamAgent$, data => this.setSubscriptionToDataReceiverAgent(data));
     this.subscribeUntilDestroyed(this.serviceGeneral.activateBasicTemplateStream$, data => this.setSubscriptionToBasicTemplateReceiver(data));
+    this.subscribeUntilDestroyed(this.serviceGeneral.activateBasicTemplateJsonStream$, data => this.setSubscriptionToBasicTemplateJsonReceiver(data));
     this.serviceGeneral.activateUploadDocumentStream$.pipe(takeUntil(this.destroy$)).pipe(take(2)).subscribe(data=>this.setSubscriptionToFileReceiver(data));
-    this.subscribeUntilDestroyed(this.serviceGeneral.executingImageStream$, data => this.setSubscriptionToImageReceiver(data));
+    this.subscribeUntilDestroyed(this.serviceGeneral.executingImageStreamAgent$, data => this.setSubscriptionToImageReceiverAgent(data));
     this.serviceGeneral.changeComponent$.pipe(takeUntil(this.destroy$)).subscribe(data=>{
       if(data!=''){
         this.loadComponent(data);
@@ -92,31 +99,31 @@ export class App implements OnInit, OnDestroy, AfterViewInit{
     if (this.sseSubscription) {
         this.sseSubscription.unsubscribe();
     }
-
     if (request && request.prompt!='') {
         this.sseSubscription = this.receiveData.getDataStream(request)
             .pipe(
                 takeUntilDestroyed(this.destroyRef), 
                 finalize(() => console.log('Observable stream fully finalized'))
             )
-            .subscribe({
-                next: (token) => {
-                    this.serviceGeneral.setStatusMessage(true);
-                    this.serviceGeneral.setIsUploadingAnimation(false);
-                    this.serviceGeneral.setResponseMessagePrompt(token.data.message);
-                },
-                error: (err) => {
-                    this.serviceGeneral.setStatusMessage(false);
-                    this.serviceGeneral.setIsUploadingAnimation(false);
-                    this.serviceGeneral.setResponseMessagePrompt('Error: Could not complete the request.');
-                },
-                complete: () => {
-                    console.log('Stream completed via backend signal');
-                }
-            });
+            .subscribe(this.dataReceiverObserver);
         this.subscriptions.add(this.sseSubscription);
     }
-}
+  }
+
+  private setSubscriptionToDataReceiverAgent(request: GenerationDataAgentInterface) {
+    if (this.sseSubscriptionAgent) {
+        this.sseSubscriptionAgent.unsubscribe();
+    }
+    if (request && request.prompt!='') {
+        this.sseSubscriptionAgent = this.receiveData.getDataStreamAgent(request)
+            .pipe(
+                takeUntilDestroyed(this.destroyRef), 
+                finalize(() => console.log('Observable stream fully finalized'))
+            )
+            .subscribe(this.dataReceiverObserverAgent);
+        this.subscriptions.add(this.sseSubscriptionAgent);
+    }
+  }
 
   private setSubscriptionToFileReceiver(executing: boolean): void{
     if(executing){
@@ -135,10 +142,10 @@ export class App implements OnInit, OnDestroy, AfterViewInit{
     }
   }
 
-  private setSubscriptionToBasicTemplateReceiver(executing: boolean): void{
+  private setSubscriptionToBasicTemplateReceiver(executing: FormData | null): void{
     if(executing){
       this.subscriptionsFile.add(
-        this.receiveData.getDataStreamBasicTemplate().subscribe({
+        this.receiveData.getDataStreamBasicTemplate(executing).subscribe({
           next: (response) => {
             if(response!=this.flagToStartBasicTemplate){
               this.catchErrorInJsonTransformation(response);
@@ -153,10 +160,28 @@ export class App implements OnInit, OnDestroy, AfterViewInit{
     }
   }
 
-  private setSubscriptionToImageReceiver(executing:boolean):void{
+  private setSubscriptionToBasicTemplateJsonReceiver(executing: GenerationTemplateJsonInfoInterface | null): void{
+    if(executing){
+      this.subscriptionsFile.add(
+        this.receiveData.getDataStreamBasicTemplateJson(executing).subscribe({
+          next: (response) => {
+            if(response!=this.flagToStartBasicTemplate){
+              this.catchErrorInJsonTransformationTemplateInfo(response);
+            }
+          },
+          error: (err) =>{
+            this.setToastMessage('error', 'Error en el procesamiento de los archivos');
+            this.serviceGeneral.setIsUploadingAnimation(false);
+          },
+        })
+      );
+    }
+  }
+
+  private setSubscriptionToImageReceiverAgent(executing:GenerationImageInterface | null):void{
     if(executing){
       this.subscriptionsImage.add(
-        this.receiveData.getDataStreamImage().subscribe({
+        this.receiveData.getDataStreamImageAgent(executing).subscribe({
             next: (response) => {
               if(response!="Image generation started for prompt"){
                 this.setToastMessage('success', 'Imagen generada');       
@@ -225,5 +250,71 @@ export class App implements OnInit, OnDestroy, AfterViewInit{
     } catch (error) {
       this.setToastMessage("warn", 'Error en la estructura del json de respuesta'); 
     }  
+  }
+
+  private catchErrorInJsonTransformationTemplateInfo(cleanJson: string){
+    try {
+      if(cleanJson!=this.flagToStartAnalyzingTemplate){
+        this.serviceGeneral.setIsUploadingAnimation(false);
+        const result= JSON.parse(cleanJson);
+        this.serviceGeneral.setBasicTemplateJsonInfo(result); 
+        this.setToastMessage('success', 'Información correctamente procesada'); 
+      } 
+    } catch (error) {
+      this.setToastMessage("warn", 'Error en la estructura del json de respuesta'); 
+    }  
+  }
+
+  private dataReceiverObserver = {
+    next: (token: any) => {
+        this.setObservablesInNext(token);
+    },
+    error: (err: any) => {
+        this.setObservablesInError();
+    },
+    complete: () => {
+        console.log('Stream completed via backend signal');
+    }
+  };
+
+  private dataReceiverObserverAgent = {
+    next: (token: any) => {
+        this.setObservablesInNextAgent(token)
+    },
+    error: (err: any) => {
+        this.setObservablesInError();
+    },
+    complete: () => {
+        console.log('Stream completed via backend signal');
+    }
+  };
+
+  private setObservablesInError(){
+    this.serviceGeneral.setStatusMessage(false);
+    this.serviceGeneral.setIsUploadingAnimation(false);
+    this.serviceGeneral.setResponseMessagePrompt('Error: Could not complete the request.');
+  }
+  
+  private setObservablesInNext(token: any){
+    this.serviceGeneral.setStatusMessage(true);
+    this.serviceGeneral.setIsUploadingAnimation(false);
+    this.serviceGeneral.setResponseMessagePrompt(token.data.message);
+  }
+
+  private setObservablesInNextAgent(token: any){
+    if(token.event === 'new-image'){
+      this.serviceGeneral.setStatusMessage(false);
+      this.serviceGeneral.setIsUploadingAnimation(false);
+      this.saveImageInRedis(token.data.message);
+    }else if(token.event === 'new-basic-template'){
+      this.serviceGeneral.setStatusMessage(false);
+      if("Basic template is starting for prompt"!==token.data.message){
+        this.serviceGeneral.setIsUploadingAnimation(false);
+        this.serviceGeneral.setBasicTemplateGenerated(token.data.message);
+      }
+    }else{
+      this.serviceGeneral.setStatusMessage(true);
+      this.serviceGeneral.setResponseMessagePrompt(token.data.message);
+    }
   }
 }

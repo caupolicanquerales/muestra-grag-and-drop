@@ -1,5 +1,6 @@
 import { Component, signal } from '@angular/core';
 import { SafeStyle } from '@angular/platform-browser';
+import { ServiceGeneral } from '../service/service-general';
 
 @Component({
   selector: 'app-bill-presentation',
@@ -12,7 +13,13 @@ export class BillPresentation {
   appImageURL: string= "assets/images/imagen_de_entrada.png"
   canvasColor = signal('rgb(255, 255, 255)');
 
+  constructor(private serviceGeneral: ServiceGeneral) {}
+
   getBackgroundImageStyle(): string {
     return `url('${this.appImageURL}')`; 
+  }
+
+  goToAgentChat(): void {
+    this.serviceGeneral.setChangeComponent("bill-agent-data");
   }
 }

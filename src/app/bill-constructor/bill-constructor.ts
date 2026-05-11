@@ -15,9 +15,10 @@ import { composeHtmlCssTemplate, getBasicTemplateInterfaceFromEvent } from '../u
 import { ChatButtons } from '../chat-buttons/chat-buttons';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { FormsModule } from '@angular/forms';
-import { getSystemPromptWithoutPublicity, getSystemPromptWithPublicity } from '../utils/system-prompt-utils';
+import {  getUserPromptSubAgent } from '../utils/system-prompt-utils';
 import { EditorConfig, getEditors, orderSystem, orderSystemWithPublicity, systemPromptHelp, textHelp, titlesHelp } from '../utils/bill-constructor-utils';
 import { JoyrideModule, JoyrideService } from 'ngx-joyride';
+import { formatDataIfJson } from '../utils/json-format-utils';
 
 @Component({
   selector: 'bill-constructor',
@@ -31,9 +32,10 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
   @ViewChildren('editorRef') editorRefs!: QueryList<ElementRef<HTMLDivElement>>;
 
   titleData: string= "Constructor";
-  radioButton1: string ="Prompt de sistema"
-  radioButton2: string ="Prompt de sistema y publicidad"
+  radioButton1: string ="Sin publicidad";
+  radioButton2: string ="Con publicidad"
   selectedOption: string= '';
+  selectedAgent: string= '';
   isFocused = signal(false);
   tree: TreeNode[]= [buildMainNode('Prompts', true)];
   editors = signal<EditorConfig[]>([]);
@@ -44,6 +46,9 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
   titlesHelp: any= titlesHelp();
   textHelp: any= textHelp();
   promptSystemHelp: any= systemPromptHelp();
+  promptUser: string= '';
+  placeHolderPromptUser: string= 'Escribe aquí el prompt del usuario para la generación de la imagen...';
+  allowPromptUser: boolean= true;
 
   constructor(private serviceGeneral: ServiceGeneral,
     private executingRestFulService: ExecutingRestFulService){}
@@ -54,18 +59,19 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
     this.handleDataUpdate('0', TypePromptEnum.BASIC_TEMPLATE, this.serviceGeneral.basicTemplateData$);
     this.handleDataUpdate('1', TypePromptEnum.SYNTHETIC_DATA, this.serviceGeneral.syntheticData$);
     this.handleDataUpdate('2', TypePromptEnum.PUBLICITY_DATA, this.serviceGeneral.publicityData$);
-    this.handleDataUpdate('3', TypePromptEnum.SYSTEM_PROMPT, this.serviceGeneral.promptSystem$);
     this.subscribeUntilDestroyed(this.serviceGeneral.basicTemplate$, data => this.setBasicTemplateToEditor(data, this.index));
   }
 
   ngOnDestroy(): void {
     this.serviceGeneral.setBasicTemplate('');
+    this.serviceGeneral.setImageVariablesData({});
     this.destroy$.next();
     this.destroy$.complete();
   }
 
   ngAfterViewInit() {
     setTimeout(() => {
+      this.onRadioChange(null);
       this.editorRefs.forEach(editor => {
         this.adjustHeight(editor.nativeElement);
       });
@@ -78,9 +84,11 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
   }
 
   resizeAllTextareas() {
-    this.editorRefs.forEach((editor) => {
-      this.adjustHeight(editor.nativeElement);
-    });
+    if(this.editorRefs!=undefined){
+        this.editorRefs.forEach((editor) => {
+        this.adjustHeight(editor.nativeElement);
+      });
+    }
   }
 
   private adjustHeight(el: HTMLDivElement) {
@@ -100,7 +108,9 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
     if($event?.node?.data){
       if($event?.node?.data?.type==TypePromptEnum.BASIC_TEMPLATE){
         let request= this.getBasicTemplateInterface($event?.node?.data?.data);
+        let requestImageVariables= this.getImageVariableDataInterface($event?.node?.data?.data?.id);
         this.executingRestFulService.getBasicTemplateById(request);
+        this.executingRestFulService.getImageVariablesDataById(requestImageVariables);
       }else{
         this.insertingInformationInTextarea($event?.node?.data, index);
       }
@@ -156,8 +166,10 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
   }
   
   private insertingInformationInTextarea($event: any, index: string){
+    this.allowPromptUser = (index=='1')?false: this.allowPromptUser;
     this.insertStringIntoEditor('', index);  
-    const coloredSpan = removeColorContent($event?.data, "rgb(0, 0, 0)");
+    const formattedData = formatDataIfJson($event?.data);
+    const coloredSpan = removeColorContent(formattedData, "rgb(0, 0, 0)");
     this.insertStringIntoEditor(coloredSpan, index);
   }
 
@@ -191,6 +203,7 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
 }
 
   emitEraseText($event: any, index: string){
+    this.allowPromptUser = (index=='1');
     this.insertStringIntoEditor('', index);
   }
 
@@ -225,22 +238,35 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
   }
 
   generateImage($event: any){
+      this.setUserPrompt();
+      this.serviceGeneral.setChangeComponent('bill-agent-data');
+  }
+
+  private setUserPrompt(){
     let prompt= '';
     if(this.selectedOption==this.radioButton1){
-      let mapPrompt: Map<string,string>= this. extractAllContent(["0","1","3"]);
-      let systemPrompt= getSystemPromptWithoutPublicity(mapPrompt.get("0"),mapPrompt.get("1"),mapPrompt.get("3"));
-      prompt= JSON.stringify(systemPrompt);  
+      let mapPrompt: Map<string,string>= this. extractAllContent(["0","1"]);
+      let systemPrompt= getUserPromptSubAgent(mapPrompt.get("0"),mapPrompt.get("1"), undefined ,this.promptUser);
+      prompt= JSON.stringify(systemPrompt);
     }else{
-      let mapPrompt: Map<string,string>= this. extractAllContent(["0","1","2","3"]);
-      let systemPrompt= getSystemPromptWithPublicity(mapPrompt.get("0"),mapPrompt.get("1"),mapPrompt.get("2"), mapPrompt.get("3"));
-      prompt= JSON.stringify(systemPrompt);  
+      let mapPrompt: Map<string,string>= this. extractAllContent(["0","1","2"]);
+      let systemPrompt= getUserPromptSubAgent(mapPrompt.get("0"),mapPrompt.get("1"), mapPrompt.get("2"), this.promptUser);
+      prompt= JSON.stringify(systemPrompt);
     }
     this.serviceGeneral.setSelectedPromptBill(prompt);
-    this.serviceGeneral.setChangeComponent('show-template');
   }
+
 
   startTour() {
     const dynamicSteps = this.editors().map(item => `treeStep_${item.id}`);
     this.joyrideService.startTour({ steps: ['modeStep', ...dynamicSteps] });
+  }
+
+  private getImageVariableDataInterface(templateID:string): SyntheticDataInterface {
+    return {
+      id: templateID,
+      data: '',
+      name: ''
+    };
   }
 }

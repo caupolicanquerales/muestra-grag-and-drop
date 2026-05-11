@@ -1,0 +1,23 @@
+<div class="chat-container">
+    <chat-box
+    [prompt]="prompt()"
+    [responseMessage]="responseMessage"
+    [statusMessage]="statusMessage"
+    [titleData]="titleData"
+    [helpButton]="true"
+    [reverseLayout]="true"
+    [showImage]="showImage"
+    [showTemplate]="showTemplate"
+    [base64String]="base64String"
+    [htmlString]="htmlString"
+    [cssString]="cssString"
+    [itemsSavePrompt]="itemsSavePrompt"
+    [headerDialog]="headerDialog"
+    [copyButton]="copyButton"
+    [exportButton]="exportButton"
+    [saveButton]="saveButton"
+    (submitPromptEmitter)="submitPrompt()"
+    (promptEmitter)="promptEmitter($event)"
+    (savePromptEmitterInDB)="savePromptInDB($event)"
+  ></chat-box>
+</div>

@@ -1,57 +1,95 @@
 .card-container {
-  max-width: 500px;
-  margin: 30px auto;
-  padding: 20px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 100%;
+  margin: 0 0 1.25rem;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
 }
 
 .upload-container {
-  border: 2px dashed #ccc;
-  border-radius: 6px;
-  padding: 30px 20px;
+  border: 2px dashed #c7d2fe;
+  border-radius: 0.75rem;
+  padding: 2.5rem 1.5rem;
   text-align: center;
   cursor: pointer;
-  margin-bottom: 20px;
-  transition: all 0.2s ease-in-out;
-  
+  background: #fafaff;
+  transition: all 0.2s ease;
+
   &.drag-over {
-    border-color: #3f51b5; /* Angular Material Primary */
-    background-color: #e8eaf6; /* Light Blue background */
+    border-color: #4f46e5;
+    background-color: #eef2ff;
   }
 
   &:hover {
-    border-color: #999;
+    border-color: #818cf8;
+    background: #f5f3ff;
   }
 }
 
 .upload-prompt {
-  .upload-icon {
-    font-size: 48px;
-    height: 48px;
-    width: 48px;
-    color: #666;
-    margin-bottom: 10px;
-  }
-  p {
-    margin: 5px 0;
-    font-weight: 500;
-  }
-  small {
-    color: #888;
-  }
-}
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
 
-.file-info {
-  h4 { margin: 0 0 5px 0; font-size: 1.1em; }
-  p { margin: 0 0 10px 0; }
-  .file-size { color: #555; font-size: 0.9em; }
+  &::before {
+    content: '\e94f';
+    font-family: 'primeicons';
+    font-size: 2.5rem;
+    color: #818cf8;
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+
+  p {
+    margin: 0;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #374151;
+  }
+
+  small {
+    color: #94a3b8;
+    font-size: 0.78rem;
+  }
 }
 
 .action-area {
   text-align: center;
-  margin-bottom: 15px;
+  margin-top: 1rem;
+  margin-bottom: 0;
+
+  button[pButton] {
+    background-color: #4f46e5 !important;
+    border-color: #4f46e5 !important;
+    color: #ffffff !important;
+    border-radius: 0.5rem !important;
+    padding: 0.55rem 1.5rem !important;
+    font-weight: 600 !important;
+    font-size: 0.875rem !important;
+    transition: background-color 0.15s ease !important;
+    box-shadow: 0 2px 6px rgba(79,70,229,0.3) !important;
+
+    &:hover:not([disabled]) {
+      background-color: #4338ca !important;
+      border-color: #4338ca !important;
+    }
+
+    &[disabled] {
+      background-color: #c7d2fe !important;
+      border-color: #c7d2fe !important;
+      cursor: not-allowed !important;
+      box-shadow: none !important;
+    }
+  }
+}
+
+.file-info {
+  h4 { margin: 0 0 5px; font-size: 1.1em; }
+  p { margin: 0 0 10px; }
+  .file-size { color: #555; font-size: 0.9em; }
 }
 
 .progress-area {
@@ -76,23 +114,22 @@
   text-align: center;
 }
 
-
 .file-info-container {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .file-type-icon {
-    font-size: 1.25rem;
-    color: var(--primary-color); /* Highlight color */
+  font-size: 1.25rem;
+  color: #4f46e5;
 }
 
 .file-name-text {
-    font-size: 0.9rem;
-    font-weight: 500;
-    max-width: 300px; /* Prevent overflow */
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  font-size: 0.9rem;
+  font-weight: 500;
+  max-width: 300px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

@@ -7,6 +7,17 @@ interface SystemPromptObject {
     parts: Array<Prompt>;
 }
 
+export interface UserPromptSubAgentObject {
+    html?: string,
+    data?: string
+    publicity?: string,
+    userPrompt?: string
+}
+
 export interface SystemPromptInterface {
     contents: Array<SystemPromptObject>;
+}
+
+export interface UserPromptSubAgentInterface {
+    userPromptSubAgent: UserPromptSubAgentObject;
 }

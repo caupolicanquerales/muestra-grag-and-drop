@@ -11,4 +11,13 @@
             [model]="items"
             styleClass="custom-menu">
         </p-tieredMenu>
+    
+    @if(variables().length > 0){
+        <div class="image-variables-container">
+            <bill-visualizer-variables
+                [variables]="variables"
+            >    
+            </bill-visualizer-variables>  
+        </div>
+    }
 </div>

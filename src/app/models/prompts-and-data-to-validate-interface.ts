@@ -9,4 +9,5 @@ export interface PromptAndDataToValidateInterface {
     [TypePromptEnum.GLOBAL_DEFECT_PROMPT]?: Array<string>;
     [TypePromptEnum.PUBLICITY_DATA]?: Array<string>;
     [TypePromptEnum.SYSTEM_PROMPT]?: Array<string>;
+    [TypePromptEnum.IMAGES_DATA]?: Array<string>; 
 }

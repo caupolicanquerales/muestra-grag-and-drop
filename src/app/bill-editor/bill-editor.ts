@@ -19,6 +19,7 @@ import { RadioButtonModule } from 'primeng/radiobutton';
 import { BasicTemplateInterface } from '../models/basic-template-interface';
 import { TypePromptEnum } from '../enums/type-prompt-enum';
 import { composeHtmlCssTemplate, getBasicTemplateInterfaceFromEvent } from '../utils/basic-template-utils';
+import { formatDataIfJson } from '../utils/json-format-utils';
 
 @Component({
   selector: 'bill-editor',
@@ -111,7 +112,8 @@ export class BillEditor implements OnInit, OnDestroy {
   }
 
   setColorText($event: any, colorRgb: string){
-    const coloredSpan = removeColorContent($event?.data, colorRgb);
+    const formattedData = formatDataIfJson($event?.data);
+    const coloredSpan = removeColorContent(formattedData, colorRgb);
     this.setTimeout(coloredSpan);
   }
 
