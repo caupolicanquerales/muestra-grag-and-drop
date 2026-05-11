@@ -137,9 +137,9 @@ export class BillAgentData implements OnInit, OnDestroy{
     if(template!=""){
       this.showTemplate.set(true);
       this.showImage.set(false);
-      this.copyButton= true;
+      this.copyButton= false;
       this.exportButton= false;
-      this.saveButton= false;
+      this.saveButton= true;
       this.headerDialog= this.headerDialogMap.get(TypePromptEnum.BASIC_TEMPLATE);
       this.itemsSavePrompt= this.itemsSavePromptMap.get(TypePromptEnum.BASIC_TEMPLATE);
       const parsedTemplate = JSON.parse(template);
