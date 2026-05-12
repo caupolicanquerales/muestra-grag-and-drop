@@ -93,6 +93,8 @@ export class ChatBox implements OnInit, OnDestroy{
   exportButton: boolean= true;
   @Input()
   saveButton: boolean= true;
+  @Input()
+  suggestedPrompts: string[] = [];
 
 
   @Output()
@@ -191,6 +193,21 @@ export class ChatBox implements OnInit, OnDestroy{
 
   emitHelpTextEvent($event: any){
     this.joyrideService.startTour({ steps: ['modeStep'] });
+  }
+
+  focusPrompt(): void {
+    const el = document.getElementById('prompt-input') as HTMLTextAreaElement;
+    if (el) el.focus();
+  }
+
+  applyChip(text: string): void {
+    this.promptInput.set(text);
+    setTimeout(() => {
+      const el = document.getElementById('prompt-input') as HTMLTextAreaElement;
+      if (el) el.focus();
+      this.resizeTextarea();
+      this.sendPromptEmitter();
+    }, 0);
   }
 
   downloadFile(extension: string){

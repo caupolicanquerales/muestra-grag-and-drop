@@ -1,17 +1,27 @@
 :host {
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
+    /* Fixed height so flex children can resolve % heights and footer never shifts */
+    height: 100vh;
 }
 
 
 .dashboard-main {
     display: flex;
-    flex: 1; 
+    flex: 1;
+    min-height: 0; /* Prevent flex item from overflowing its parent */
     gap: 0;
     padding: 0;
-    overflow: hidden; 
-    align-items: stretch; 
+    overflow: hidden;
+    align-items: stretch;
+}
+
+/* Scrollable content column — sidebar stays fixed, only content scrolls */
+.content-area {
+    flex: 1;
+    min-height: 0;
+    min-width: 0;
+    overflow-y: auto;
 }
 
 bill-menu {

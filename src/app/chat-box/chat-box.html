@@ -42,6 +42,22 @@
                 (selectedFilesEmitter)="selectedFilesEvent($event)"
                 #uploadComponentRef
               ></upload-document-chat>
+              @if(promptInput().length === 0){
+                <div class="empty-anchor" (click)="focusPrompt()">
+                  <span class="empty-anchor-header">
+                    <i class="pi pi-sparkles empty-anchor-icon"></i>
+                    <span class="empty-anchor-text">¿En qué puedo ayudarte hoy?</span>
+                  </span>
+                  @if(suggestedPrompts.length > 0){
+                    <div class="empty-anchor-chips">
+                      @for(chip of suggestedPrompts; track chip){
+                        <button type="button" class="prompt-chip"
+                          (click)="$event.stopPropagation(); applyChip(chip)">{{ chip }}</button>
+                      }
+                    </div>
+                  }
+                </div>
+              }
               <textarea 
                 id="prompt-input" 
                 [(ngModel)]="promptInput" 

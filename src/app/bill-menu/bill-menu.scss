@@ -8,7 +8,9 @@
       box-shadow: 4px 0 16px rgba(0, 0, 0, 0.06);
       border-radius: 0;
       border: none;
-      z-index: 10;
+      /* Establish an explicit stacking context so submenus z-index is relative to this layer */
+      z-index: 100;
+      position: relative;
       box-sizing: border-box;
     }
 
@@ -17,7 +19,7 @@
       font-weight: 700;
       letter-spacing: 0.1em;
       text-transform: uppercase;
-      color: #9ca3af;
+      color: #4b5563;
       font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
       margin-bottom: 1rem;
       padding-bottom: 0.5rem;
@@ -82,7 +84,7 @@
       }
 
       .p-menuitem-link-active {
-        background-color: #ede9fe;
+        background-color: #f5f6f8;
         border-left: 3px solid #4f46e5;
         padding-left: calc(0.75rem - 3px) !important;
 
@@ -97,9 +99,39 @@
       }
 
       .p-submenu-icon {
-        color: #9ca3af;
+        color: #4b5563;
         font-size: 0.6rem;
-        opacity: 0.5;
+        opacity: 0.8;
+      }
+
+      .p-submenu-list {
+        background-color: #ffffff;
+        border: 1px solid #d1d5db;
+        border-radius: 0.5rem;
+        box-shadow:
+          0 4px 6px -1px rgba(0, 0, 0, 0.10),
+          0 10px 24px -4px rgba(0, 0, 0, 0.12);
+        z-index: 1000;
+        /* Solid backdrop — never see-through over the hero content */
+        opacity: 1 !important;
+        /* Slight top accent to reinforce the submenu's own hierarchy */
+        border-top: 2px solid #4f46e5;
+        min-width: 13rem;
+        padding: 0.35rem 0;
+        margin-left: 2px;
+
+        .p-menuitem-link {
+          padding: 0.55rem 1rem;
+          border-radius: 0;
+
+          &:hover {
+            background-color: #f0f4ff;
+          }
+        }
+
+        .p-menuitem-text {
+          color: #1e293b;
+        }
       }
     }
 
