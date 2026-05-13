@@ -116,7 +116,7 @@ export class BillAgentData implements OnInit, OnDestroy{
 
   setResponseMessage( token: string): void {
     this.showImage.set(false);
-    //this.showTemplate.set(false);
+    this.showTemplate.set(false);
     this.saveButton= true;
     this.exportButton= true;
     this.copyButton= true;
@@ -182,6 +182,8 @@ export class BillAgentData implements OnInit, OnDestroy{
     if(isTemplate){
       this.showTemplate.set(isTemplate);
       this.showImage.set(false);
+      this.htmlString.set('');
+      this.cssString.set('');
       this.copyButton= false;
       this.exportButton= false;
       this.saveButton= true;
@@ -192,6 +194,7 @@ export class BillAgentData implements OnInit, OnDestroy{
     if(isImage){
       this.showTemplate.set(false);
       this.showImage.set(isImage);
+      this.base64String.set('');
       this.copyButton= false;
       this.exportButton= false;
       this.saveButton= false;

@@ -194,6 +194,9 @@ export class ChatBox implements OnInit, OnDestroy{
 
   submitPrompt():void{
     this.showSpinnerProgress.set(true);
+    this.showImage.set(false);
+    this.showTemplate.set(false);
+    this.statusMessage.set(false);
     this.submitPromptEmitter.emit('executing-submit-prompt-event');
   }
 
