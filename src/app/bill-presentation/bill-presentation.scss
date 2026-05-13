@@ -80,8 +80,6 @@
     background: #eef2ff;
     border-color: #c7d2fe;
     color: #4f46e5;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
   }
 }
 
@@ -99,19 +97,16 @@
   border: none;
   border-radius: 0.6rem;
   cursor: pointer;
-  box-shadow: 0 4px 14px rgba(79, 70, 229, 0.35);
-  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+  box-shadow: none;
+  transition: filter 0.15s ease;
   width: fit-content;
 
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(79, 70, 229, 0.45);
     filter: brightness(1.08);
   }
 
   &:active {
-    transform: translateY(0);
-    box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
+    filter: brightness(0.95);
   }
 }
 

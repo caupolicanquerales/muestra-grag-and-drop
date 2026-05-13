@@ -305,11 +305,17 @@ export class App implements OnInit, OnDestroy, AfterViewInit{
     if(token.event === 'new-image'){
       this.serviceGeneral.setStatusMessage(false);
       this.serviceGeneral.setIsUploadingAnimation(false);
-      this.saveImageInRedis(token.data.message);
+      this.serviceGeneral.setIsSpinnerAnimationImage(true);
+      if("Image generation started for prompt"!=token.data.message && "Image visual effect started for prompt"!=token.data.message){
+        this.serviceGeneral.setIsSpinnerAnimationImage(false);
+        this.saveImageInRedis(token.data.message);
+      }
     }else if(token.event === 'new-basic-template'){
       this.serviceGeneral.setStatusMessage(false);
+      this.serviceGeneral.setIsUploadingAnimation(false);
+      this.serviceGeneral.setIsSpinnerAnimationTemplate(true);
       if("Basic template is starting for prompt"!==token.data.message){
-        this.serviceGeneral.setIsUploadingAnimation(false);
+        this.serviceGeneral.setIsSpinnerAnimationTemplate(false);
         this.serviceGeneral.setBasicTemplateGenerated(token.data.message);
       }
     }else{

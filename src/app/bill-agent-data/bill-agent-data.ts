@@ -50,6 +50,8 @@ export class BillAgentData implements OnInit, OnDestroy{
     this.subscribeUntilDestroyed(this.serviceGeneral.responseMessagePrompt$, token => this.setResponseMessage(token));
     this.subscribeUntilDestroyed(this.serviceGeneral.imageGenerated$, image => this.setImageinChatBox(image));
     this.subscribeUntilDestroyed(this.serviceGeneral.basicTemplateGenerated$, template => this.setTemplateInChatBox(template));
+    this.subscribeUntilDestroyed(this.serviceGeneral.isSpinnerAnimationTemplate$, isTemplate => this.setViewTemplateInChatBox(isTemplate));
+    this.subscribeUntilDestroyed(this.serviceGeneral.isSpinnerAnimationImage$, isImage => this.setViewImageInChatBox(isImage));
   }
 
   ngOnDestroy(): void {
@@ -94,7 +96,6 @@ export class BillAgentData implements OnInit, OnDestroy{
   private updatePromptToGenerateData(): void{
     this.prompt.set('');
     this.serviceGeneral.setResizeInput(true);
-    this.serviceGeneral.setIsUploadingAnimation(true);
   }
 
   private subscribeUntilDestroyed<T>(obs: Observable<T>, handler: (v: T) => void) {
@@ -103,13 +104,8 @@ export class BillAgentData implements OnInit, OnDestroy{
 
   private setImageinChatBox(image: string): void{
     if(image!=""){
-      this.showImage.set(true);
-      this.showTemplate.set(false);
       this.headerDialog= [];
       this.itemsSavePrompt= [];
-      this.copyButton= false;
-      this.exportButton= false;
-      this.saveButton= false;
       this.base64String.set(image);
     }
   }
@@ -129,17 +125,11 @@ export class BillAgentData implements OnInit, OnDestroy{
     this.responseMessage.update(currentValue => currentValue + token);
     if(this.responseMessage().includes("||DONE||")){
       this.responseMessage.update(currentValue => currentValue.replace("||DONE||", "").trim());
-      this.serviceGeneral.setIsUploadingAnimation(false);
     }
   }
 
   private setTemplateInChatBox(template: string): void{
     if(template!=""){
-      this.showTemplate.set(true);
-      this.showImage.set(false);
-      this.copyButton= true;
-      this.exportButton= false;
-      this.saveButton= false;
       this.headerDialog= this.headerDialogMap.get(TypePromptEnum.BASIC_TEMPLATE);
       this.itemsSavePrompt= this.itemsSavePromptMap.get(TypePromptEnum.BASIC_TEMPLATE);
       const parsedTemplate = JSON.parse(template);
@@ -187,4 +177,28 @@ export class BillAgentData implements OnInit, OnDestroy{
       console.error("Error, Trying to copy prompt-editor.",e);
     }
   }
+
+  private setViewTemplateInChatBox(isTemplate: boolean): void{
+    if(isTemplate){
+      this.showTemplate.set(isTemplate);
+      this.showImage.set(false);
+      this.htmlString.set('');
+      this.cssString.set('');
+      this.copyButton= false;
+      this.exportButton= false;
+      this.saveButton= true;
+    }   
+  }
+
+  private setViewImageInChatBox(isImage: boolean): void{
+    if(isImage){
+      this.showTemplate.set(false);
+      this.showImage.set(isImage);
+      this.base64String.set('');
+      this.copyButton= false;
+      this.exportButton= false;
+      this.saveButton= false;
+    }
+  }
+
 }

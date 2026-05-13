@@ -36,6 +36,12 @@ export class ServiceGeneral {
   private isUploadingAnimation = new BehaviorSubject<boolean>(false);
   isUploadingAnimation$: Observable<boolean> = this.isUploadingAnimation.asObservable();
 
+  private isSpinnerAnimationTemplate = new BehaviorSubject<boolean>(false);
+  isSpinnerAnimationTemplate$: Observable<boolean> = this.isSpinnerAnimationTemplate.asObservable();
+
+  private isSpinnerAnimationImage = new BehaviorSubject<boolean>(false);
+  isSpinnerAnimationImage$: Observable<boolean> = this.isSpinnerAnimationImage.asObservable();
+
   private resizeInput = new BehaviorSubject<boolean>(false);
   resizeInput$: Observable<boolean> = this.resizeInput.asObservable();
 
@@ -164,6 +170,14 @@ export class ServiceGeneral {
 
   setIsUploadingAnimation(isUploadingAnimation:boolean): void{
     this.isUploadingAnimation.next(isUploadingAnimation);
+  }
+
+  setIsSpinnerAnimationTemplate(isSpinnerAnimationTemplate:boolean): void{
+    this.isSpinnerAnimationTemplate.next(isSpinnerAnimationTemplate);
+  }
+
+  setIsSpinnerAnimationImage(isSpinnerAnimationImage:boolean): void{
+    this.isSpinnerAnimationImage.next(isSpinnerAnimationImage);
   }
 
   setResizeInput(resizeInput:boolean): void{
