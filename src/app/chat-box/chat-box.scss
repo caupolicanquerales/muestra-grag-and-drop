@@ -61,6 +61,14 @@
     overflow-wrap: break-word;
 }
 
+.spinner-message {
+    background-color: transparent;
+    box-shadow: none;
+    padding: 0.5rem 0;
+    align-self: flex-start;
+    margin-left: 0;
+}
+
 .layout-reversed .p-fluid {
     order: 2;
     margin-top: 0 rem; 
@@ -151,6 +159,27 @@
     box-shadow: 0 0 0 3px rgba(34,197,94,0.15);
 }
 .status-label { font-weight: 500; }
+
+@keyframes labelBlink {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.2; }
+}
+
+.progress-spinner-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.6rem;
+}
+
+.spinner-label {
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-gray);
+    letter-spacing: 0.01em;
+    animation: labelBlink 1.2s ease-in-out infinite;
+}
 
 .relative-container {
     display: flex;

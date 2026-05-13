@@ -16,12 +16,14 @@ import { JoyrideModule, JoyrideService } from 'ngx-joyride';
 import { PromptAndDataToValidateInterface } from '../models/prompts-and-data-to-validate-interface';
 import { VisualizerCanvas } from '../visualizer-canvas/visualizer-canvas';
 import { BillSkeleton } from '../bill-skeleton/bill-skeleton';
+import { SpinnerAnimation } from "../spinner-animation/spinner-animation";
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 
 @Component({
   selector: 'chat-box',
   standalone:true,
-  imports: [CommonModule,SafeHtmlPipePipe,FormsModule,NgClass,ButtonModule, UploadDocumentChat,
-    ChatButtons, TooltipModule, JoyrideModule, VisualizerCanvas, BillSkeleton],
+  imports: [CommonModule, SafeHtmlPipePipe, FormsModule, NgClass, ButtonModule, UploadDocumentChat,
+    ChatButtons, TooltipModule, JoyrideModule, VisualizerCanvas, BillSkeleton, SpinnerAnimation, ProgressSpinnerModule],
   templateUrl: './chat-box.html',
   styleUrl: './chat-box.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -29,6 +31,7 @@ import { BillSkeleton } from '../bill-skeleton/bill-skeleton';
 export class ChatBox implements OnInit, OnDestroy{
 
   promptInput = signal('');
+  showSpinnerProgress = signal(false);
   private destroy$ = new Subject<void>();
   private readonly joyrideService = inject(JoyrideService);
   deleteFiles: boolean= false
@@ -127,6 +130,13 @@ export class ChatBox implements OnInit, OnDestroy{
         }, delay);
       }
     });
+
+    effect(() => {
+      const hasResponse = this.statusMessage() || this.showImage() || this.showTemplate();
+      if (hasResponse) {
+        this.showSpinnerProgress.set(false);
+      }
+    });
   }
 
   ngOnInit(): void {
@@ -183,6 +193,7 @@ export class ChatBox implements OnInit, OnDestroy{
   }
 
   submitPrompt():void{
+    this.showSpinnerProgress.set(true);
     this.submitPromptEmitter.emit('executing-submit-prompt-event');
   }
 
@@ -248,6 +259,7 @@ export class ChatBox implements OnInit, OnDestroy{
   emitEraseText($event: any){
         this.promptInput.set('');
         this.deleteFiles= true;
+        this.showSpinnerProgress.set(false);
         setTimeout(() => {
             this.resizeTextarea();
         }, 0);

@@ -98,20 +98,30 @@
         </div>
 
         @if (statusMessage() || showImage() || showTemplate()) {
-           <div class="status-message">
+           <div class="status-message"> 
               <div id="response" class="response-text" [innerHTML]="responseMessage() | safeHtml"></div>
               @if(showImage()){
-                <div class="image-fixed">
-                  <visualizer-canvas
-                      [base64String]="base64String()"
-                  ></visualizer-canvas>  
-                </div>
+                  @if(base64String() === ''){
+                    <spinner-animation></spinner-animation>
+                  }
+                  @else{
+                    <div class="image-fixed">
+                      <visualizer-canvas
+                          [base64String]="base64String()"
+                      ></visualizer-canvas>  
+                    </div>
+                  }
               }
               @if(showTemplate()){
-                <bill-skeleton
-                  [htmlString]="htmlString()"
-                  [scssString]="cssString()"
-                ></bill-skeleton>
+                @if(htmlString() === '' && cssString() === ''){
+                  <spinner-animation></spinner-animation>
+                }
+                @else{
+                    <bill-skeleton
+                    [htmlString]="htmlString()"
+                    [scssString]="cssString()"
+                  ></bill-skeleton>
+                }
               }     
               <chat-buttons
                   [itemsExportPrompt]="itemsExportPrompt"
@@ -126,7 +136,15 @@
                   (submitSavePromptEmitter)="emitSavePrompt($event)"
                 ></chat-buttons>
             </div>   
-          }
+        }
+        @if(showSpinnerProgress()){
+          <div class="status-message spinner-message">
+            <div class="progress-spinner-container">
+                <p-progress-spinner  strokeWidth="5" fill="transparent" animationDuration=".5s" [style]="{ width: '40px', height: '40px' }" />
+                <span class="spinner-label">Analizando ...</span>
+            </div>
+          </div>
+        }
     </div>
   </div>
 
