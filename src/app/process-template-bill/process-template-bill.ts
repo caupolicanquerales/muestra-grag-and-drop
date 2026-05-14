@@ -71,13 +71,14 @@ export class ProcessTemplateBill implements OnInit, OnDestroy{
   private setVariableBeforeSendingPrompt(){
     this.statusMessage.set(false);
     this.responseMessage.set('');
+    this.showImage.set(true);
+    this.base64String.set('');
   }
 
   private executingPrompt(){
     const request= this.getRequestGenerationData();
     this.prompt.set('');
     this.serviceGeneral.setResizeInput(true);
-    this.serviceGeneral.setIsUploadingAnimation(true);
     this.serviceGeneral.setExecutingImageStreamAgent(request);
     this.serviceGeneral.setSelectedPromptImage('');
   }
