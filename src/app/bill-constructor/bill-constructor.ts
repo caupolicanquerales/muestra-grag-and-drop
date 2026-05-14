@@ -42,6 +42,8 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
   private destroy$ = new Subject<void>();
   private index: string="";
   private editorBackup: string='';
+  private hasBasicTemplate: boolean = false;
+  private hasSyntheticData: boolean = false;
   private readonly joyrideService = inject(JoyrideService);
   titlesHelp: any= titlesHelp();
   textHelp: any= textHelp();
@@ -49,6 +51,7 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
   promptUser: string= '';
   placeHolderPromptUser: string= 'Escribe aquí el prompt del usuario para la generación de la imagen...';
   allowPromptUser: boolean= true;
+  processButtonTooltipHeader: string= "";
 
   constructor(private serviceGeneral: ServiceGeneral,
     private executingRestFulService: ExecutingRestFulService){}
@@ -161,16 +164,34 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
   private setBasicTemplateToEditor(data: any, index: string){
     if(data && data?.["cssString"] && data?.["htmlString"]){
      const template= composeHtmlCssTemplate(data);
+     this.hasBasicTemplate = true;
+     this.updateProcessButtonTooltip();
      this.insertStringIntoEditor(template, index);
     } 
   }
   
   private insertingInformationInTextarea($event: any, index: string){
     this.allowPromptUser = (index=='1')?false: this.allowPromptUser;
+    if (index === '1') {
+      this.hasSyntheticData = true;
+      this.updateProcessButtonTooltip();
+    }
     this.insertStringIntoEditor('', index);  
     const formattedData = formatDataIfJson($event?.data);
     const coloredSpan = removeColorContent(formattedData, "rgb(0, 0, 0)");
     this.insertStringIntoEditor(coloredSpan, index);
+  }
+
+  private updateProcessButtonTooltip(): void {
+    if (this.hasBasicTemplate && this.hasSyntheticData) {
+      this.processButtonTooltipHeader = 'Generar Factura Completa';
+    } else if (this.hasBasicTemplate) {
+      this.processButtonTooltipHeader = 'Generar Prompt de Imagen';
+    } else if (this.hasSyntheticData) {
+      this.processButtonTooltipHeader = 'Generar Datos Sintéticos';
+    } else {
+      this.processButtonTooltipHeader = '';
+    }
   }
 
   private insertStringIntoEditor(coloredSpan: string, editorId: string) {
@@ -202,9 +223,17 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
   return prompts;
 }
 
-  emitEraseText($event: any, index: string){
-    this.allowPromptUser = (index=='1');
-    this.insertStringIntoEditor('', index);
+  emitEraseText($event: any, index: number){
+    this.allowPromptUser = (index==1);
+    if (index === 0) {
+      this.hasBasicTemplate = false;
+      this.updateProcessButtonTooltip();
+    } else if (index === 1) {
+      this.hasSyntheticData = false;
+      this.updateProcessButtonTooltip();
+    }
+    this.updateSpecificEditor(index.toString(), { selectedNode: null });
+    this.insertStringIntoEditor('', index.toString());
   }
 
   onRadioChange($event:any){

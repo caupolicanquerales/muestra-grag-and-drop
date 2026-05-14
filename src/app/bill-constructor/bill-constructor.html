@@ -55,9 +55,10 @@
                             [saveButton]="false"
                             [exportButton]="false"
                             [copyButton]="false"
-                            [generateImageButton]="true"
+                            [processButton]="true"
+                            [processButtonTooltipHeader]="processButtonTooltipHeader"
                             [generatePromptButton]="false"
-                            (submitGenerateImage)="generateImage($event)"
+                            (submitProcessTextEmitter)="generateImage($event)"
                         ></chat-buttons>
                     </div>
                 </div>
@@ -117,6 +118,7 @@
 <ng-template #treeContent let-item="item" let-treeData="treeData">
     <p-tree [value]="treeData" class="w-full md:w-[30rem]" 
         selectionMode="single"
+        [(selection)]="item.selectedNode"
         (onNodeSelect)="nodeSelect($event, item, item.id)">
         <ng-template let-node pTemplate="default">
             <span [style]="node.style" [class.p-disabled]="node.selectable === false">
