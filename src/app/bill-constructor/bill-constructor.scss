@@ -100,6 +100,20 @@
     border-radius: 0.75rem;
     background: #f8f9fb;
     flex-shrink: 0;
+
+    /* Override PrimeNG tree selected node highlight to match the flow-line cyan */
+    ::ng-deep .p-treenode-content.p-highlight,
+    ::ng-deep .p-treenode-content[data-p-highlight="true"] {
+        background: rgba(34, 211, 238, 0.14) !important;
+        color: #0e7490 !important;
+        border-radius: 0.5rem;
+    }
+
+    ::ng-deep .p-treenode-content.p-highlight .p-tree-node-icon,
+    ::ng-deep .p-treenode-content.p-highlight .p-treenode-label,
+    ::ng-deep .p-treenode-content[data-p-highlight="true"] span {
+        color: #0e7490 !important;
+    }
 }
 
 .p-selector-group::-webkit-scrollbar {
@@ -113,11 +127,18 @@
 
 /* ── Code panel ── */
 .code-panel {
+    position: relative;
     border-radius: 0.75rem;
     border: 1px solid #c7d0dd;
-    overflow: hidden;
+    overflow: visible;
     display: flex;
     flex-direction: column;
+    transition: border-color 0.4s ease, box-shadow 0.4s ease;
+
+    &.panel-active {
+        border-color: rgba(34, 211, 238, 0.55);
+        box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.12), 0 0 20px rgba(34, 211, 238, 0.1);
+    }
 }
 
 .code-toolbar {
@@ -186,18 +207,272 @@
 /* ── Section divider ── */
 .editor-divider {
     height: 1px;
+    width: 100%;
     background: linear-gradient(to right, transparent, #e2e8f0 20%, #e2e8f0 80%, transparent);
-    margin: 1.5rem 0;
+}
+
+.divider-connector-row {
+    position: relative;
+    height: 6.5rem;
+    display: flex;
+    align-items: center;
+    overflow: visible;
+}
+
+.connector-to-prompt-row {
+    position: relative;
+    height: 9rem;
+    overflow: visible;
+}
+
+/* ── Connector anchor & SVG elements ── */
+.connector-anchor {
+    position: absolute;
+    left: calc(22rem + 1rem);
+    top: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 10;
+
+    .flow-connector {
+        width: 90px;
+        height: 280px;
+        display: block;
+        overflow: visible;
+        transition: filter 0.4s ease;
+    }
+
+    .flow-connector--sm {
+        height: 210px;
+    }
+
+    /* ── Pending state (default) ── */
+    .conn-line {
+        stroke: #cbd5e1;
+        stroke-width: 2.5;
+        stroke-dasharray: 7 5;
+        fill: none;
+        opacity: 0.65;
+        transition: stroke 0.4s ease, opacity 0.4s ease;
+    }
+
+    .conn-arrow {
+        fill: #cbd5e1;
+        transition: fill 0.4s ease;
+    }
+
+    .conn-dot {
+        fill: #cbd5e1;
+        transition: fill 0.4s ease;
+    }
+
+    .conn-badge {
+        fill: #f1f5f9;
+        stroke: #cbd5e1;
+        stroke-width: 1.5;
+        transition: fill 0.4s ease, stroke 0.4s ease;
+    }
+
+    .conn-badge--action {
+        fill: #f5f3ff;
+        stroke: #c4b5fd;
+    }
+
+    .conn-label-bg--action {
+        fill: #f5f3ff;
+        stroke: #c4b5fd;
+        stroke-width: 1;
+        transition: fill 0.4s ease, stroke 0.4s ease;
+    }
+
+    .conn-label-txt--action {
+        fill: #7c3aed;
+        font-weight: 900;
+        transition: fill 0.4s ease;
+    }
+
+    .conn-badge-num {
+        fill: #94a3b8;
+        font-family: system-ui, -apple-system, sans-serif;
+        font-size: 14px;
+        font-weight: 700;
+        transition: fill 0.4s ease;
+    }
+
+    .conn-label-bg {
+        fill: #f8fafc;
+        stroke: #e2e8f0;
+        stroke-width: 1;
+        transition: fill 0.4s ease, stroke 0.4s ease;
+    }
+
+    .conn-label-txt {
+        fill: #94a3b8;
+        font-family: system-ui, -apple-system, sans-serif;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.14em;
+        transition: fill 0.4s ease;
+    }
+
+    /* ── Active state ── */
+    &.is-active {
+        .flow-connector {
+            filter: drop-shadow(0 0 10px rgba(34, 211, 238, 0.5));
+        }
+
+        .conn-line {
+            stroke: #22d3ee;
+            stroke-dasharray: 2000;
+            opacity: 0.55;
+        }
+
+        .conn-arrow {
+            fill: #22d3ee;
+        }
+
+        .conn-dot {
+            fill: #22d3ee;
+        }
+
+        .conn-badge {
+            fill: #22d3ee;
+            stroke: #0891b2;
+        }
+
+        .conn-badge--action {
+            fill: #7c3aed;
+            stroke: #5b21b6;
+        }
+
+        .conn-badge-num {
+            fill: #ffffff;
+        }
+
+        .conn-label-bg {
+            fill: #ecfeff;
+            stroke: #22d3ee;
+            stroke-width: 1.5;
+        }
+
+        .conn-label-bg--action {
+            fill: #f3e8ff;
+            stroke: #7c3aed;
+            stroke-width: 1.5;
+        }
+
+        .conn-label-txt {
+            fill: #0e7490;
+            font-weight: 900;
+        }
+
+        .conn-label-txt--action {
+            fill: #5b21b6;
+            font-weight: 900;
+        }
+
+        .conn-line {
+            stroke: #22d3ee;
+            stroke-dasharray: 2000;
+            opacity: 0.55;
+        }
+    }
+
+    /* ── Warning state (downstream data loaded, template missing) ── */
+    &.is-warning {
+        .flow-connector {
+            filter: drop-shadow(0 0 8px rgba(251, 146, 60, 0.55));
+        }
+
+        .conn-line {
+            stroke: #fb923c;
+            stroke-dasharray: 8 5;
+            opacity: 0.85;
+        }
+
+        .conn-arrow {
+            fill: #fb923c;
+        }
+
+        .conn-badge {
+            fill: #fb923c;
+            stroke: #ea580c;
+        }
+
+        .conn-badge-num {
+            fill: #ffffff;
+            font-size: 16px;
+        }
+
+        .conn-label-bg {
+            fill: #fff7ed;
+            stroke: #fb923c;
+            stroke-width: 1.5;
+        }
+
+        .conn-label-txt {
+            fill: #c2410c;
+            font-weight: 900;
+        }
+
+        .conn-sublabel-bg {
+            fill: #fff7ed;
+            stroke: #fb923c;
+            stroke-width: 1;
+        }
+
+        .conn-sublabel-txt {
+            fill: #c2410c;
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+        }
+    }
+}
+
+/* ── Warning state for empty template panel ── */
+.code-panel.panel-warning {
+    border-color: rgba(251, 146, 60, 0.65);
+    box-shadow: 0 0 0 2px rgba(251, 146, 60, 0.15), 0 0 20px rgba(251, 146, 60, 0.12);
+    animation: warning-pulse 2.2s ease-in-out infinite;
+}
+
+@keyframes warning-pulse {
+    0%, 100% { box-shadow: 0 0 0 2px rgba(251, 146, 60, 0.15), 0 0 20px rgba(251, 146, 60, 0.12); }
+    50%       { box-shadow: 0 0 0 3px rgba(251, 146, 60, 0.30), 0 0 28px rgba(251, 146, 60, 0.22); }
+}
+
+.pendiente-badge {
+    position: absolute;
+    top: -0.85rem;
+    right: 0.75rem;
+    background: #fff7ed;
+    border: 1px solid #fb923c;
+    color: #c2410c;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    padding: 0.2rem 0.65rem;
+    border-radius: 2rem;
+    z-index: 20;
+    white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(251, 146, 60, 0.2);
 }
 
 /* ── Floating command center ── */
 .command-center {
-    margin-top: 1.25rem;
+    margin-top: 3rem;
     background: #ffffff;
     border-radius: 0.875rem;
     border: 1px solid #e2e8f0;
     box-shadow: 0 4px 24px rgba(79,70,229,0.08), 0 1px 4px rgba(0,0,0,0.06);
     padding: 1rem 1.25rem;
+    transition: border-color 0.4s ease, box-shadow 0.4s ease;
+
+    &.panel-active {
+        border-color: rgba(34, 211, 238, 0.45);
+        box-shadow: 0 4px 24px rgba(34, 211, 238, 0.14), 0 0 0 2px rgba(34, 211, 238, 0.1);
+    }
 
     textarea {
         width: 100%;
@@ -228,4 +503,122 @@
     display: flex;
     justify-content: flex-end;
     margin-top: 0.75rem;
+}
+
+/* ── Bypass / direct-path connector state (template alone) ── */
+.connector-anchor.is-active.is-bypass {
+    .flow-connector {
+        filter: drop-shadow(0 0 12px rgba(99, 102, 241, 0.65));
+    }
+
+    .conn-line {
+        stroke: #818cf8;
+        opacity: 0.75;
+    }
+
+    .conn-arrow {
+        fill: #818cf8;
+    }
+
+    .conn-dot {
+        fill: #818cf8;
+    }
+
+    .conn-badge {
+        fill: #6366f1;
+        stroke: #4338ca;
+    }
+
+    .conn-badge--action {
+        fill: #7c3aed;
+        stroke: #5b21b6;
+        animation: crea-pulse 1.8s ease-in-out infinite;
+    }
+
+    .conn-label-bg {
+        fill: #eef2ff;
+        stroke: #818cf8;
+        stroke-width: 1.5;
+    }
+
+    .conn-label-txt {
+        fill: #4338ca;
+        font-weight: 900;
+    }
+
+    .conn-label-bg--action {
+        fill: #ede9fe;
+        stroke: #7c3aed;
+        stroke-width: 1.5;
+    }
+
+    .conn-label-txt--action {
+        fill: #4c1d95;
+        animation: label-pulse 1.8s ease-in-out infinite;
+    }
+}
+
+@keyframes crea-pulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.55; }
+}
+
+@keyframes label-pulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.5; }
+}
+
+/* ── "Listo para Generar" badge ── */
+.listo-badge-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 0.5rem;
+}
+
+.listo-badge {
+    background: #f0fdf4;
+    border: 1px solid #86efac;
+    color: #15803d;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    padding: 0.2rem 0.7rem;
+    border-radius: 2rem;
+    white-space: nowrap;
+}
+
+/* ── Ghost quick-action buttons ── */
+.ghost-actions {
+    display: flex;
+    gap: 0.6rem;
+    margin-bottom: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.ghost-btn {
+    padding: 0.35rem 0.9rem;
+    border-radius: 2rem;
+    border: 1.5px solid #6366f1;
+    background: transparent;
+    color: #4338ca;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s ease, color 0.15s ease;
+
+    &:hover {
+        background: #eef2ff;
+        color: #3730a3;
+    }
+
+    &.ghost-btn--secondary {
+        border-color: #a5b4fc;
+        color: #6366f1;
+
+        &:hover {
+            background: #f5f3ff;
+            color: #4338ca;
+        }
+    }
 }

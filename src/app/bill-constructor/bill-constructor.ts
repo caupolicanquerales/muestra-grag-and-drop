@@ -1,5 +1,5 @@
 import { CommonModule, NgClass } from '@angular/common';
-import { AfterViewInit, Component, ElementRef, HostListener, inject, OnDestroy, OnInit, QueryList, signal, ViewChildren } from '@angular/core';
+import { AfterViewInit, Component, computed, ElementRef, HostListener, inject, OnDestroy, OnInit, QueryList, signal, ViewChildren } from '@angular/core';
 import { TreeNode } from 'primeng/api';
 import { TreeModule } from 'primeng/tree';
 import { ServiceGeneral } from '../service/service-general';
@@ -42,15 +42,43 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
   private destroy$ = new Subject<void>();
   private index: string="";
   private editorBackup: string='';
-  private hasBasicTemplate: boolean = false;
-  private hasSyntheticData: boolean = false;
+  hasBasicTemplate = signal(false);
+  hasSyntheticData = signal(false);
+  hasPublicityData = signal(false);
+  showConnector0 = computed(() => this.hasBasicTemplate() && this.editors().length >= 2);
+  showConnector1 = computed(() => this.hasSyntheticData() && this.editors().length >= 2);
+  showConnector2 = computed(() => this.hasPublicityData() && this.editors().length >= 3);
+  // i===1 link (DATO SINT → DATO PUB): only when BOTH are loaded
+  showConnectorSintToPub = computed(() => this.hasSyntheticData() && this.hasPublicityData() && this.editors().length >= 3);
+  showConnectorToPrompt = computed(() => {
+    if (this.editors().length >= 3) {
+      return this.showConnector0()  // template alone → direct path
+          || (this.showConnector1() && (!this.showConnector2() || this.showConnector0()))
+          || (this.showConnector2() && !this.showConnector1());
+    }
+    return this.showConnector0() || this.showConnector1();
+  });
+  // Warning: SINT + PUB both loaded but template still missing (flow blocked)
+  showTemplateWarning = computed(() =>
+    this.hasSyntheticData() && this.hasPublicityData() && !this.hasBasicTemplate()
+  );
+  // Template selected alone → direct shortcut path to prompt
+  showTemplateOnly = computed(() =>
+    this.hasBasicTemplate() && !this.hasSyntheticData() && !this.hasPublicityData()
+  );
   private readonly joyrideService = inject(JoyrideService);
   titlesHelp: any= titlesHelp();
   textHelp: any= textHelp();
   promptSystemHelp: any= systemPromptHelp();
   promptUser: string= '';
-  placeHolderPromptUser: string= 'Escribe aquí el prompt del usuario para la generación de la imagen...';
-  allowPromptUser: boolean= true;
+  placeHolderPromptUser = computed(() =>
+    this.showTemplateOnly()
+      ? "Template detectado. Presiona 'CREA' para procesar con valores por defecto o escribe instrucciones adicionales..."
+      : 'Escribe aquí el prompt del usuario para la generación de la imagen...'
+  );
+  allowPromptUser = computed(() =>
+    !this.hasSyntheticData() && !this.hasPublicityData()
+  );
   processButtonTooltipHeader: string= "";
 
   constructor(private serviceGeneral: ServiceGeneral,
@@ -164,16 +192,19 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
   private setBasicTemplateToEditor(data: any, index: string){
     if(data && data?.["cssString"] && data?.["htmlString"]){
      const template= composeHtmlCssTemplate(data);
-     this.hasBasicTemplate = true;
+     this.hasBasicTemplate.set(true);
      this.updateProcessButtonTooltip();
      this.insertStringIntoEditor(template, index);
     } 
   }
   
   private insertingInformationInTextarea($event: any, index: string){
-    this.allowPromptUser = (index=='1')?false: this.allowPromptUser;
     if (index === '1') {
-      this.hasSyntheticData = true;
+      this.hasSyntheticData.set(true);
+      this.updateProcessButtonTooltip();
+    }
+    if (index === '2') {
+      this.hasPublicityData.set(true);
       this.updateProcessButtonTooltip();
     }
     this.insertStringIntoEditor('', index);  
@@ -183,11 +214,11 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
   }
 
   private updateProcessButtonTooltip(): void {
-    if (this.hasBasicTemplate && this.hasSyntheticData) {
+    if (this.hasBasicTemplate() && this.hasSyntheticData()) {
       this.processButtonTooltipHeader = 'Generar Factura Completa';
-    } else if (this.hasBasicTemplate) {
+    } else if (this.hasBasicTemplate()) {
       this.processButtonTooltipHeader = 'Generar Prompt de Imagen';
-    } else if (this.hasSyntheticData) {
+    } else if (this.hasSyntheticData()) {
       this.processButtonTooltipHeader = 'Generar Datos Sintéticos';
     } else {
       this.processButtonTooltipHeader = '';
@@ -224,12 +255,14 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
 }
 
   emitEraseText($event: any, index: number){
-    this.allowPromptUser = (index==1);
     if (index === 0) {
-      this.hasBasicTemplate = false;
+      this.hasBasicTemplate.set(false);
       this.updateProcessButtonTooltip();
     } else if (index === 1) {
-      this.hasSyntheticData = false;
+      this.hasSyntheticData.set(false);
+      this.updateProcessButtonTooltip();
+    } else if (index === 2) {
+      this.hasPublicityData.set(false);
       this.updateProcessButtonTooltip();
     }
     this.updateSpecificEditor(index.toString(), { selectedNode: null });
@@ -237,6 +270,10 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
   }
 
   onRadioChange($event:any){
+    this.hasBasicTemplate.set(false);
+    this.hasSyntheticData.set(false);
+    this.hasPublicityData.set(false);
+    this.updateProcessButtonTooltip();
     let backup=this.setEditorBackup();
     if(this.selectedOption==this.radioButton1){
       let typePrompts= orderSystem();  
