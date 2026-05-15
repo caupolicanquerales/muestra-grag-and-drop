@@ -95,9 +95,21 @@
             [rounded]="true" 
             [text]="true"
             severity="secondary" 
-            pTooltip="Procesar"
+            pTooltip="{{processButtonTooltipHeader}}"
             tooltipPosition="top"
             (click)="processEvent('process-text')" 
+            ></p-button>
+        }
+        @if(guideAllowButton){
+            <p-button 
+            icon="pi pi-eye" 
+            class="submit-button-shape-help"
+            [rounded]="true" 
+            [text]="true"
+            severity="secondary" 
+            pTooltip="Guía"
+            tooltipPosition="top"
+            (click)="guideEvent('guide-text')" 
             ></p-button>
         }
     </div>

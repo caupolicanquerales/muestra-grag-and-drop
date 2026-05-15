@@ -85,3 +85,26 @@ html, body {
 *, *::before, *::after {
   box-sizing: border-box;
 }
+
+/* ── PrimeNG v20 Lara design-token overrides: tree selected node → flow-line cyan ── */
+:root {
+    --p-tree-node-selected-background: rgba(34, 211, 238, 0.14);
+    --p-tree-node-selected-color: #0e7490;
+    --p-highlight-background: rgba(34, 211, 238, 0.14);
+    --p-highlight-color: #0e7490;
+}
+
+/* Fallback high-specificity class override (covers both Lara v19/v20 structures) */
+.p-tree .p-treenode-content.p-highlight,
+.p-tree .p-treenode-content[data-p-highlight="true"] {
+    background: rgba(34, 211, 238, 0.14) !important;
+    color: #0e7490 !important;
+    border-radius: 0.45rem;
+}
+
+.p-tree .p-treenode-content.p-highlight .p-treenode-label,
+.p-tree .p-treenode-content.p-highlight .p-tree-node-icon,
+.p-tree .p-treenode-content.p-highlight span,
+.p-tree .p-treenode-content[data-p-highlight="true"] span {
+    color: #0e7490 !important;
+}

@@ -41,11 +41,15 @@ export class ChatButtons implements OnInit{
   @Input()
   helpButton: boolean= false;
   @Input()
+  guideButton: boolean= false;
+  @Input()
   processButton: boolean= false;
   @Input()
   returnButton: boolean= false;
   @Input()
   arrayPromptAndData: PromptAndDataToValidateInterface={};
+  @Input()
+  processButtonTooltipHeader: string= "Procesar";
 
   @Output()
   submitCopyTextEmitter: EventEmitter<string>= new EventEmitter<string>();
@@ -65,6 +69,8 @@ export class ChatButtons implements OnInit{
   submitProcessTextEmitter: EventEmitter<string>= new EventEmitter<string>();
   @Output()
   submitReturnTextEmitter: EventEmitter<string>= new EventEmitter<string>();
+  @Output()
+  submitGuideTextEmitter: EventEmitter<string>= new EventEmitter<string>();
 
   visible: boolean= false;
   headerDialogTitle: string="";
@@ -114,6 +120,10 @@ export class ChatButtons implements OnInit{
 
   get helpAllowButton(){
     return this.helpButton;
+  }
+
+  get guideAllowButton(){
+    return this.guideButton;
   }
 
   get processAllowButton(){
@@ -169,6 +179,10 @@ export class ChatButtons implements OnInit{
 
   processEvent($event: string){
     this.submitProcessTextEmitter.emit($event);
+  }
+
+  guideEvent($event: string){
+    this.submitGuideTextEmitter.emit($event);
   }
 
   returnEvent($event: string){

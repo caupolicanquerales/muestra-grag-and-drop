@@ -5,13 +5,14 @@ export interface EditorConfig {
   tree: any[]; 
   styledPrompt: string;
   typePrompt: string;
+  selectedNode?: any;
 }
 
 export function getEditors():EditorConfig[]{
     return [
-        { id: '0', tree: [], styledPrompt: '', typePrompt:''},
-        { id: '1', tree: [], styledPrompt: '', typePrompt:'' },
-        { id: '2', tree: [], styledPrompt: '', typePrompt:'' }
+        { id: '0', tree: [], styledPrompt: '', typePrompt:'', selectedNode: null },
+        { id: '1', tree: [], styledPrompt: '', typePrompt:'', selectedNode: null },
+        { id: '2', tree: [], styledPrompt: '', typePrompt:'', selectedNode: null }
         //{ id: '3', tree: [], styledPrompt: '', typePrompt:'' }
       ]
 }

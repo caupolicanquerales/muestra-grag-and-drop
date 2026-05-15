@@ -15,7 +15,7 @@
                 [copyButton]="false"
                 [generateImageButton]="false"
                 [generatePromptButton]="false"
-                [helpButton]="true"
+                [guideButton]="true"
                 (submitHelpTextEmitter)="startTour()"
             ></chat-buttons>
         </div>
@@ -44,20 +44,105 @@
             }"></ng-container>
 
             @if (!last) {
-            <div class="editor-divider"></div>
+            <div class="divider-connector-row">
+                <div class="editor-divider"></div>
+                @if (i === 0) {
+                    <div class="connector-anchor"
+                         [class.is-active]="showConnector0()"
+                         [class.is-warning]="showTemplateWarning()">
+                        <svg class="flow-connector" viewBox="0 0 90 280" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Track line -->
+                            <line class="conn-line" x1="45" y1="40" x2="45" y2="210"/>
+                            <!-- Arrowhead -->
+                            <polygon class="conn-arrow" points="35,210 45,228 55,210"/>
+                            <!-- z3: label pill -->
+                            <rect class="conn-label-bg" x="3" y="105" width="84" height="26" rx="13"/>
+                            @if (showTemplateWarning()) {
+                                <rect class="conn-sublabel-bg" x="3" y="134" width="84" height="20" rx="10"/>
+                            }
+                            <!-- z4: circles -->
+                            <circle class="conn-badge" cx="45" cy="22" r="17"/>
+                            <circle class="conn-badge" cx="45" cy="258" r="17"/>
+                            <!-- z5: text -->
+                            @if (showTemplateWarning()) {
+                                <text class="conn-badge-num" x="45" y="22" text-anchor="middle" dominant-baseline="central">!</text>
+                                <text class="conn-sublabel-txt" x="45" y="144" text-anchor="middle" dominant-baseline="central">Falta origen</text>
+                            } @else if (showConnector0()) {
+                                <text class="conn-badge-num" x="45" y="22" text-anchor="middle" dominant-baseline="central">✓</text>
+                            } @else {
+                                <text class="conn-badge-num" x="45" y="22" text-anchor="middle" dominant-baseline="central">1</text>
+                            }
+                            <text class="conn-label-txt" x="45" y="118" text-anchor="middle" dominant-baseline="central">GENERA</text>
+                            <text class="conn-badge-num" x="45" y="258" text-anchor="middle" dominant-baseline="central">2</text>
+                        </svg>
+                    </div>
+                }
+                @if (i === 1) {
+                    <div class="connector-anchor" [class.is-active]="showConnectorSintToPub()">
+                        <svg class="flow-connector" viewBox="0 0 90 280" xmlns="http://www.w3.org/2000/svg">
+                            <!-- z1: track line -->
+                            <line class="conn-line" x1="45" y1="40" x2="45" y2="210"/>
+                            <!-- z2: arrowhead -->
+                            <polygon class="conn-arrow" points="35,210 45,228 55,210"/>
+                            <!-- z3: label pill -->
+                            <rect class="conn-label-bg" x="3" y="113" width="84" height="26" rx="13"/>
+                            <!-- z4: circles -->
+                            <circle class="conn-badge" cx="45" cy="22" r="17"/>
+                            <circle class="conn-badge" cx="45" cy="258" r="17"/>
+                            <!-- z5: text -->
+                            <text class="conn-badge-num" x="45" y="22" text-anchor="middle" dominant-baseline="central">2</text>
+                            <text class="conn-label-txt" x="45" y="126" text-anchor="middle" dominant-baseline="central">AÑADE</text>
+                            <text class="conn-badge-num" x="45" y="258" text-anchor="middle" dominant-baseline="central">3</text>
+                        </svg>
+                    </div>
+                }
+            </div>
             }
             @if (last) {
-                <div class="command-center">
-                    <textarea rows="3" pTextarea [(ngModel)]="promptUser" placeholder="{{placeHolderPromptUser}}" [disabled]="allowPromptUser" fluid></textarea>
+                <div class="connector-to-prompt-row">
+                    <div class="connector-anchor"
+                         [class.is-active]="showConnectorToPrompt()"
+                         [class.is-bypass]="showTemplateOnly()">
+                        <svg class="flow-connector flow-connector--sm" viewBox="0 0 90 210" xmlns="http://www.w3.org/2000/svg">
+                            <!-- z-layer 1: track line (behind everything) -->
+                            <line class="conn-line" x1="45" y1="17" x2="45" y2="175"/>
+                            <!-- z-layer 2: arrowhead -->
+                            <polygon class="conn-arrow" points="36,175 45,193 54,175"/>
+                            <!-- z-layer 3: label pill backgrounds -->
+                            <rect class="conn-label-bg" x="3" y="78" width="84" height="22" rx="11"/>
+                            <rect class="conn-label-bg conn-label-bg--action" x="3" y="150" width="84" height="22" rx="11"/>
+                            <!-- z-layer 4: circles (cover line) -->
+                            <circle class="conn-dot" cx="45" cy="10" r="7"/>
+                            <circle class="conn-badge conn-badge--action" cx="45" cy="128" r="17"/>
+                            <!-- z-layer 5: text (always on top) -->
+                            <text class="conn-label-txt" x="45" y="89" text-anchor="middle" dominant-baseline="central">ENVÍA</text>
+                            <text class="conn-badge-num" x="45" y="128" text-anchor="middle" dominant-baseline="central">{{ editors().length + 1 }}</text>
+                            <text class="conn-label-txt conn-label-txt--action" x="45" y="161" text-anchor="middle" dominant-baseline="central">CREA</text>
+                        </svg>
+                    </div>
+                </div>
+                <div class="command-center" [class.panel-active]="showConnectorToPrompt()">
+                    @if (showConnectorToPrompt()) {
+                        <div class="listo-badge-row">
+                            <span class="listo-badge">✓ Listo para Generar</span>
+                        </div>
+                    }
+                    @if (showTemplateOnly()) {
+                        <div class="ghost-actions">
+                            <button class="ghost-btn ghost-btn--secondary" (click)="generateImage(null)">Generar prompt del template</button>
+                        </div>
+                    }
+                    <textarea rows="3" pTextarea [(ngModel)]="promptUser" placeholder="{{placeHolderPromptUser()}}" [disabled]="allowPromptUser()" fluid></textarea>
                     <div class="command-actions">
                         <chat-buttons
                             [eraseButton]="false"
                             [saveButton]="false"
                             [exportButton]="false"
                             [copyButton]="false"
-                            [generateImageButton]="true"
+                            [processButton]="true"
+                            [processButtonTooltipHeader]="processButtonTooltipHeader"
                             [generatePromptButton]="false"
-                            (submitGenerateImage)="generateImage($event)"
+                            (submitProcessTextEmitter)="generateImage($event)"
                         ></chat-buttons>
                     </div>
                 </div>
@@ -83,7 +168,12 @@
         
         <ng-container *ngTemplateOutlet="treeContent; context: { item: item, treeData: treeData }"></ng-container>
     </div>
-    <div class="code-panel">
+    <div class="code-panel"
+         [class.panel-active]="(index === 0 && showConnector0()) || (index === 1 && showConnector1()) || (index === 2 && showConnector2())"
+         [class.panel-warning]="index === 0 && showTemplateWarning()">
+        @if (index === 0 && showTemplateWarning()) {
+            <div class="pendiente-badge">⚠ Pendiente: Selección de plantilla</div>
+        }
         <div class="code-toolbar">
             <span class="code-label">{{ item.typePrompt }}</span>
             <chat-buttons
@@ -117,6 +207,7 @@
 <ng-template #treeContent let-item="item" let-treeData="treeData">
     <p-tree [value]="treeData" class="w-full md:w-[30rem]" 
         selectionMode="single"
+        [(selection)]="item.selectedNode"
         (onNodeSelect)="nodeSelect($event, item, item.id)">
         <ng-template let-node pTemplate="default">
             <span [style]="node.style" [class.p-disabled]="node.selectable === false">

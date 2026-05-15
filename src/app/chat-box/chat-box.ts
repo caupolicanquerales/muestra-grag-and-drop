@@ -205,7 +205,7 @@ export class ChatBox implements OnInit, OnDestroy{
     this.selectedFilesEmitter.emit($event);
   }
 
-  emitHelpTextEvent($event: any){
+  emitGuideTextEvent($event: any){
     this.joyrideService.startTour({ steps: ['modeStep'] });
   }
 
