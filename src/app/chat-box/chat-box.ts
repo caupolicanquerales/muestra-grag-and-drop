@@ -31,7 +31,6 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 export class ChatBox implements OnInit, OnDestroy{
 
   promptInput = signal('');
-  showSpinnerProgress = signal(false);
   private destroy$ = new Subject<void>();
   private readonly joyrideService = inject(JoyrideService);
   deleteFiles: boolean= false
@@ -98,7 +97,8 @@ export class ChatBox implements OnInit, OnDestroy{
   saveButton: boolean= true;
   @Input()
   suggestedPrompts: string[] = [];
-
+  @Input()
+  showSpinnerProgress: WritableSignal<boolean> = signal(false);
 
   @Output()
   submitExtractJsonEmitter: EventEmitter<string>= new EventEmitter<string>();
@@ -193,7 +193,6 @@ export class ChatBox implements OnInit, OnDestroy{
   }
 
   submitPrompt():void{
-    this.showSpinnerProgress.set(true);
     this.showImage.set(false);
     this.showTemplate.set(false);
     this.statusMessage.set(false);
