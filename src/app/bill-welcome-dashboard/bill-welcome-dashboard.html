@@ -1,0 +1,32 @@
+<div class="main-wrapper">
+    <div class="card-container">
+        @for (item of editorCards(); track item.id; let i = $index) {
+            <ng-container *ngTemplateOutlet="cardTemplate; context: {
+                index: i,
+                id: item.id,
+                item: item
+            }"></ng-container>
+        }
+    </div>
+</div>
+
+<ng-template #cardTemplate
+  let-id="id"
+  let-item="item"
+  let-index="index"
+  >
+  <div class="editor-content-wrapper">
+      <p-card [style]="{ width: '100%', overflow: 'hidden', height: '100%' }">
+          <ng-template #header>
+              <img [alt]="item.title" class="card-header-image" [src]="item.image" />
+          </ng-template>
+          <ng-template #title> {{ item.title }} </ng-template>
+          <p class="card-description">{{ item.description }}</p>
+          <ng-template #footer>
+              <div class="flex gap-4 mt-1">
+                  <button class="card-btn" (click)="item.action()">Ingresar &rarr;</button>
+              </div>
+          </ng-template>
+      </p-card>
+  </div>
+</ng-template>

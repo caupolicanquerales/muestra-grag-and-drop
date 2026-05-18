@@ -1,0 +1,119 @@
+.main-wrapper {
+    min-height: 100%;
+    background-color: #f8f9fb;
+    padding: 1.5rem;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    min-width: 55rem;
+}
+
+/* ── Main card ── */
+.card-container {
+    width: 100%;
+    max-width: 100%;
+    padding: 1.5rem;
+    background-color: #ffffff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.07);
+    border-radius: 0.875rem;
+    border: 1px solid #e2e8f0;
+    border-top: 3px solid #4f46e5;
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    align-items: start;
+}
+
+.editor-content-wrapper {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Last two cards span 2 columns each to fill row 2 symmetrically */
+.card-container > .editor-content-wrapper:nth-child(n+5) {
+    grid-column: span 2;
+}
+
+.card-header-image {
+    width: 100%;
+    max-height: 120px;
+    object-fit: cover;
+}
+
+.card-description {
+    font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
+    font-size: 0.82rem;
+    font-weight: 400;
+    color: #64748b;
+    line-height: 1.5;
+    margin: 0;
+}
+
+.card-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 180px;
+    padding: 0.65rem 1.25rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
+    color: #ffffff;
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    border: none;
+    border-radius: 0.6rem;
+    cursor: pointer;
+    transition: filter 0.15s ease;
+
+    &:hover {
+        filter: brightness(1.08);
+    }
+
+    &:active {
+        filter: brightness(0.95);
+    }
+}
+
+/* ── Card typography matching app style ── */
+::ng-deep bill-welcome-dashboard {
+    /* Equal-height button alignment for regular cards */
+    .editor-content-wrapper:not(.banner-wrapper) {
+        .p-card {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .p-card-body {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .p-card-content {
+            flex: 1;
+        }
+    }
+
+    .p-card-title {
+        font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
+        font-size: 1rem;
+        font-weight: 600;
+        color: #1e293b;
+        letter-spacing: -0.01em;
+        margin-bottom: 0.35rem;
+    }
+
+    .p-card-content p,
+    .p-card-body p {
+        font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
+        font-size: 0.82rem;
+        font-weight: 400;
+        color: #64748b;
+        line-height: 1.5;
+        margin: 0;
+    }
+}

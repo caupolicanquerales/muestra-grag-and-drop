@@ -1,34 +1,14 @@
 {
-    "Generador": [
+    "Agente": [
         {
             "label": "Prompt nuevo",
-            "templateName": "bill-agent-data"
-        },
-        {
-            "label": "Prompt imagen",
-            "templateName": "bill-agent-data"
-        },
-        {
-            "label": "Prompt dato",
             "templateName": "bill-agent-data"
         }
     ],
-    "Facturas":[
+    "Imagenes":[
         {
             "label": "Prompt nuevo",
             "templateName": "show-template"
-        },
-        {
-            "label": "Prompt imagen",
-            "templateName": "show-template"
-        },
-        {
-            "label": "Prompt dato",
-            "templateName": "show-template"
-        },
-        {
-            "label": "Visualizador",
-            "templateName": "bill-visualizer"
         }
     ],
     "Documentación":[
@@ -37,24 +17,30 @@
             "templateName": "upload-document"
         }
     ],
-    "Edición":[
+    "Plantilla/Editor":[
         {
             "label": "Plantilla",
             "templateName": "bill-template"
         },
         {
-            "label": "Editar defecto",
-            "templateName": "bill-editor-defect"
-        },
-        {
             "label": "Editor",
             "templateName": "bill-editor"
+        },
+        {
+            "label": "Editar defecto",
+            "templateName": "bill-editor-defect"
         }
     ],
     "Constructor":[
         {
             "label": "Ingresar",
             "templateName": "bill-constructor"
+        }
+    ],
+    "Visualizador":[
+        {
+            "label": "Ingresar",
+            "templateName": "bill-visualizer"
         }
     ],
     "Borrar prompt":[
