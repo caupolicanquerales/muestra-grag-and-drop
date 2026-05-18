@@ -10,6 +10,7 @@ import { BillDeletePrompt } from "../bill-delete-prompt/bill-delete-prompt";
 import { BillEditorDefect } from "../bill-editor-defect/bill-editor-defect";
 import { BillConstructor } from "../bill-constructor/bill-constructor";
 import { BillAgentData } from "../bill-agent-data/bill-agent-data";
+import { BillWelcomeDashboard } from "../bill-welcome-dashboard/bill-welcome-dashboard";
 
 export function getMapComponentToDisplay(): { [key: string]: Type<any> } {
     return {
@@ -23,6 +24,7 @@ export function getMapComponentToDisplay(): { [key: string]: Type<any> } {
     'bill-delete-prompt': BillDeletePrompt,
     'bill-editor-defect': BillEditorDefect,
     'bill-constructor': BillConstructor,
-    'bill-agent-data': BillAgentData
+    'bill-agent-data': BillAgentData,
+    'bill-welcome-dashboard': BillWelcomeDashboard
   };
 }

@@ -19,7 +19,7 @@ export class BillPresentation {
     return `url('${this.appImageURL}')`; 
   }
 
-  goToAgentChat(): void {
-    this.serviceGeneral.setChangeComponent("bill-agent-data");
+  goToWelcomeDashboard(): void {
+    this.serviceGeneral.setChangeComponent("bill-welcome-dashboard");
   }
 }
