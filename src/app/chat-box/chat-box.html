@@ -96,7 +96,7 @@
             </div>
           </div>
         </div>
-
+        
         @if (statusMessage() || showImage() || showTemplate()) {
            <div class="status-message"> 
               <div id="response" class="response-text" [innerHTML]="responseMessage() | safeHtml"></div>

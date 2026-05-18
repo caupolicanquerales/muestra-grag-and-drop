@@ -23,7 +23,6 @@ export class BillAgentData implements OnInit, OnDestroy{
   responseMessage: WritableSignal<string> = signal('');
   statusMessage: WritableSignal<boolean> = signal(false);
   titleData: string ="Agente";
-  private destroy$ = new Subject<void>();
   showImage: WritableSignal<boolean> = signal(false);
   showTemplate: WritableSignal<boolean> = signal(false);
   base64String: WritableSignal<string> = signal('');
@@ -37,6 +36,8 @@ export class BillAgentData implements OnInit, OnDestroy{
   copyButton: boolean= true;  
   exportButton: boolean= false;
   saveButton: boolean= false;
+  showSpinnerProgress: WritableSignal<boolean> = signal(false);
+  private destroy$ = new Subject<void>();
 
   constructor(private serviceGeneral: ServiceGeneral,
     private executingRestFulService: ExecutingRestFulService
@@ -45,7 +46,7 @@ export class BillAgentData implements OnInit, OnDestroy{
   ngOnInit(): void {
     this.itemsSavePromptMap= getSaveFormartJsonSkeleton();
     this.headerDialogMap= getHeaderDialogJsonSkeleton();
-    this.subscribeUntilDestroyed(this.serviceGeneral.selectedPromptBill$, data => this.prompt.set(data));
+    this.subscribeUntilDestroyed(this.serviceGeneral.selectedPromptBill$, data => this.executingPrompt(data));
     this.subscribeUntilDestroyed(this.serviceGeneral.statusMessage$, status => this.setStatusMessage(status));
     this.subscribeUntilDestroyed(this.serviceGeneral.responseMessagePrompt$, token => this.setResponseMessage(token));
     this.subscribeUntilDestroyed(this.serviceGeneral.imageGenerated$, image => this.setImageinChatBox(image));
@@ -61,34 +62,37 @@ export class BillAgentData implements OnInit, OnDestroy{
     this.base64String.set('');
     this.htmlString.set('');
     this.cssString.set('');
+    this.showSpinnerProgress.set(false);
     this.destroy$.next();
     this.destroy$.complete();
   }
   
   submitPrompt(): void {
     if (this.prompt().length >= 10) {
-      this.statusMessage.set(false);
-      this.responseMessage.set('');
-      this.executingPrompt();      
+      this.executingPrompt(this.prompt());      
     }
   }
 
   promptEmitter(value: string){
     this.prompt.set(value);
   }
-
-  private executingPrompt(){
-    const request= this.getRequestGenerationData();
-    console.log(request);
-    this.serviceGeneral.setActivateChatClientStreamAgent(request);
-    setTimeout(() => {
-      this.updatePromptToGenerateData();
-    }, 50); 
+  
+  private executingPrompt(prompt:string){
+    if(prompt!==""){
+      this.statusMessage.set(false);
+      this.responseMessage.set('');
+      this.showSpinnerProgress.set(true);
+      const request= this.getRequestGenerationData(prompt);
+      this.serviceGeneral.setActivateChatClientStreamAgent(request);
+      setTimeout(() => {
+        this.updatePromptToGenerateData();
+      }, 50); 
+    }
   }
 
-  private getRequestGenerationData():GenerationDataAgentInterface{
+  private getRequestGenerationData(prompt: string): GenerationDataAgentInterface{
     return {
-      prompt: this.prompt(),
+      prompt: prompt,
       conversationId: this.conversationId
     }
   }

@@ -133,6 +133,7 @@
     overflow: visible;
     display: flex;
     flex-direction: column;
+    min-width: 0;
     transition: border-color 0.4s ease, box-shadow 0.4s ease;
 
     &.panel-active {
@@ -190,6 +191,7 @@
     font-size: 0.825rem;
     font-family: 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
     padding: 1rem;
+    overflow-x: auto;
     overflow-y: hidden;
     min-height: 13rem;
     height: auto;
