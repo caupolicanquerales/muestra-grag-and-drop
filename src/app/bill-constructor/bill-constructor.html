@@ -4,33 +4,39 @@
         [title]="promptSystemHelp['title']" 
         [text]="promptSystemHelp['text']"
         >
-        <div class="title-header">
-            <h2 class="title-text">
-                {{ titleData }}
-            </h2>
-            <chat-buttons
-                [eraseButton]="false"
-                [saveButton]="false"
-                [exportButton]="false"
-                [copyButton]="false"
-                [generateImageButton]="false"
-                [generatePromptButton]="false"
-                [guideButton]="true"
-                (submitGuideTextEmitter)="startTour()"
-            ></chat-buttons>
+        <div class="header-top-row">
+            <div class="title-header">
+                <h2 class="title-text">
+                    {{ titleData }}
+                </h2>
+                <chat-buttons
+                    [eraseButton]="false"
+                    [saveButton]="false"
+                    [exportButton]="false"
+                    [copyButton]="false"
+                    [generateImageButton]="false"
+                    [generatePromptButton]="false"
+                    [guideButton]="true"
+                    (submitGuideTextEmitter)="startTour()"
+                ></chat-buttons>
+            </div>
+            <div class="segment-control">
+                <button class="segment-btn"
+                    [class.segment-active]="selectedOption === radioButton1"
+                    (click)="selectedOption = radioButton1; onRadioChange(null)">
+                    {{radioButton1}}
+                </button>
+                <button class="segment-btn"
+                    [class.segment-active]="selectedOption === radioButton2"
+                    (click)="selectedOption = radioButton2; onRadioChange(null)">
+                    {{radioButton2}}
+                </button>
+            </div>
         </div>
-        <div class="segment-control">
-            <button class="segment-btn"
-                [class.segment-active]="selectedOption === radioButton1"
-                (click)="selectedOption = radioButton1; onRadioChange(null)">
-                {{radioButton1}}
-            </button>
-            <button class="segment-btn"
-                [class.segment-active]="selectedOption === radioButton2"
-                (click)="selectedOption = radioButton2; onRadioChange(null)">
-                {{radioButton2}}
-            </button>
-        </div>
+        <horizontal-stepper
+            [steps]="stepperConfig().steps"
+            [activeStep]="stepperConfig().active">
+        </horizontal-stepper>
     </div>
     <div class="card-container" >
         @for (item of editors(); track item.id; let last = $last; let i = $index) { 
@@ -99,6 +105,7 @@
             </div>
             }
             @if (last) {
+                @if (showCommandCenter()) {
                 <div class="connector-to-prompt-row">
                     <div class="connector-anchor"
                          [class.is-active]="showConnectorToPrompt()"
@@ -146,6 +153,7 @@
                         ></chat-buttons>
                     </div>
                 </div>
+                } <!-- end showCommandCenter -->
             }
         }
     </div>
@@ -199,6 +207,23 @@
                 (blur)="isFocused.set(false)">
             </div>
         </div>
+        @if(item.id!=='0' && hasEditorContent()[item.id] && !hasBasicTemplate() && !(hasSyntheticData() && hasPublicityData())) {
+            <div class="editor-prompt-wrapper">
+                <textarea pTextarea [(ngModel)]="promptUser" placeholder="{{placeHolderPromptUser()}}" [disabled]="allowPromptUser()" fluid></textarea>
+                <div class="editor-prompt-action-bar">
+                    <chat-buttons
+                        [eraseButton]="false"
+                        [saveButton]="false"
+                        [exportButton]="false"
+                        [copyButton]="false"
+                        [processButton]="true"
+                        [processButtonTooltipHeader]="processButtonTooltipHeader"
+                        [generatePromptButton]="false"
+                        (submitProcessTextEmitter)="generateImage($event)"
+                    ></chat-buttons>
+                </div>
+            </div>
+        }
     </div>
   </div>
 </ng-template>

@@ -19,10 +19,15 @@ import {  getUserPromptSubAgent } from '../utils/system-prompt-utils';
 import { EditorConfig, getEditors, orderSystem, orderSystemWithPublicity, systemPromptHelp, textHelp, titlesHelp } from '../utils/bill-constructor-utils';
 import { JoyrideModule, JoyrideService } from 'ngx-joyride';
 import { formatDataIfJson } from '../utils/json-format-utils';
+import { HorizontalStepper } from '../horizontal-stepper/horizontal-stepper';
+import { StepperService } from '../service/stepper-service';
+
+//this.serviceGeneral.imageVariablesData
 
 @Component({
   selector: 'bill-constructor',
-  imports: [CommonModule, NgClass, FormsModule, TreeModule, ChatButtons, RadioButtonModule, JoyrideModule],
+  imports: [CommonModule, NgClass, FormsModule, TreeModule, ChatButtons, RadioButtonModule, JoyrideModule,
+    HorizontalStepper],
   standalone: true,
   templateUrl: './bill-constructor.html',
   styleUrl: './bill-constructor.scss'
@@ -45,6 +50,7 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
   hasBasicTemplate = signal(false);
   hasSyntheticData = signal(false);
   hasPublicityData = signal(false);
+  hasEditorContent = signal<{[key: string]: boolean}>({});
   showConnector0 = computed(() => this.hasBasicTemplate() && this.editors().length >= 2);
   showConnector1 = computed(() => this.hasSyntheticData() && this.editors().length >= 2);
   showConnector2 = computed(() => this.hasPublicityData() && this.editors().length >= 3);
@@ -65,6 +71,15 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
   // Template selected alone → direct shortcut path to prompt
   showTemplateOnly = computed(() =>
     this.hasBasicTemplate() && !this.hasSyntheticData() && !this.hasPublicityData()
+  );
+  // Command center only appears when template + synthetic data are both present
+  showCommandCenter = computed(() => this.hasBasicTemplate() && this.hasSyntheticData());
+
+  private readonly stepperService = inject(StepperService);
+  stepperConfig = this.stepperService.buildConfig(
+    this.hasBasicTemplate,
+    this.hasSyntheticData,
+    this.hasPublicityData
   );
   private readonly joyrideService = inject(JoyrideService);
   titlesHelp: any= titlesHelp();
@@ -148,10 +163,11 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
     }
   }
 
-  updatePromptFromContentEditable(event: Event, editorId: string): void {
+  updatePromptFromContentEditable(event: Event, item: EditorConfig): void {
     const target = event.target as HTMLDivElement;
     const newValue = target.innerText;
     this.adjustHeight(target);
+    this.hasEditorContent.update(state => ({...state, [item.id]: !!newValue.trim()}));
   }
 
   private setChildrenInTreeNode(label: string, type: string, 
@@ -211,6 +227,7 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
     const formattedData = formatDataIfJson($event?.data);
     const coloredSpan = removeColorContent(formattedData, "rgb(0, 0, 0)");
     this.insertStringIntoEditor(coloredSpan, index);
+    this.hasEditorContent.update(state => ({...state, [index]: true}));
   }
 
   private updateProcessButtonTooltip(): void {
@@ -257,6 +274,7 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
   emitEraseText($event: any, index: number){
     if (index === 0) {
       this.hasBasicTemplate.set(false);
+      this.serviceGeneral.setImageVariablesData({});
       this.updateProcessButtonTooltip();
     } else if (index === 1) {
       this.hasSyntheticData.set(false);
@@ -267,6 +285,7 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
     }
     this.updateSpecificEditor(index.toString(), { selectedNode: null });
     this.insertStringIntoEditor('', index.toString());
+    this.hasEditorContent.update(state => ({...state, [index.toString()]: false}));
   }
 
   onRadioChange($event:any){

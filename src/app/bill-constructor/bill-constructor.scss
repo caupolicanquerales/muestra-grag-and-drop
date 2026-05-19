@@ -10,12 +10,23 @@
 
 /* ── Header ── */
 .header-container {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: #f8f9fb;
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+    margin: -1.5rem -1.5rem 1.25rem;
+    padding: 1rem 1.5rem 1rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+}
+
+.header-top-row {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
+    align-items: center;
     gap: 1.5rem;
-    width: 100%;
-    margin-bottom: 1.25rem;
 }
 
 .title-header {
@@ -462,6 +473,30 @@
 }
 
 /* ── Floating command center ── */
+%textarea-style {
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 0.9375rem;
+    border-radius: 0.5rem;
+    border: 1px solid #e2e8f0;
+    padding: 0.75rem;
+    resize: vertical;
+    font-family: inherit;
+    color: #1e293b;
+    background: #f8f9fb;
+    transition: border-color 0.15s ease;
+
+    &:focus {
+        border-color: #4f46e5;
+        outline: none;
+    }
+
+    &:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+    }
+}
+
 .command-center {
     margin-top: 3rem;
     background: #ffffff;
@@ -477,27 +512,60 @@
     }
 
     textarea {
+        @extend %textarea-style;
+    }
+}
+
+.code-panel {
+    textarea {
+        @extend %textarea-style;
+        margin-top: 0.75rem;
+    }
+}
+
+.editor-prompt-wrapper {
+    margin: 0 1rem 1rem 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+    background: #ffffff;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+
+    textarea {
         width: 100%;
         box-sizing: border-box;
+        padding: 0.75rem 1rem;
         font-size: 0.9375rem;
-        border-radius: 0.5rem;
-        border: 1px solid #e2e8f0;
-        padding: 0.75rem;
-        resize: vertical;
         font-family: inherit;
         color: #1e293b;
-        background: #f8f9fb;
-        transition: border-color 0.15s ease;
+        background: #ffffff;
+        border: none !important;
+        box-shadow: none !important;
+        outline: none;
+        resize: none;
+        min-height: 5.5rem;
+        max-height: 14rem;
+        overflow-y: auto;
+        field-sizing: content;
 
-        &:focus {
-            border-color: #4f46e5;
-            outline: none;
+        &::placeholder {
+            color: #94a3b8;
         }
 
         &:disabled {
             opacity: 0.45;
             cursor: not-allowed;
         }
+    }
+
+    .editor-prompt-action-bar {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        padding: 8px 16px;
+        border-top: 1px solid #e9ecef;
+        background: #f3f4f6;
     }
 }
 

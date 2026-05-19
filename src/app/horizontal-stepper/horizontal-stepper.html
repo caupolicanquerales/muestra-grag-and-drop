@@ -1,0 +1,14 @@
+<div class="stepper-card">
+    <p-stepper [value]="activeStep()">
+        <p-step-list>
+            @for (step of steps(); track step.value) {
+                <p-step
+                    [value]="step.value"
+                    [attr.data-step-done]="isStepDone(step.value)"
+                    [attr.data-step-warning]="step.warning === true">
+                    {{ step.label }}
+                </p-step>
+            }
+        </p-step-list>
+    </p-stepper>
+</div>
