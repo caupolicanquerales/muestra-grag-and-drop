@@ -1,4 +1,7 @@
 <div class="main-wrapper">
+    <modal-constructor
+        [visible]="showModalConstructor"
+    ></modal-constructor>
     <div class="header-container"
         joyrideStep="modeStep" 
         [title]="promptSystemHelp['title']" 
@@ -46,7 +49,8 @@
                 treeData: item.tree, 
                 promptValue: item.styledPrompt ,
                 item: item,
-                titles: titlesHelp
+                titles: titlesHelp,
+                placeholder: item.placeHolder
             }"></ng-container>
 
             @if (!last) {
@@ -106,54 +110,64 @@
             }
             @if (last) {
                 @if (showCommandCenter()) {
-                <div class="connector-to-prompt-row">
-                    <div class="connector-anchor"
-                         [class.is-active]="showConnectorToPrompt()"
-                         [class.is-bypass]="showTemplateOnly()">
-                        <svg class="flow-connector flow-connector--sm" viewBox="0 0 90 210" xmlns="http://www.w3.org/2000/svg">
-                            <!-- z-layer 1: track line (behind everything) -->
-                            <line class="conn-line" x1="45" y1="17" x2="45" y2="175"/>
-                            <!-- z-layer 2: arrowhead -->
-                            <polygon class="conn-arrow" points="36,175 45,193 54,175"/>
-                            <!-- z-layer 3: label pill backgrounds -->
-                            <rect class="conn-label-bg" x="3" y="78" width="84" height="22" rx="11"/>
-                            <rect class="conn-label-bg conn-label-bg--action" x="3" y="150" width="84" height="22" rx="11"/>
-                            <!-- z-layer 4: circles (cover line) -->
-                            <circle class="conn-dot" cx="45" cy="10" r="7"/>
-                            <circle class="conn-badge conn-badge--action" cx="45" cy="128" r="17"/>
-                            <!-- z-layer 5: text (always on top) -->
-                            <text class="conn-label-txt" x="45" y="89" text-anchor="middle" dominant-baseline="central">ENVÍA</text>
-                            <text class="conn-badge-num" x="45" y="128" text-anchor="middle" dominant-baseline="central">{{ editors().length + 1 }}</text>
-                            <text class="conn-label-txt conn-label-txt--action" x="45" y="161" text-anchor="middle" dominant-baseline="central">CREA</text>
-                        </svg>
-                    </div>
-                </div>
-                <div class="command-center" [class.panel-active]="showConnectorToPrompt()">
-                    @if (showConnectorToPrompt()) {
-                        <div class="listo-badge-row">
-                            <span class="listo-badge">✓ Listo para Generar</span>
+                    <div class="connector-to-prompt-row">
+                        <div class="connector-anchor"
+                            [class.is-active]="showConnectorToPrompt()"
+                            [class.is-bypass]="showTemplateOnly()">
+                            <svg class="flow-connector flow-connector--sm" viewBox="0 0 90 210" xmlns="http://www.w3.org/2000/svg">
+                                <!-- z-layer 1: track line (behind everything) -->
+                                <line class="conn-line" x1="45" y1="17" x2="45" y2="175"/>
+                                <!-- z-layer 2: arrowhead -->
+                                <polygon class="conn-arrow" points="36,175 45,193 54,175"/>
+                                <!-- z-layer 3: label pill backgrounds -->
+                                <rect class="conn-label-bg" x="3" y="78" width="84" height="22" rx="11"/>
+                                <rect class="conn-label-bg conn-label-bg--action" x="3" y="150" width="84" height="22" rx="11"/>
+                                <!-- z-layer 4: circles (cover line) -->
+                                <circle class="conn-dot" cx="45" cy="10" r="7"/>
+                                <circle class="conn-badge conn-badge--action" cx="45" cy="128" r="17"/>
+                                <!-- z-layer 5: text (always on top) -->
+                                <text class="conn-label-txt" x="45" y="89" text-anchor="middle" dominant-baseline="central">ENVÍA</text>
+                                <text class="conn-badge-num" x="45" y="128" text-anchor="middle" dominant-baseline="central">{{ editors().length + 1 }}</text>
+                                <text class="conn-label-txt conn-label-txt--action" x="45" y="161" text-anchor="middle" dominant-baseline="central">CREA</text>
+                            </svg>
                         </div>
-                    }
-                    @if (showTemplateOnly()) {
-                        <div class="ghost-actions">
-                            <button class="ghost-btn ghost-btn--secondary" (click)="generateImage(null)">Generar prompt del template</button>
-                        </div>
-                    }
-                    <textarea rows="3" pTextarea [(ngModel)]="promptUser" placeholder="{{placeHolderPromptUser()}}" [disabled]="allowPromptUser()" fluid></textarea>
-                    <div class="command-actions">
-                        <chat-buttons
-                            [eraseButton]="false"
-                            [saveButton]="false"
-                            [exportButton]="false"
-                            [copyButton]="false"
-                            [processButton]="true"
-                            [processButtonTooltipHeader]="processButtonTooltipHeader"
-                            [generatePromptButton]="false"
-                            (submitProcessTextEmitter)="generateImage($event)"
-                        ></chat-buttons>
                     </div>
-                </div>
+                    <div class="command-center" [class.panel-active]="showConnectorToPrompt()">
+                        @if (showConnectorToPrompt()) {
+                            <div class="listo-badge-row">
+                                <span class="listo-badge">✓ Listo para Generar</span>
+                            </div>
+                        }
+                        @if (showTemplateOnly()) {
+                            <div class="ghost-actions">
+                                <button class="ghost-btn ghost-btn--secondary" (click)="generateImage(null)">Generar prompt del template</button>
+                            </div>
+                        }
+                        <textarea rows="3" pTextarea [(ngModel)]="promptUser" placeholder="{{item.placeHolder}}" [disabled]="allowPromptUser()" fluid></textarea>
+                        <div class="command-actions">
+                            <chat-buttons
+                                [eraseButton]="false"
+                                [saveButton]="false"
+                                [exportButton]="false"
+                                [copyButton]="false"
+                                [processButton]="true"
+                                [processButtonTooltipHeader]="processButtonTooltipHeader"
+                                [generatePromptButton]="false"
+                                (submitProcessTextEmitter)="generateImage($event)"
+                            ></chat-buttons>
+                        </div>
+                    </div>
                 } <!-- end showCommandCenter -->
+                @if(!showCommandCenter() && showTemplateOnly()) {
+                    <div class="generate-action-row">
+                        <div class="segment-control">
+                            <button class="segment-btn segment-active"
+                                (click)="selectedOption = generarButton; generateImage('Generate-template-prompt')">
+                                {{generarButton}}
+                            </button>
+                        </div>
+                    </div>
+                }
             }
         }
     </div>
@@ -209,7 +223,7 @@
         </div>
         @if(item.id!=='0' && hasEditorContent()[item.id] && !hasBasicTemplate() && !(hasSyntheticData() && hasPublicityData())) {
             <div class="editor-prompt-wrapper">
-                <textarea pTextarea [(ngModel)]="promptUser" placeholder="{{placeHolderPromptUser()}}" [disabled]="allowPromptUser()" fluid></textarea>
+                <textarea pTextarea [(ngModel)]="promptUser" placeholder="{{item.placeHolder}}" [disabled]="allowPromptUser()" fluid></textarea>
                 <div class="editor-prompt-action-bar">
                     <chat-buttons
                         [eraseButton]="false"

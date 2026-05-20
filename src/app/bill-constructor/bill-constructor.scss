@@ -81,6 +81,12 @@
     box-shadow: 0 1px 4px rgba(79,70,229,0.35);
 }
 
+.generate-action-row {
+    display: flex;
+    justify-content: flex-end;
+    padding: 1rem 0 0;
+}
+
 /* ── Main card ── */
 .card-container {
     width: 100%;

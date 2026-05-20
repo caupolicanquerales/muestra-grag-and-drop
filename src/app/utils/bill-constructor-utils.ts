@@ -6,13 +6,21 @@ export interface EditorConfig {
   styledPrompt: string;
   typePrompt: string;
   selectedNode?: any;
+  placeHolder?: string;
+}
+
+const placeHolderEditor = (): any =>{
+  return {
+    '1': 'Escriba el prompt para generara los datos sintéticos usando el json de datos mostrado',
+    '2': 'Escriba el prompt para generara los datos de publicidad usando el json de datos mostrado'
+  }
 }
 
 export function getEditors():EditorConfig[]{
     return [
-        { id: '0', tree: [], styledPrompt: '', typePrompt:'', selectedNode: null },
-        { id: '1', tree: [], styledPrompt: '', typePrompt:'', selectedNode: null },
-        { id: '2', tree: [], styledPrompt: '', typePrompt:'', selectedNode: null }
+        { id: '0', tree: [], styledPrompt: '', typePrompt:'', selectedNode: null, placeHolder: '' },
+        { id: '1', tree: [], styledPrompt: '', typePrompt:'', selectedNode: null, placeHolder: placeHolderEditor()['1'] },
+        { id: '2', tree: [], styledPrompt: '', typePrompt:'', selectedNode: null, placeHolder: placeHolderEditor()['2'] }   
         //{ id: '3', tree: [], styledPrompt: '', typePrompt:'' }
       ]
 }

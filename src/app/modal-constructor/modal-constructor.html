@@ -1,0 +1,40 @@
+
+<p-dialog [(visible)]="visible" [modal]="true" [style]="{ width: '52rem' }">
+    @if(hasBasicTemplate() || hasSyntheticData()) {
+        <horizontal-stepper
+        [steps]="stepperConfig().steps"
+        [activeStep]="stepperConfig().active">
+    </horizontal-stepper>
+    }
+
+    <ng-template #header>
+        <h3 class="modal-title">{{ titleModal }}</h3>
+    </ng-template>
+
+    <div class="cards-row">
+        @for (item of editorCards(); track item.id) {
+            <div class="flow-card" [class.flow-card--active]="option === item.id" (click)="option = item.id">
+                <img [alt]="item.title" class="flow-card__image" [src]="item.image" />
+                <div class="flow-card__radio-row">
+                    <p-radiobutton
+                        [name]="'flow'"
+                        [value]="item.id"
+                        [(ngModel)]="option"
+                        [inputId]="'flow-' + item.id">
+                    </p-radiobutton>
+                </div>
+                <div class="flow-card__body">
+                    <p class="flow-card__title">{{ item.title }}</p>
+                    <p class="flow-card__desc">{{ item.description }}</p>
+                </div>
+            </div>
+        }
+    </div>
+    <div class="modal-info">{{ informationModal }}</div>
+    <ng-template #footer>
+        <div class="modal-footer-row">
+            <button class="flow-btn" (click)="visible = false">Cancelar</button>
+            <button class="flow-btn flow-btn--active" (click)="processClick()">Confirmar</button>
+        </div>
+    </ng-template>
+</p-dialog>

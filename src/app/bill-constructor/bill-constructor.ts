@@ -21,13 +21,12 @@ import { JoyrideModule, JoyrideService } from 'ngx-joyride';
 import { formatDataIfJson } from '../utils/json-format-utils';
 import { HorizontalStepper } from '../horizontal-stepper/horizontal-stepper';
 import { StepperService } from '../service/stepper-service';
-
-//this.serviceGeneral.imageVariablesData
+import { ModalConstructor } from '../modal-constructor/modal-constructor';
 
 @Component({
   selector: 'bill-constructor',
   imports: [CommonModule, NgClass, FormsModule, TreeModule, ChatButtons, RadioButtonModule, JoyrideModule,
-    HorizontalStepper],
+    HorizontalStepper, ModalConstructor],
   standalone: true,
   templateUrl: './bill-constructor.html',
   styleUrl: './bill-constructor.scss'
@@ -39,6 +38,7 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
   titleData: string= "Constructor";
   radioButton1: string ="Sin publicidad";
   radioButton2: string ="Con publicidad"
+  generarButton: string ="Generar"
   selectedOption: string= '';
   selectedAgent: string= '';
   isFocused = signal(false);
@@ -54,7 +54,6 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
   showConnector0 = computed(() => this.hasBasicTemplate() && this.editors().length >= 2);
   showConnector1 = computed(() => this.hasSyntheticData() && this.editors().length >= 2);
   showConnector2 = computed(() => this.hasPublicityData() && this.editors().length >= 3);
-  // i===1 link (DATO SINT → DATO PUB): only when BOTH are loaded
   showConnectorSintToPub = computed(() => this.hasSyntheticData() && this.hasPublicityData() && this.editors().length >= 3);
   showConnectorToPrompt = computed(() => {
     if (this.editors().length >= 3) {
@@ -64,15 +63,12 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
     }
     return this.showConnector0() || this.showConnector1();
   });
-  // Warning: SINT + PUB both loaded but template still missing (flow blocked)
   showTemplateWarning = computed(() =>
     this.hasSyntheticData() && this.hasPublicityData() && !this.hasBasicTemplate()
   );
-  // Template selected alone → direct shortcut path to prompt
   showTemplateOnly = computed(() =>
     this.hasBasicTemplate() && !this.hasSyntheticData() && !this.hasPublicityData()
   );
-  // Command center only appears when template + synthetic data are both present
   showCommandCenter = computed(() => this.hasBasicTemplate() && this.hasSyntheticData());
 
   private readonly stepperService = inject(StepperService);
@@ -95,6 +91,7 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
     !this.hasSyntheticData() && !this.hasPublicityData()
   );
   processButtonTooltipHeader: string= "";
+  showModalConstructor: boolean= true;
 
   constructor(private serviceGeneral: ServiceGeneral,
     private executingRestFulService: ExecutingRestFulService){}
@@ -283,6 +280,7 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
       this.hasPublicityData.set(false);
       this.updateProcessButtonTooltip();
     }
+    this.promptUser = '';
     this.updateSpecificEditor(index.toString(), { selectedNode: null });
     this.insertStringIntoEditor('', index.toString());
     this.hasEditorContent.update(state => ({...state, [index.toString()]: false}));

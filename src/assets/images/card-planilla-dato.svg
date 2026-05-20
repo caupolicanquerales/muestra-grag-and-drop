@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 120">
+  <!-- Background -->
+  <rect width="400" height="120" fill="#060b14"/>
+  <!-- Background grid -->
+  <line x1="0" y1="30" x2="400" y2="30" stroke="#0c1a2e" stroke-width="1"/>
+  <line x1="0" y1="60" x2="400" y2="60" stroke="#0c1a2e" stroke-width="1"/>
+  <line x1="0" y1="90" x2="400" y2="90" stroke="#0c1a2e" stroke-width="1"/>
+  <line x1="100" y1="0" x2="100" y2="120" stroke="#0c1a2e" stroke-width="1"/>
+  <line x1="200" y1="0" x2="200" y2="120" stroke="#0c1a2e" stroke-width="1"/>
+  <line x1="300" y1="0" x2="300" y2="120" stroke="#0c1a2e" stroke-width="1"/>
+
+  <!-- ── Left panel: invoice blueprint ── -->
+  <rect x="8" y="7" width="162" height="106" rx="2" fill="#050916" stroke="#1d4ed8" stroke-width="1.5" opacity="0.9"/>
+  <!-- Header zone -->
+  <rect x="15" y="14" width="148" height="17" rx="1" fill="#1d4ed8" opacity="0.12" stroke="#3b82f6" stroke-width="1"/>
+  <text x="89" y="26" text-anchor="middle" font-size="8" fill="#60a5fa" font-family="monospace" letter-spacing="2">HEADER</text>
+  <!-- Line items box -->
+  <rect x="15" y="35" width="148" height="38" rx="1" fill="none" stroke="#4f46e5" stroke-width="1"/>
+  <text x="89" y="31" text-anchor="middle" font-size="6" fill="#818cf8" font-family="monospace" letter-spacing="1">LINE ITEMS</text>
+  <line x1="15" y1="47" x2="163" y2="47" stroke="#4f46e5" stroke-width="0.5" opacity="0.6"/>
+  <line x1="15" y1="58" x2="163" y2="58" stroke="#4f46e5" stroke-width="0.5" opacity="0.5"/>
+  <line x1="100" y1="35" x2="100" y2="73" stroke="#4f46e5" stroke-width="0.5" opacity="0.3"/>
+  <line x1="138" y1="35" x2="138" y2="73" stroke="#4f46e5" stroke-width="0.5" opacity="0.3"/>
+  <!-- Total bar -->
+  <rect x="88" y="80" width="75" height="11" rx="1" fill="#4f46e5" opacity="0.2" stroke="#6366f1" stroke-width="1"/>
+  <text x="125" y="89" text-anchor="middle" font-size="7" fill="#a5b4fc" font-family="monospace" letter-spacing="1">TOTAL</text>
+  <!-- Corner brackets (left panel) -->
+  <line x1="8" y1="12" x2="21" y2="12" stroke="#06b6d4" stroke-width="1.5"/>
+  <line x1="8" y1="12" x2="8" y2="25" stroke="#06b6d4" stroke-width="1.5"/>
+  <line x1="170" y1="12" x2="157" y2="12" stroke="#06b6d4" stroke-width="1.5"/>
+  <line x1="170" y1="12" x2="170" y2="25" stroke="#06b6d4" stroke-width="1.5"/>
+  <line x1="8" y1="108" x2="21" y2="108" stroke="#06b6d4" stroke-width="1.5"/>
+  <line x1="8" y1="108" x2="8" y2="95" stroke="#06b6d4" stroke-width="1.5"/>
+  <line x1="170" y1="108" x2="157" y2="108" stroke="#06b6d4" stroke-width="1.5"/>
+  <line x1="170" y1="108" x2="170" y2="95" stroke="#06b6d4" stroke-width="1.5"/>
+
+  <!-- ── Center plus sign ── -->
+  <text x="199" y="68" text-anchor="middle" font-size="30" fill="#06b6d4" font-family="monospace" opacity="0.9">+</text>
+
+  <!-- ── Right panel: JSON block ── -->
+  <rect x="230" y="7" width="162" height="106" rx="2" fill="#050916" stroke="#1d4ed8" stroke-width="1.5" opacity="0.9"/>
+  <!-- Opening brace { -->
+  <text x="237" y="35" font-size="22" fill="#06b6d4" font-family="monospace" opacity="0.85">{</text>
+  <!-- Closing brace } -->
+  <text x="368" y="106" font-size="22" fill="#06b6d4" font-family="monospace" opacity="0.85">}</text>
+  <!-- facturaId -->
+  <rect x="250" y="13" width="54" height="8" rx="1" fill="#0f2a4a" stroke="#3b82f6" stroke-width="0.5"/>
+  <text x="253" y="20" font-size="5.8" fill="#60a5fa" font-family="monospace">"facturaId"</text>
+  <text x="307" y="20" font-size="6" fill="#475569" font-family="monospace">:</text>
+  <rect x="314" y="13" width="37" height="8" rx="1" fill="#1e1b4b" stroke="#6366f1" stroke-width="0.5"/>
+  <text x="317" y="20" font-size="5.8" fill="#a5b4fc" font-family="monospace">"F-0042"</text>
+  <!-- cliente -->
+  <rect x="250" y="24" width="44" height="8" rx="1" fill="#0f2a4a" stroke="#3b82f6" stroke-width="0.5"/>
+  <text x="253" y="31" font-size="5.8" fill="#60a5fa" font-family="monospace">"cliente"</text>
+  <text x="297" y="31" font-size="6" fill="#475569" font-family="monospace">:</text>
+  <rect x="304" y="24" width="66" height="8" rx="1" fill="#1e1b4b" stroke="#6366f1" stroke-width="0.5"/>
+  <text x="307" y="31" font-size="5.8" fill="#a5b4fc" font-family="monospace">"Empresa SA"</text>
+  <!-- items: [ -->
+  <rect x="250" y="35" width="34" height="8" rx="1" fill="#0f2a4a" stroke="#3b82f6" stroke-width="0.5"/>
+  <text x="253" y="42" font-size="5.8" fill="#60a5fa" font-family="monospace">"items"</text>
+  <text x="287" y="42" font-size="6" fill="#475569" font-family="monospace">: [</text>
+  <!-- array item 1 -->
+  <rect x="258" y="45" width="128" height="8" rx="1" fill="#1e1b4b" opacity="0.9" stroke="#4f46e5" stroke-width="0.5"/>
+  <text x="261" y="52" font-size="5.2" fill="#818cf8" font-family="monospace">{ "desc": "Serv A", "precio": 100 },</text>
+  <!-- array item 2 -->
+  <rect x="258" y="55" width="122" height="8" rx="1" fill="#1e1b4b" opacity="0.9" stroke="#4f46e5" stroke-width="0.5"/>
+  <text x="261" y="62" font-size="5.2" fill="#818cf8" font-family="monospace">{ "desc": "Serv B", "precio": 200 }</text>
+  <!-- close array -->
+  <text x="250" y="74" font-size="6" fill="#475569" font-family="monospace">],</text>
+  <!-- total -->
+  <rect x="250" y="77" width="34" height="8" rx="1" fill="#0f2a4a" stroke="#3b82f6" stroke-width="0.5"/>
+  <text x="253" y="84" font-size="5.8" fill="#60a5fa" font-family="monospace">"total"</text>
+  <text x="287" y="84" font-size="6" fill="#475569" font-family="monospace">:</text>
+  <rect x="294" y="77" width="24" height="8" rx="1" fill="#064e3b" stroke="#10b981" stroke-width="0.5"/>
+  <text x="297" y="84" font-size="5.8" fill="#34d399" font-family="monospace">300</text>
+  <!-- Corner brackets (right panel) -->
+  <line x1="230" y1="12" x2="243" y2="12" stroke="#06b6d4" stroke-width="1.5"/>
+  <line x1="230" y1="12" x2="230" y2="25" stroke="#06b6d4" stroke-width="1.5"/>
+  <line x1="392" y1="12" x2="379" y2="12" stroke="#06b6d4" stroke-width="1.5"/>
+  <line x1="392" y1="12" x2="392" y2="25" stroke="#06b6d4" stroke-width="1.5"/>
+  <line x1="230" y1="108" x2="243" y2="108" stroke="#06b6d4" stroke-width="1.5"/>
+  <line x1="230" y1="108" x2="230" y2="95" stroke="#06b6d4" stroke-width="1.5"/>
+  <line x1="392" y1="108" x2="379" y2="108" stroke="#06b6d4" stroke-width="1.5"/>
+  <line x1="392" y1="108" x2="392" y2="95" stroke="#06b6d4" stroke-width="1.5"/>
+</svg>
