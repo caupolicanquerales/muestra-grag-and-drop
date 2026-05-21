@@ -8,6 +8,33 @@
     box-sizing: border-box;
 }
 
+.table-empty-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    padding: 2.5rem 1rem;
+}
+
+.table-empty-icon {
+    font-size: 2.5rem;
+    opacity: 0.45;
+    color: #94a3b8;
+    margin-bottom: 0.25rem;
+}
+
+.table-empty-text {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #64748b;
+}
+
+.table-empty-hint {
+    font-size: 0.78rem;
+    color: #94a3b8;
+}
+
 .dashboard-card {
     background-color: #ffffff;
     padding: 1.5rem;

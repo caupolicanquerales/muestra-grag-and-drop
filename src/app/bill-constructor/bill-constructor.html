@@ -1,6 +1,7 @@
 <div class="main-wrapper">
     <modal-constructor
         [visible]="showModalConstructor"
+        (optionSelectedEvent)="getOptionSelectedEvent($event)"
     ></modal-constructor>
     <div class="header-container"
         joyrideStep="modeStep" 
@@ -182,7 +183,9 @@
   let-index="index"
   let-titles="titles"
   >
-  <div class="editor-content-wrapper">
+  <div class="editor-content-wrapper"
+       [class.zone-hint]="(index === 0 && hintBasicTemplate()) || (index === 1 && hintSyntheticData())"
+       (click)="clearModalHint()">
     <div class="p-selector-group" 
         [joyrideStep]="'treeStep_' + item.id"
         [title]="titles[item.id+1]"

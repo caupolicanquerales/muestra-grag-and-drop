@@ -8,8 +8,8 @@
                     [copyButton]="false"
                     [generateImageButton]="false"
                     [generatePromptButton]="false"
-                    [helpButton]="true"
-                    (submitHelpTextEmitter)="startTour()"
+                    [guideButton]="true"
+                    (submitGuideTextEmitter)="startTour()"
                 ></chat-buttons>
             <upload-document
                 joyrideStep="modeStep" 
@@ -46,6 +46,17 @@
                             </td>
                             <td>
                                 <p-button icon="pi pi-trash" (click)="deleteTemplate(templatesId)" severity="secondary" rounded />
+                            </td>
+                        </tr>
+                    </ng-template>
+                    <ng-template #emptymessage>
+                        <tr>
+                            <td colspan="3">
+                                <div class="table-empty-placeholder">
+                                    <i class="pi pi-image table-empty-icon"></i>
+                                    <span class="table-empty-text">No hay templates cargados</span>
+                                    <span class="table-empty-hint">Sube un archivo para comenzar</span>
+                                </div>
                             </td>
                         </tr>
                     </ng-template>

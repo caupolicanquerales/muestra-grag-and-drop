@@ -108,3 +108,103 @@ html, body {
 .p-tree .p-treenode-content[data-p-highlight="true"] span {
     color: #0e7490 !important;
 }
+
+/* ── ngx-joyride tour popup ── */
+.joyride-step__holder {
+    font-family: inherit;
+}
+
+.joyride-step__container {
+    background: #ffffff !important;
+    border-radius: 0.875rem !important;
+    border: 1px solid #e2e8f0 !important;
+    border-top: 3px solid #4f46e5 !important;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.13) !important;
+    padding: 0 !important;
+    min-width: 280px;
+    max-width: 360px;
+}
+
+.joyride-step__header {
+    padding: 1rem 1.25rem 0.5rem !important;
+    border-bottom: 1px solid #eef0f5;
+}
+
+.joyride-step__title {
+    font-size: 0.95rem !important;
+    font-weight: 700 !important;
+    color: #1e293b !important;
+    letter-spacing: -0.01em;
+}
+
+.joyride-step__close {
+    color: #94a3b8 !important;
+    font-size: 1rem !important;
+    background: transparent !important;
+    border: none !important;
+    cursor: pointer;
+    &:hover { color: #4f46e5 !important; }
+}
+
+.joyride-step__body {
+    padding: 0.75rem 1.25rem !important;
+    font-size: 0.85rem !important;
+    color: #475569 !important;
+    line-height: 1.6 !important;
+}
+
+.joyride-step__footer {
+    padding: 0.75rem 1.25rem !important;
+    border-top: 1px solid #eef0f5;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.joyride-step__counter-container {
+    font-size: 0.72rem;
+    color: #94a3b8;
+    font-weight: 500;
+}
+
+.joyride-step__counter {
+    color: #4f46e5;
+    font-weight: 700;
+}
+
+.joyride-button {
+    padding: 0.35rem 1rem !important;
+    border: none !important;
+    border-radius: 2rem !important;
+    font-size: 0.8rem !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    font-family: inherit !important;
+    transition: all 0.15s ease !important;
+    line-height: 1.5 !important;
+}
+
+.joyride-step__prev-container .joyride-button,
+.joyride-step__prev-button {
+    background: #eef0f5 !important;
+    color: #64748b !important;
+    box-shadow: none !important;
+    &:hover {
+        background: #e2e6ef !important;
+        color: #334155 !important;
+    }
+}
+
+.joyride-step__next-container .joyride-button {
+    background: #4f46e5 !important;
+    color: #ffffff !important;
+    box-shadow: 0 1px 4px rgba(79,70,229,0.35) !important;
+    &:hover { background: #4338ca !important; }
+}
+
+.joyride-step__done-container .joyride-button {
+    background: #4f46e5 !important;
+    color: #ffffff !important;
+    box-shadow: 0 1px 4px rgba(79,70,229,0.35) !important;
+    &:hover { background: #4338ca !important; }
+}

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, Input, signal } from '@angular/core';
+import { Component, EventEmitter, inject, Input, Output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
@@ -18,6 +18,9 @@ export class ModalConstructor {
 
   @Input()
   visible: boolean = false;
+
+  @Output()
+  optionSelectedEvent = new EventEmitter<number>();
 
   titleModal: string = "Selecciona tu Flujo de Trabajo";
   informationModal: string = "Esta selección adaptara el proceso de construcción de tu factura.";
@@ -48,7 +51,7 @@ export class ModalConstructor {
   constructor() {
     this.editorCards.set([
       {
-        id:1,
+        id:0,
         title: 'Template Básico',
         image: 'assets/images/card-planilla.svg',
         description: 'Selecciona el layout de la factura.',
@@ -56,7 +59,7 @@ export class ModalConstructor {
         }
       },
       {
-        id:2,
+        id:1,
         title: 'Dato Sintético',
         image: 'assets/images/card-dato-sintetico.svg',
         description: 'Genera o carga la estructura de datos para rellenar las facturas.',
@@ -64,7 +67,7 @@ export class ModalConstructor {
         }
       },
       {
-        id:3,
+        id:2,
         title: 'Template + Dato',
         image: 'assets/images/card-planilla-dato.svg',
         description: 'Combina la definición de datos con el diseño visual de forma simultánea.',
@@ -76,6 +79,7 @@ export class ModalConstructor {
 
   processClick(): void {
     this.visible = false;
+    this.optionSelectedEvent.emit(this.option!);
   }
 
 }

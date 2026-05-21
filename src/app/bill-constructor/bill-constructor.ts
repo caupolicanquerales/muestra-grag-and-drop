@@ -51,6 +51,9 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
   hasSyntheticData = signal(false);
   hasPublicityData = signal(false);
   hasEditorContent = signal<{[key: string]: boolean}>({});
+  modalHint = signal<number | null>(null);
+  hintBasicTemplate = computed(() => this.modalHint() === 0 || this.modalHint() === 2);
+  hintSyntheticData = computed(() => this.modalHint() === 1 || this.modalHint() === 2);
   showConnector0 = computed(() => this.hasBasicTemplate() && this.editors().length >= 2);
   showConnector1 = computed(() => this.hasSyntheticData() && this.editors().length >= 2);
   showConnector2 = computed(() => this.hasPublicityData() && this.editors().length >= 3);
@@ -290,6 +293,7 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
     this.hasBasicTemplate.set(false);
     this.hasSyntheticData.set(false);
     this.hasPublicityData.set(false);
+    this.serviceGeneral.setImageVariablesData({});
     this.updateProcessButtonTooltip();
     let backup=this.setEditorBackup();
     if(this.selectedOption==this.radioButton1){
@@ -342,7 +346,10 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
 
   startTour() {
     const dynamicSteps = this.editors().map(item => `treeStep_${item.id}`);
-    this.joyrideService.startTour({ steps: ['modeStep', ...dynamicSteps] });
+    this.joyrideService.startTour({
+      steps: ['modeStep', ...dynamicSteps],
+      customTexts: { prev: 'Anterior', next: 'Siguiente', done: 'Finalizar', close: 'Cerrar' }
+    });
   }
 
   private getImageVariableDataInterface(templateID:string): SyntheticDataInterface {
@@ -352,4 +359,13 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
       name: ''
     };
   }
+
+  getOptionSelectedEvent($event: number): void {
+    this.modalHint.set($event);
+  }
+
+  clearModalHint(): void {
+    this.modalHint.set(null);
+  }
+
 }

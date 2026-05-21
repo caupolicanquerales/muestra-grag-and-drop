@@ -36,17 +36,17 @@ export const orderSystemWithPublicity = (): string[] => [...orderSystemBase(),..
 
 export const titlesHelp = (): any =>{
   return{
-    "01": "Busqueda de templates básicos",
-    "11": "Busqueda de datos sintéticos",
-    "21": "Busqueda de datos publicitarios",
-    "31": "Busqueda de prompt de sistemas",
+    "01": "Layout Base (HTML / CSS)",
+    "11": "Inyección de Datos (JSON)",
+    "21": "Inyeccio de Datos Publicitarios (JSON)",
+    "31": "Prompt de Sistema",
   }
 }
 
 export const textHelp = (): any =>{
   return{
-    "01": "Despliegue la carpeta de templates básicos y seleccione el HTMLy CSS previamente creado para ser usado como mapa visual",
-    "11": "Despliegue la carpeta de datos sintéticos y seleccione los datos en formato JSON previamente creados para ser introducidos como información principal a desplegar en la imagen",
+    "01": "Selecciona la plantilla estructural en formato HTML/CSS. Esta funcionará como el armazón o matriz visual sobre la cual se inyectarán dinámicamente los datos de las facturas.",
+    "11": "Carga el archivo JSON que contiene las variables y valores sintéticos (fechas, montos, ítems, clientes). El sistema mapeará estos datos directamente sobre el layout seleccionado para poblar la factura.",
     "21": "Despliegue la carpeta de datos publicitarios y seleccione los datos en formato JSON previamente creados para ser introducidos como información secundaria a desplegar en la imagen",
     "31": "Despliegue la carpeta de prompt de sistemas y seleccione el prompt de reglas que debera seguir el modelo de imagen al ejecutar el prompt maestro de sistema",
   }
@@ -54,7 +54,7 @@ export const textHelp = (): any =>{
 
 export const systemPromptHelp = (): any =>{
   return{
-    "title": "Selección del prompt de sistema con o sin información de publicidad",
-    "text": "Un prompt de sistema es una forma de introducir al modelo de generación de imagen los datos del usuario y las reglas que deberan ser ejecutas, de esta forma el proceso puede utilizarse de forma repetitiva. Minimamente requiere un mapa visual, una información principal a ser desplegada y un prompt de reglas. Seleccionar el prompt con datos publicitarios representa una forma de introducir información extra no relacionada con los datos principales."
+    "title": "Selección la configuración con o sin información de publicidad",
+    "text": "Define las reglas del sistema y el comportamiento del agente de IA para la renderización. Activa o desactiva la inyección de elementos secundarios (como bloques publicitarios o metadatos extras) para alterar la composición visual de la factura sintética."
   }
 }
