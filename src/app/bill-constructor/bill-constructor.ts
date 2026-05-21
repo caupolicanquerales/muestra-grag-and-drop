@@ -19,10 +19,14 @@ import {  getUserPromptSubAgent } from '../utils/system-prompt-utils';
 import { EditorConfig, getEditors, orderSystem, orderSystemWithPublicity, systemPromptHelp, textHelp, titlesHelp } from '../utils/bill-constructor-utils';
 import { JoyrideModule, JoyrideService } from 'ngx-joyride';
 import { formatDataIfJson } from '../utils/json-format-utils';
+import { HorizontalStepper } from '../horizontal-stepper/horizontal-stepper';
+import { StepperService } from '../service/stepper-service';
+import { ModalConstructor } from '../modal-constructor/modal-constructor';
 
 @Component({
   selector: 'bill-constructor',
-  imports: [CommonModule, NgClass, FormsModule, TreeModule, ChatButtons, RadioButtonModule, JoyrideModule],
+  imports: [CommonModule, NgClass, FormsModule, TreeModule, ChatButtons, RadioButtonModule, JoyrideModule,
+    HorizontalStepper, ModalConstructor],
   standalone: true,
   templateUrl: './bill-constructor.html',
   styleUrl: './bill-constructor.scss'
@@ -34,6 +38,7 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
   titleData: string= "Constructor";
   radioButton1: string ="Sin publicidad";
   radioButton2: string ="Con publicidad"
+  generarButton: string ="Generar"
   selectedOption: string= '';
   selectedAgent: string= '';
   isFocused = signal(false);
@@ -45,10 +50,13 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
   hasBasicTemplate = signal(false);
   hasSyntheticData = signal(false);
   hasPublicityData = signal(false);
+  hasEditorContent = signal<{[key: string]: boolean}>({});
+  modalHint = signal<number | null>(null);
+  hintBasicTemplate = computed(() => this.modalHint() === 0 || this.modalHint() === 2);
+  hintSyntheticData = computed(() => this.modalHint() === 1 || this.modalHint() === 2);
   showConnector0 = computed(() => this.hasBasicTemplate() && this.editors().length >= 2);
   showConnector1 = computed(() => this.hasSyntheticData() && this.editors().length >= 2);
   showConnector2 = computed(() => this.hasPublicityData() && this.editors().length >= 3);
-  // i===1 link (DATO SINT → DATO PUB): only when BOTH are loaded
   showConnectorSintToPub = computed(() => this.hasSyntheticData() && this.hasPublicityData() && this.editors().length >= 3);
   showConnectorToPrompt = computed(() => {
     if (this.editors().length >= 3) {
@@ -58,13 +66,19 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
     }
     return this.showConnector0() || this.showConnector1();
   });
-  // Warning: SINT + PUB both loaded but template still missing (flow blocked)
   showTemplateWarning = computed(() =>
     this.hasSyntheticData() && this.hasPublicityData() && !this.hasBasicTemplate()
   );
-  // Template selected alone → direct shortcut path to prompt
   showTemplateOnly = computed(() =>
     this.hasBasicTemplate() && !this.hasSyntheticData() && !this.hasPublicityData()
+  );
+  showCommandCenter = computed(() => this.hasBasicTemplate() && this.hasSyntheticData());
+
+  private readonly stepperService = inject(StepperService);
+  stepperConfig = this.stepperService.buildConfig(
+    this.hasBasicTemplate,
+    this.hasSyntheticData,
+    this.hasPublicityData
   );
   private readonly joyrideService = inject(JoyrideService);
   titlesHelp: any= titlesHelp();
@@ -80,6 +94,7 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
     !this.hasSyntheticData() && !this.hasPublicityData()
   );
   processButtonTooltipHeader: string= "";
+  showModalConstructor: boolean= true;
 
   constructor(private serviceGeneral: ServiceGeneral,
     private executingRestFulService: ExecutingRestFulService){}
@@ -148,10 +163,11 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
     }
   }
 
-  updatePromptFromContentEditable(event: Event, editorId: string): void {
+  updatePromptFromContentEditable(event: Event, item: EditorConfig): void {
     const target = event.target as HTMLDivElement;
     const newValue = target.innerText;
     this.adjustHeight(target);
+    this.hasEditorContent.update(state => ({...state, [item.id]: !!newValue.trim()}));
   }
 
   private setChildrenInTreeNode(label: string, type: string, 
@@ -211,6 +227,7 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
     const formattedData = formatDataIfJson($event?.data);
     const coloredSpan = removeColorContent(formattedData, "rgb(0, 0, 0)");
     this.insertStringIntoEditor(coloredSpan, index);
+    this.hasEditorContent.update(state => ({...state, [index]: true}));
   }
 
   private updateProcessButtonTooltip(): void {
@@ -257,6 +274,7 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
   emitEraseText($event: any, index: number){
     if (index === 0) {
       this.hasBasicTemplate.set(false);
+      this.serviceGeneral.setImageVariablesData({});
       this.updateProcessButtonTooltip();
     } else if (index === 1) {
       this.hasSyntheticData.set(false);
@@ -265,14 +283,17 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
       this.hasPublicityData.set(false);
       this.updateProcessButtonTooltip();
     }
+    this.promptUser = '';
     this.updateSpecificEditor(index.toString(), { selectedNode: null });
     this.insertStringIntoEditor('', index.toString());
+    this.hasEditorContent.update(state => ({...state, [index.toString()]: false}));
   }
 
   onRadioChange($event:any){
     this.hasBasicTemplate.set(false);
     this.hasSyntheticData.set(false);
     this.hasPublicityData.set(false);
+    this.serviceGeneral.setImageVariablesData({});
     this.updateProcessButtonTooltip();
     let backup=this.setEditorBackup();
     if(this.selectedOption==this.radioButton1){
@@ -325,7 +346,10 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
 
   startTour() {
     const dynamicSteps = this.editors().map(item => `treeStep_${item.id}`);
-    this.joyrideService.startTour({ steps: ['modeStep', ...dynamicSteps] });
+    this.joyrideService.startTour({
+      steps: ['modeStep', ...dynamicSteps],
+      customTexts: { prev: 'Anterior', next: 'Siguiente', done: 'Finalizar', close: 'Cerrar' }
+    });
   }
 
   private getImageVariableDataInterface(templateID:string): SyntheticDataInterface {
@@ -335,4 +359,13 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
       name: ''
     };
   }
+
+  getOptionSelectedEvent($event: number): void {
+    this.modalHint.set($event);
+  }
+
+  clearModalHint(): void {
+    this.modalHint.set(null);
+  }
+
 }

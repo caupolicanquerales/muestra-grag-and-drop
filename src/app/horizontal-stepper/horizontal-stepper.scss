@@ -1,0 +1,144 @@
+:host {
+    display: block;
+    width: 100%;
+}
+
+.stepper-card {
+    width: 100%;
+}
+
+:host ::ng-deep {
+    // Full-width stepper — strip PrimeNG internal padding so edges align with card borders
+    .p-stepper {
+        width: 100%;
+        padding: 0;
+    }
+
+    .p-step-list {
+        padding: 0;
+        gap: 0;
+    }
+
+    .p-step-header {
+        padding: 0.5rem 0;
+    }
+
+    // Connector lines — visible, distinct
+    .p-stepper-separator {
+        height: 2px;
+        background-color: #d1d5db;
+        flex: 1;
+    }
+
+    // Base step number
+    .p-step-number {
+        width: 2rem;
+        height: 2rem;
+        border-radius: 50%;
+        border: 2px solid #d1d5db;
+        background: #ffffff;
+        color: #a0aec0;
+        font-size: 0.8125rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+        font-family: inherit;
+    }
+
+    // Base step title
+    .p-step-title {
+        color: #a0aec0;
+        font-size: 0.75rem;
+        font-weight: 500;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        font-family: inherit;
+        transition: color 0.2s ease;
+    }
+
+    // Active step
+    .p-step[data-p-active="true"] {
+        .p-step-number {
+            background: #4f46e5;
+            border-color: #4f46e5;
+            color: #ffffff;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.18);
+        }
+
+        .p-step-title {
+            color: #2d3748;
+            font-weight: 700;
+        }
+    }
+
+    // Completed step
+    .p-step[data-step-done="true"] {
+        .p-step-number {
+            background: rgba(34, 211, 238, 0.18);
+            border-color: #22d3ee;
+            color: transparent;
+            font-size: 0;
+
+            &::after {
+                content: '✓';
+                font-size: 0.875rem;
+                color: #0e7490;
+            }
+        }
+
+        .p-step-title {
+            color: #0e7490;
+            font-weight: 600;
+        }
+
+        // Color the connector after a completed step
+        .p-stepper-separator {
+            background-color: #22d3ee;
+            opacity: 0.6;
+        }
+
+        // Connector leading INTO a warning step: dashed amber instead of solid cyan
+        &:has(+ .p-step[data-step-warning="true"]) {
+            .p-stepper-separator {
+                background: repeating-linear-gradient(
+                    to right,
+                    #f59e0b 0px,
+                    #f59e0b 7px,
+                    transparent 7px,
+                    transparent 14px
+                ) !important;
+                opacity: 1 !important;
+            }
+        }
+    }
+
+    // Warning step (pending required action)
+    .p-step[data-step-warning="true"] {
+        .p-step-number {
+            background: #fff7ed;
+            border: 2px dashed #f59e0b;
+            color: transparent;
+            font-size: 0;
+            animation: warning-pulse 1.6s ease-in-out infinite;
+
+            &::after {
+                content: '!';
+                font-size: 0.9rem;
+                font-weight: 800;
+                color: #d97706;
+            }
+        }
+
+        .p-step-title {
+            color: #d97706;
+            font-weight: 700;
+        }
+    }
+}
+
+@keyframes warning-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
+    50%       { box-shadow: 0 0 0 6px rgba(245, 158, 11, 0); }
+}

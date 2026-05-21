@@ -55,25 +55,26 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 100%;
-    max-width: 180px;
-    padding: 0.65rem 1.25rem;
-    font-size: 0.9rem;
+    padding: 0.35rem 1rem;
+    font-size: 0.8rem;
     font-weight: 600;
-    font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
+    font-family: inherit;
     color: #ffffff;
-    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    background: #4f46e5;
     border: none;
-    border-radius: 0.6rem;
+    border-radius: 2rem;
     cursor: pointer;
-    transition: filter 0.15s ease;
+    box-shadow: 0 1px 4px rgba(79, 70, 229, 0.35);
+    transition: all 0.15s ease;
+    white-space: nowrap;
 
     &:hover {
-        filter: brightness(1.08);
+        background: #4338ca;
+        box-shadow: 0 2px 8px rgba(79, 70, 229, 0.45);
     }
 
     &:active {
-        filter: brightness(0.95);
+        background: #3730a3;
     }
 }
 
