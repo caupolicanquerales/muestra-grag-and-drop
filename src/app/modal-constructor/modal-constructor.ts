@@ -37,8 +37,8 @@ export class ModalConstructor {
 
   set option(value: number | null) {
     this._option = value;
-    this.hasBasicTemplate.set(value === 1 || value === 3);
-    this.hasSyntheticData.set(value === 2 || value === 3);
+    this.hasBasicTemplate.set(value === 0 || value === 2);
+    this.hasSyntheticData.set(value === 1 || value === 2);
   }
 
   private readonly stepperService = inject(StepperService);

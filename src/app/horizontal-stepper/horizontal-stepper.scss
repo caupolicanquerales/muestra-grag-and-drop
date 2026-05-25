@@ -17,6 +17,7 @@
     .p-step-list {
         padding: 0;
         gap: 0;
+        align-items: center;
     }
 
     .p-step-header {
@@ -28,6 +29,7 @@
         height: 2px;
         background-color: #d1d5db;
         flex: 1;
+        align-self: center;
     }
 
     // Base step number
@@ -69,12 +71,37 @@
 
         .p-step-title {
             color: #2d3748;
-            font-weight: 700;
+            font-weight: 500;
+            text-transform: none;
+            font-family: 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+            font-size: 0.7rem;
+            letter-spacing: 0;
         }
     }
 
     // Completed step
     .p-step[data-step-done="true"] {
+        .p-step-header {
+            cursor: pointer;
+            border-radius: 0.5rem;
+            transition: background 0.15s ease;
+
+            &:hover {
+                background: rgba(14, 116, 144, 0.08) !important;
+
+                .p-step-title {
+                    text-decoration: underline !important;
+                    text-underline-offset: 2px;
+                    color: #0e7490 !important;
+                }
+
+                .p-step-number {
+                    filter: brightness(0.88);
+                    box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.25);
+                }
+            }
+        }
+
         .p-step-number {
             background: rgba(34, 211, 238, 0.18);
             border-color: #22d3ee;

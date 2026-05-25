@@ -122,9 +122,9 @@
 .code-toolbar {
     display: flex;
     align-items: center;
-    padding: 0.35rem 0.75rem;
-    background: #e8ecf2;
-    border-bottom: 1px solid #c7d0dd;
+    padding: 0.75rem 1rem;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
     gap: 0.5rem;
     min-height: 2.25rem;
 }
@@ -197,6 +197,26 @@
 
 :host ::ng-deep .error-node .p-treenode-icon {
     color: #94a3b8 !important;
+}
+
+/* Selected node — purple brand highlight */
+:host ::ng-deep .p-tree .p-tree-node-content.p-tree-node-selected {
+    background: rgba(79, 70, 229, 0.12) !important;
+    color: #3730a3 !important;
+    border-radius: 0.5rem;
+    box-shadow: inset 3px 0 0 #4f46e5;
+}
+
+:host ::ng-deep .p-tree .p-tree-node-content.p-tree-node-selected .p-tree-node-label,
+:host ::ng-deep .p-tree .p-tree-node-content.p-tree-node-selected .p-tree-node-icon {
+    color: #3730a3 !important;
+    font-weight: 600;
+}
+
+/* Hover state — consistent with brand */
+:host ::ng-deep .p-tree .p-tree-node-content:not(.p-tree-node-selected):hover {
+    background: rgba(79, 70, 229, 0.06) !important;
+    border-radius: 0.5rem;
 }
 
 :host ::ng-deep .error-node > .p-treenode-content {

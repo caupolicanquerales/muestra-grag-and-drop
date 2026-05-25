@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { StepperModule } from 'primeng/stepper';
 import { CommonModule } from '@angular/common';
 
@@ -19,7 +19,15 @@ export class HorizontalStepper {
   steps = input<StepConfig[]>([]);
   activeStep = input<number>(1);
 
+  stepDoneClick = output<number>();
+
   isStepDone(stepValue: number): boolean {
     return this.activeStep() > stepValue;
+  }
+
+  onDoneStepClick(stepValue: number): void {
+    if (this.isStepDone(stepValue)) {
+      this.stepDoneClick.emit(stepValue);
+    }
   }
 }
