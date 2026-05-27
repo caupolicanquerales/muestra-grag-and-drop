@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, signal, ViewChild, WritableSignal } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
-import { ServiceGeneral } from '../service/service-general';
-import { getMapForIconFiles } from '../utils/icon-files-utils';
+import { ServiceGeneral } from '../../service/service-general';
+import { getMapForIconFiles } from '../../utils/icon-files-utils';
 import { Subject, takeUntil } from 'rxjs';
 
 @Component({

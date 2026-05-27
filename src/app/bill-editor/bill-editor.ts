@@ -1,7 +1,7 @@
 import { CommonModule, NgClass } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, HostListener, inject, OnDestroy, OnInit, signal, ViewChild, WritableSignal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ChatButtons } from '../chat-buttons/chat-buttons';
+import { ChatButtons } from '../reusable-component/chat-buttons/chat-buttons';
 import { ServiceGeneral } from '../service/service-general';
 import { PromptGenerationImageInterface } from '../models/prompt-generation-image-interface';
 import { triggerDownloadTheFile, getMapTypeFormatDownloadFile } from '../utils/download-file-utils';
@@ -20,7 +20,7 @@ import { BasicTemplateInterface } from '../models/basic-template-interface';
 import { TypePromptEnum } from '../enums/type-prompt-enum';
 import { composeHtmlCssTemplate, getBasicTemplateInterfaceFromEvent } from '../utils/basic-template-utils';
 import { formatDataIfJson } from '../utils/json-format-utils';
-import { HorizontalStepper } from '../horizontal-stepper/horizontal-stepper';
+import { HorizontalStepper } from '../reusable-component/horizontal-stepper/horizontal-stepper';
 import { StepperEditorService } from '../service/stepper-editor-service';
 
 @Component({

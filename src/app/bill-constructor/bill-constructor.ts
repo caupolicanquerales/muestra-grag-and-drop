@@ -1,5 +1,5 @@
-import { CommonModule, NgClass } from '@angular/common';
-import { AfterViewInit, Component, computed, ElementRef, HostListener, inject, OnDestroy, OnInit, QueryList, signal, ViewChildren } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { AfterViewInit, Component, ElementRef, HostListener, inject, OnDestroy, OnInit, QueryList, signal, ViewChild, ViewChildren } from '@angular/core';
 import { TreeNode } from 'primeng/api';
 import { TreeModule } from 'primeng/tree';
 import { ServiceGeneral } from '../service/service-general';
@@ -12,27 +12,27 @@ import { ExecutingRestFulService } from '../service/executing-rest-ful-service';
 import { removeColorContent } from '../utils/operation-string-utils';
 import { TypePromptEnum } from '../enums/type-prompt-enum';
 import { composeHtmlCssTemplate, getBasicTemplateInterfaceFromEvent } from '../utils/basic-template-utils';
-import { ChatButtons } from '../chat-buttons/chat-buttons';
-import { RadioButtonModule } from 'primeng/radiobutton';
-import { FormsModule } from '@angular/forms';
+import { ChatButtons } from '../reusable-component/chat-buttons/chat-buttons';
 import {  getUserPromptSubAgent } from '../utils/system-prompt-utils';
 import { EditorConfig, getEditors, orderSystem, orderSystemWithPublicity, systemPromptHelp, textHelp, titlesHelp } from '../utils/bill-constructor-utils';
 import { JoyrideModule, JoyrideService } from 'ngx-joyride';
 import { formatDataIfJson } from '../utils/json-format-utils';
-import { HorizontalStepper } from '../horizontal-stepper/horizontal-stepper';
+import { HorizontalStepper } from '../reusable-component/horizontal-stepper/horizontal-stepper';
 import { StepperService } from '../service/stepper-service';
-import { ModalConstructor } from '../modal-constructor/modal-constructor';
+import { ModalConstructor } from '../reusable-component/modal-constructor/modal-constructor';
+import { EditorTemplate } from '../reusable-component/editor-template/editor-template';
 
 @Component({
   selector: 'bill-constructor',
-  imports: [CommonModule, NgClass, FormsModule, TreeModule, ChatButtons, RadioButtonModule, JoyrideModule,
-    HorizontalStepper, ModalConstructor],
+  imports: [CommonModule, TreeModule, ChatButtons, JoyrideModule,
+    HorizontalStepper, ModalConstructor, EditorTemplate],
   standalone: true,
   templateUrl: './bill-constructor.html',
   styleUrl: './bill-constructor.scss'
 })
 export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
 
+  @ViewChild(EditorTemplate) editorTemplateComponent?: EditorTemplate;
   @ViewChildren('editorRef') editorRefs!: QueryList<ElementRef<HTMLDivElement>>;
 
   titleData: string= "Constructor";
@@ -41,7 +41,6 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
   generarButton: string ="Generar"
   selectedOption: string= '';
   selectedAgent: string= '';
-  isFocused = signal(false);
   tree: TreeNode[]= [buildMainNode('Prompts', true)];
   editors = signal<EditorConfig[]>([]);
   private destroy$ = new Subject<void>();
@@ -52,27 +51,6 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
   hasPublicityData = signal(false);
   hasEditorContent = signal<{[key: string]: boolean}>({});
   modalHint = signal<number | null>(null);
-  hintBasicTemplate = computed(() => this.modalHint() === 0 || this.modalHint() === 2);
-  hintSyntheticData = computed(() => this.modalHint() === 1 || this.modalHint() === 2);
-  showConnector0 = computed(() => this.hasBasicTemplate() && this.editors().length >= 2);
-  showConnector1 = computed(() => this.hasSyntheticData() && this.editors().length >= 2);
-  showConnector2 = computed(() => this.hasPublicityData() && this.editors().length >= 3);
-  showConnectorSintToPub = computed(() => this.hasSyntheticData() && this.hasPublicityData() && this.editors().length >= 3);
-  showConnectorToPrompt = computed(() => {
-    if (this.editors().length >= 3) {
-      return this.showConnector0()  // template alone → direct path
-          || (this.showConnector1() && (!this.showConnector2() || this.showConnector0()))
-          || (this.showConnector2() && !this.showConnector1());
-    }
-    return this.showConnector0() || this.showConnector1();
-  });
-  showTemplateWarning = computed(() =>
-    this.hasSyntheticData() && this.hasPublicityData() && !this.hasBasicTemplate()
-  );
-  showTemplateOnly = computed(() =>
-    this.hasBasicTemplate() && !this.hasSyntheticData() && !this.hasPublicityData()
-  );
-  showCommandCenter = computed(() => this.hasBasicTemplate() && this.hasSyntheticData());
 
   private readonly stepperService = inject(StepperService);
   stepperConfig = this.stepperService.buildConfig(
@@ -85,14 +63,6 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
   textHelp: any= textHelp();
   promptSystemHelp: any= systemPromptHelp();
   promptUser: string= '';
-  placeHolderPromptUser = computed(() =>
-    this.showTemplateOnly()
-      ? "Template detectado. Presiona 'CREA' para procesar con valores por defecto o escribe instrucciones adicionales..."
-      : 'Escribe aquí el prompt del usuario para la generación de la imagen...'
-  );
-  allowPromptUser = computed(() =>
-    !this.hasSyntheticData() && !this.hasPublicityData()
-  );
   processButtonTooltipHeader: string= "";
   showModalConstructor: boolean= true;
 
@@ -118,9 +88,7 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
   ngAfterViewInit() {
     setTimeout(() => {
       this.onRadioChange(null);
-      this.editorRefs.forEach(editor => {
-        this.adjustHeight(editor.nativeElement);
-      });
+      this.editorTemplateComponent?.adjustAllEditorsHeight();
     }, 100);
   }
 
@@ -130,17 +98,21 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
   }
 
   resizeAllTextareas() {
-    if(this.editorRefs!=undefined){
-        this.editorRefs.forEach((editor) => {
+    if (this.editorTemplateComponent) {
+      this.editorTemplateComponent.adjustAllEditorsHeight();
+      return;
+    }
+    if (this.editorRefs !== undefined) {
+      this.editorRefs.forEach((editor) => {
         this.adjustHeight(editor.nativeElement);
       });
     }
   }
 
-  private adjustHeight(el: HTMLDivElement) {
+  private adjustHeight(el: HTMLDivElement): void {
     el.style.height = 'auto';
     setTimeout(() => {
-      el.style.height = el.scrollHeight + 'px';
+      el.style.height = `${el.scrollHeight}px`;
     }, 0);
   }
 
@@ -163,11 +135,12 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
     }
   }
 
-  updatePromptFromContentEditable(event: Event, item: EditorConfig): void {
+  updatePromptFromContentEditable(event: Event, item: EditorConfig | string): void {
     const target = event.target as HTMLDivElement;
     const newValue = target.innerText;
     this.adjustHeight(target);
-    this.hasEditorContent.update(state => ({...state, [item.id]: !!newValue.trim()}));
+    const itemId = typeof item === 'string' ? item : item.id;
+    this.hasEditorContent.update(state => ({...state, [itemId]: !!newValue.trim()}));
   }
 
   private setChildrenInTreeNode(label: string, type: string, 
@@ -242,9 +215,13 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
     }
   }
 
-  private insertStringIntoEditor(coloredSpan: string, editorId: string) {
+  private insertStringIntoEditor(coloredSpan: string, editorId: string): void {
+    if (this.editorTemplateComponent) {
+      this.editorTemplateComponent.setEditorContent(coloredSpan, editorId);
+      return;
+    }
     setTimeout(() => {
-      const editorsArray = this.editorRefs.toArray();
+      const editorsArray = this.editorRefs?.toArray() ?? [];
       const targetEditor = editorsArray.find(ref => {
         const el = ref.nativeElement;
         return el.id === editorId.toString();
@@ -258,35 +235,39 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
   }
 
   extractAllContent(promptOrder:Array<string>): Map<string,string> {
-    let prompts: Map<string,string>= new Map<string,string>();
-    const editorsArray = this.editorRefs.toArray();
-    for(let i=0; i<promptOrder.length; i++){
-      for(let j=0; j<editorsArray.length; j++){
-          const el = editorsArray[j].nativeElement;
-          if(promptOrder[i]==el.id){
-            prompts.set(el.id,el.innerHTML);        
-          }
+    if (this.editorTemplateComponent) {
+      return this.editorTemplateComponent.extractAllContent(promptOrder);
+    }
+    const prompts: Map<string, string> = new Map<string, string>();
+    const editorsArray = this.editorRefs?.toArray() ?? [];
+    for (let i = 0; i < promptOrder.length; i++) {
+      for (let j = 0; j < editorsArray.length; j++) {
+        const el = editorsArray[j].nativeElement;
+        if (promptOrder[i] === el.id) {
+          prompts.set(el.id, el.innerHTML);
+        }
       }
     }
-  return prompts;
+    return prompts;
 }
 
-  emitEraseText($event: any, index: number){
-    if (index === 0) {
+  emitEraseText($event: any, index: number | string){
+    const indexNumber = Number(index);
+    if (indexNumber === 0) {
       this.hasBasicTemplate.set(false);
       this.serviceGeneral.setImageVariablesData({});
       this.updateProcessButtonTooltip();
-    } else if (index === 1) {
+    } else if (indexNumber === 1) {
       this.hasSyntheticData.set(false);
       this.updateProcessButtonTooltip();
-    } else if (index === 2) {
+    } else if (indexNumber === 2) {
       this.hasPublicityData.set(false);
       this.updateProcessButtonTooltip();
     }
     this.promptUser = '';
-    this.updateSpecificEditor(index.toString(), { selectedNode: null });
-    this.insertStringIntoEditor('', index.toString());
-    this.hasEditorContent.update(state => ({...state, [index.toString()]: false}));
+    this.updateSpecificEditor(indexNumber.toString(), { selectedNode: null });
+    this.insertStringIntoEditor('', indexNumber.toString());
+    this.hasEditorContent.update(state => ({...state, [indexNumber.toString()]: false}));
   }
 
   onRadioChange($event:any){
@@ -319,8 +300,12 @@ export class BillConstructor implements OnInit, OnDestroy, AfterViewInit{
   private setEditors(backup: EditorConfig[], typePrompts: Array<string>){  
     const filtered = backup.filter(item => typePrompts.includes(item.typePrompt));
     this.editors.set(filtered);
+    if (this.editorTemplateComponent) {
+      this.editorTemplateComponent.clearAllEditors();
+      return;
+    }
     this.editorRefs?.forEach(ref => {
-        ref.nativeElement.innerHTML = '';
+      ref.nativeElement.innerHTML = '';
     });
   }
 

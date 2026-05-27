@@ -8,7 +8,7 @@ import { JoyrideService } from 'ngx-joyride';
 import { CommonModule, NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TreeModule } from 'primeng/tree';
-import { ChatButtons } from '../chat-buttons/chat-buttons';
+import { ChatButtons } from '../reusable-component/chat-buttons/chat-buttons';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { TypePromptEnum } from '../enums/type-prompt-enum';
 

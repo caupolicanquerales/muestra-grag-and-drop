@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit, signal, WritableSignal } from '@angular/core';
-import { ChatBox } from '../chat-box/chat-box';
+import { ChatBox } from '../reusable-component/chat-box/chat-box';
 import { Observable, Subject, takeUntil } from 'rxjs';
 import { ServiceGeneral } from '../service/service-general';
 import { GenerationDataAgentInterface } from '../models/generation-data-agent-interface';

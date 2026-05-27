@@ -1,5 +1,5 @@
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
-import { getMapForIconFiles } from '../utils/icon-files-utils';
+import { getMapForIconFiles } from '../../utils/icon-files-utils';
 import { CommonModule } from '@angular/common';
 
 @Component({

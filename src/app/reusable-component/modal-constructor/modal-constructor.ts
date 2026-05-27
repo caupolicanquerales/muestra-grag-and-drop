@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { RadioButtonModule } from 'primeng/radiobutton';
-import { StepperService } from '../service/stepper-service';
+import { StepperService } from '../../service/stepper-service';
 import { HorizontalStepper } from '../horizontal-stepper/horizontal-stepper';
 
 @Component({

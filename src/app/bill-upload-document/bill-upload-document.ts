@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, signal, WritableSignal } from '@angular/core';
 import { HttpClientService } from '../service/http-client-service';
 import { ServiceGeneral } from '../service/service-general';
-import { UploadDocument } from '../upload-document/upload-document';
+import { UploadDocument } from '../reusable-component/upload-document/upload-document';
 
 @Component({
   selector: 'bill-upload-document',

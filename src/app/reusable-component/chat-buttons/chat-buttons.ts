@@ -4,10 +4,10 @@ import { FormGroup,FormControl, Validators, ReactiveFormsModule } from '@angular
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { PopoverModule } from 'primeng/popover';
-import { nameValidatorInArray } from '../utils/validation-utils';
-import { PromptAndDataToValidateInterface } from '../models/prompts-and-data-to-validate-interface';
+import { nameValidatorInArray } from '../../utils/validation-utils';
+import { PromptAndDataToValidateInterface } from '../../models/prompts-and-data-to-validate-interface';
 import { TooltipModule } from 'primeng/tooltip';
-import { TypePromptEnum } from '../enums/type-prompt-enum';
+import { TypePromptEnum } from '../../enums/type-prompt-enum';
 
 @Component({
   selector: 'chat-buttons',

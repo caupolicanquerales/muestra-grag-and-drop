@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, Signal, signal } from '@angular/core';
 import { EditorConfig } from '../utils/bill-constructor-utils';
 import { CommonModule, NgClass } from '@angular/common';
-import { ChatButtons } from '../chat-buttons/chat-buttons';
+import { ChatButtons } from '../reusable-component/chat-buttons/chat-buttons';
 import { getHeaderDialogJsonSkeleton, getSaveFormartJsonSkeleton } from '../utils/dialog-parameters-utils';
 import { TypePromptEnum } from '../enums/type-prompt-enum';
 import { ExecutingRestFulService } from '../service/executing-rest-ful-service';

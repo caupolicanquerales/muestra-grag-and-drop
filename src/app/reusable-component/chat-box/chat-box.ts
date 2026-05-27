@@ -1,21 +1,21 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, effect, EventEmitter, HostListener, inject, Input, OnDestroy, OnInit, Output, signal, ViewChild, WritableSignal } from '@angular/core';
-import { SafeHtmlPipePipe } from '../pipes/safe-html-pipe-pipe';
+import { SafeHtmlPipePipe } from '../../pipes/safe-html-pipe-pipe';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgClass } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
-import { ServiceGeneral } from '../service/service-general';
+import { ServiceGeneral } from '../../service/service-general';
 import { UploadDocumentChat } from '../upload-document-chat/upload-document-chat';
-import { triggerDownloadTheFile, getMapTypeFormatDownloadFile } from '../utils/download-file-utils';
-import { SavePromptDbInterface } from '../models/save-prompt-db-interface';
+import { triggerDownloadTheFile, getMapTypeFormatDownloadFile } from '../../utils/download-file-utils';
+import { SavePromptDbInterface } from '../../models/save-prompt-db-interface';
 import { ChatButtons } from '../chat-buttons/chat-buttons';
-import { removeTagHtmlToText } from '../utils/operation-string-utils'
+import { removeTagHtmlToText } from '../../utils/operation-string-utils'
 import { Subject, takeUntil } from 'rxjs';
 import { TooltipModule } from 'primeng/tooltip';
 import { JoyrideModule, JoyrideService } from 'ngx-joyride';
-import { PromptAndDataToValidateInterface } from '../models/prompts-and-data-to-validate-interface';
-import { VisualizerCanvas } from '../visualizer-canvas/visualizer-canvas';
-import { BillSkeleton } from '../bill-skeleton/bill-skeleton';
+import { PromptAndDataToValidateInterface } from '../../models/prompts-and-data-to-validate-interface';
+import { VisualizerCanvas } from '../../visualizer-canvas/visualizer-canvas';
+import { BillSkeleton } from '../../bill-skeleton/bill-skeleton';
 import { SpinnerAnimation } from "../spinner-animation/spinner-animation";
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 

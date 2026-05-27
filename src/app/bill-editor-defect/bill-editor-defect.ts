@@ -7,7 +7,7 @@ import { TabsDefectInterface } from '../models/tabs-defect-interface';
 import { CheckboxModule } from 'primeng/checkbox';
 import { FormsModule } from '@angular/forms';
 import { GlobalDefectInterface } from '../models/global-defect-interface';
-import { ChatButtons } from '../chat-buttons/chat-buttons';
+import { ChatButtons } from '../reusable-component/chat-buttons/chat-buttons';
 import { PromptAndDataToValidateInterface } from '../models/prompts-and-data-to-validate-interface';
 import { getSavePromptGlobalDefect, getHeaderDialogGlobalDefect } from '../utils/dialog-parameters-utils';
 import { ExecutingRestFulService } from '../service/executing-rest-ful-service';

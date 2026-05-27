@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, signal } from '@angular/core';
-import { ChatButtons } from '../chat-buttons/chat-buttons';
+import { ChatButtons } from '../reusable-component/chat-buttons/chat-buttons';
 
 @Component({
   selector: 'bill-visualizer-variables',

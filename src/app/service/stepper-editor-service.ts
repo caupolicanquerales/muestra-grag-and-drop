@@ -1,6 +1,6 @@
 import { computed, Injectable, Signal } from '@angular/core';
 import { TreeNode } from 'primeng/api';
-import { StepConfig } from '../horizontal-stepper/horizontal-stepper';
+import { StepConfig } from '../reusable-component/horizontal-stepper/horizontal-stepper';
 import { StepperConfig } from './stepper-service';
 
 @Injectable({

@@ -2,7 +2,7 @@ import { Component, signal, OnInit, WritableSignal, OnDestroy, ChangeDetectionSt
 import { HttpClientService } from '../service/http-client-service';
 import { GenerationDataInterface } from '../models/generation-data-interface';
 import { ServiceGeneral } from '../service/service-general';
-import { ChatBox } from '../chat-box/chat-box';
+import { ChatBox } from '../reusable-component/chat-box/chat-box';
 import { SavePromptDbInterface } from '../models/save-prompt-db-interface';
 import { PromptGenerationImageInterface} from '../models/prompt-generation-image-interface';
 import { ExecutingRestFulService } from '../service/executing-rest-ful-service';

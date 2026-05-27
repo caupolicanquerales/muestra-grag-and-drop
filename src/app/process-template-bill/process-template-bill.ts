@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, signal, WritableSignal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ChatBox } from '../chat-box/chat-box';
+import { ChatBox } from '../reusable-component/chat-box/chat-box';
 import { GenerationImageInterface } from '../models/generation-image-interface';
 import { ServiceGeneral } from '../service/service-general';
 import { Subject, takeUntil } from 'rxjs';

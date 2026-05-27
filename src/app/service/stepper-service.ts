@@ -1,5 +1,5 @@
 import { computed, Injectable, Signal } from '@angular/core';
-import { StepConfig } from '../horizontal-stepper/horizontal-stepper';
+import { StepConfig } from '../reusable-component/horizontal-stepper/horizontal-stepper';
 
 export interface StepperConfig {
   steps: StepConfig[];
