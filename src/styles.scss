@@ -1,4 +1,6 @@
 /* You can add global styles to this file, and also import other style files */
+@use 'styles/variables';
+@use 'styles/shared';
 @import "primeicons/primeicons.css";
 
 
@@ -84,14 +86,6 @@ html, body {
 
 *, *::before, *::after {
   box-sizing: border-box;
-}
-
-/* ── PrimeNG v20 Lara design-token overrides: tree selected node → flow-line cyan ── */
-:root {
-    --p-tree-node-selected-background: rgba(34, 211, 238, 0.14);
-    --p-tree-node-selected-color: #0e7490;
-    --p-highlight-background: rgba(34, 211, 238, 0.14);
-    --p-highlight-color: #0e7490;
 }
 
 /* Fallback high-specificity class override (covers both Lara v19/v20 structures) */

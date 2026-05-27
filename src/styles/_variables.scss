@@ -1,0 +1,25 @@
+// ── Design tokens – single source of truth ────────────────────────────────────
+:root {
+    // Brand colours
+    --primary-blue:       #1e3a8a;
+    --primary-indigo:     #4f46e5;
+    --secondary-teal:     #14b8a6;
+
+    // Surfaces / Backgrounds
+    --gray-bg:            #f8f9fb;
+
+    // Borders
+    --light-gray-border:  #e2e8f0;
+
+    // Text
+    --text-gray:          #64748b;
+
+    // Feedback
+    --error-red:          #ef4444;
+
+    // PrimeNG tree selected node → cyan accent
+    --p-tree-node-selected-background: rgba(34, 211, 238, 0.14);
+    --p-tree-node-selected-color:      #0e7490;
+    --p-highlight-background:          rgba(34, 211, 238, 0.14);
+    --p-highlight-color:               #0e7490;
+}

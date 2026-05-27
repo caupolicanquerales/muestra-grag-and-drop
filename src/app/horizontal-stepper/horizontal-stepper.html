@@ -5,7 +5,8 @@
                 <p-step
                     [value]="step.value"
                     [attr.data-step-done]="isStepDone(step.value)"
-                    [attr.data-step-warning]="step.warning === true">
+                    [attr.data-step-warning]="step.warning === true"
+                    (click)="onDoneStepClick(step.value)">
                     {{ step.label }}
                 </p-step>
             }

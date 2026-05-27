@@ -34,80 +34,11 @@
 
 .buttons-dialog {
   margin-top: 5%;
-  display: flex;
-  justify-content: center;
   gap: 1rem;
 }
 
-/* ── Table overrides (matches bill-template style) ── */
-:host ::ng-deep {
-    /* Header */
-    .p-datatable .p-datatable-thead > tr > th {
-        background: #f8fafc !important;
-        border-bottom: 2px solid #e2e8f0 !important;
-        color: #374151 !important;
-        font-size: 0.75rem !important;
-        font-weight: 700 !important;
-        letter-spacing: 0.05em !important;
-        text-transform: uppercase !important;
-        padding: 0.75rem 1rem !important;
-    }
-
-    /* Body rows */
-    .p-datatable .p-datatable-tbody > tr {
-        border-bottom: 1px solid #f1f5f9 !important;
-        transition: background-color 0.12s ease !important;
-
-        &:hover {
-            background-color: #f5f7ff !important;
-        }
-    }
-
-    .p-datatable .p-datatable-tbody > tr > td {
-        padding: 0.65rem 1rem !important;
-        font-size: 0.875rem !important;
-        color: #334155 !important;
-        border: none !important;
-    }
-
-    /* Action buttons — ghost style */
-    .p-datatable .p-datatable-tbody .p-button {
-        width: 2rem !important;
-        height: 2rem !important;
-        padding: 0 !important;
-        background: transparent !important;
-        border-color: transparent !important;
-        color: #64748b !important;
-        box-shadow: none !important;
-        border-radius: 0.4rem !important;
-        transition: background 0.12s ease, color 0.12s ease !important;
-
-        &:hover {
-            background: #fef2f2 !important;
-            color: #ef4444 !important;
-        }
-    }
-
-    /* Pagination — right-aligned, borderless */
-    .p-paginator {
-        justify-content: flex-end !important;
-        background: transparent !important;
-        border: none !important;
-        padding: 0.75rem 0 0 !important;
-    }
-
-    .p-paginator .p-paginator-page {
-        border: none !important;
-        border-radius: 50% !important;
-        min-width: 2rem !important;
-        height: 2rem !important;
-        font-size: 0.8rem !important;
-        color: #64748b !important;
-    }
-
-    .p-paginator .p-paginator-page.p-highlight {
-        background-color: #4f46e5 !important;
-        color: #ffffff !important;
-        border-radius: 50% !important;
-    }
+/* ── Table overrides (component-specific hover) ── */
+:host ::ng-deep .p-datatable .p-datatable-tbody .p-button:hover {
+    background: #fef2f2 !important;
+    color: #ef4444 !important;
 }

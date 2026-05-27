@@ -32,7 +32,13 @@
 
             <div class="code-panel">
                 <div class="code-toolbar">
-                    <span class="code-label">{{ selectedOption }}</span>
+                    @if(selectedNodeSignal()?.data?.type) {
+                        <horizontal-stepper
+                            [steps]="stepperConfig().steps"
+                            [activeStep]="stepperConfig().active"
+                            (stepDoneClick)="navigateToParent($event)">
+                        </horizontal-stepper>
+                    }
                     <chat-buttons
                         [eraseButton]="true"
                         [saveButton]="false"

@@ -1,13 +1,3 @@
-.main-wrapper {
-    min-height: 100%;
-    background-color: #f8f9fb;
-    padding: 1.5rem;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    min-width: 55rem;
-}
-
 /* ── Header ── */
 .header-container {
     position: sticky;
@@ -30,55 +20,7 @@
 }
 
 .title-header {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
     margin-bottom: 0;
-}
-
-.title-text {
-    margin: 0;
-    font-size: 1.2rem;
-    font-weight: 700;
-    color: #1e293b;
-    letter-spacing: -0.01em;
-}
-
-/* ── Segmented toggle ── */
-.segment-control {
-    display: flex;
-    background: #eef0f5;
-    border-radius: 2rem;
-    padding: 0.25rem 0.35rem;
-    border: 1px solid #d8dde8;
-    gap: 0.15rem;
-    box-shadow: inset 0 1px 3px rgba(0,0,0,0.06);
-}
-
-.segment-btn {
-    padding: 0.35rem 1rem;
-    border: none;
-    border-radius: 2rem;
-    font-size: 0.8rem;
-    font-weight: 500;
-    cursor: pointer;
-    background: transparent;
-    color: #64748b;
-    transition: all 0.15s ease;
-    white-space: nowrap;
-    font-family: inherit;
-
-    &:hover:not(.segment-active) {
-        color: #334155;
-        background: #e2e6ef;
-    }
-}
-
-.segment-active {
-    background: #4f46e5;
-    color: #ffffff;
-    font-weight: 600;
-    box-shadow: 0 1px 4px rgba(79,70,229,0.35);
 }
 
 .generate-action-row {
@@ -89,14 +31,6 @@
 
 /* ── Main card ── */
 .card-container {
-    width: 100%;
-    max-width: 100%;
-    padding: 1.5rem;
-    background-color: #ffffff;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.07);
-    border-radius: 0.875rem;
-    border: 1px solid #e2e8f0;
-    border-top: 3px solid #4f46e5;
     flex: 1;
 }
 
@@ -111,35 +45,6 @@
 /* ── Left tree panel ── */
 .p-selector-group {
     max-height: 22rem;
-    overflow-y: auto;
-    overflow-x: hidden;
-    border: 1px solid #e9eef5;
-    border-radius: 0.75rem;
-    background: #f8f9fb;
-    flex-shrink: 0;
-
-    /* Override PrimeNG tree selected node highlight to match the flow-line cyan */
-    ::ng-deep .p-treenode-content.p-highlight,
-    ::ng-deep .p-treenode-content[data-p-highlight="true"] {
-        background: rgba(34, 211, 238, 0.14) !important;
-        color: #0e7490 !important;
-        border-radius: 0.5rem;
-    }
-
-    ::ng-deep .p-treenode-content.p-highlight .p-tree-node-icon,
-    ::ng-deep .p-treenode-content.p-highlight .p-treenode-label,
-    ::ng-deep .p-treenode-content[data-p-highlight="true"] span {
-        color: #0e7490 !important;
-    }
-}
-
-.p-selector-group::-webkit-scrollbar {
-    width: 5px;
-}
-
-.p-selector-group::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    border-radius: 10px;
 }
 
 /* ── Code panel ── */

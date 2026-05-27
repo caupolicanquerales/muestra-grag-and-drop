@@ -1,5 +1,5 @@
 import { CommonModule, NgClass } from '@angular/common';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, OnInit, signal, ViewChild, WritableSignal } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, HostListener, inject, OnDestroy, OnInit, signal, ViewChild, WritableSignal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ChatButtons } from '../chat-buttons/chat-buttons';
 import { ServiceGeneral } from '../service/service-general';
@@ -20,10 +20,12 @@ import { BasicTemplateInterface } from '../models/basic-template-interface';
 import { TypePromptEnum } from '../enums/type-prompt-enum';
 import { composeHtmlCssTemplate, getBasicTemplateInterfaceFromEvent } from '../utils/basic-template-utils';
 import { formatDataIfJson } from '../utils/json-format-utils';
+import { HorizontalStepper } from '../horizontal-stepper/horizontal-stepper';
+import { StepperEditorService } from '../service/stepper-editor-service';
 
 @Component({
   selector: 'bill-editor',
-  imports: [CommonModule, NgClass, FormsModule, ChatButtons, TreeModule, RadioButtonModule],
+  imports: [CommonModule, NgClass, FormsModule, ChatButtons, TreeModule, RadioButtonModule,HorizontalStepper],
   standalone: true,
   templateUrl: './bill-editor.html',
   styleUrl: './bill-editor.scss',
@@ -54,6 +56,11 @@ export class BillEditor implements OnInit, OnDestroy {
   private htmlCss: string="";
   private orderMap: any = {};
   private amountTypePrompts: number= 8;
+
+   selectedNodeSignal = signal<TreeNode | null>(null);
+
+  private readonly stepperService = inject(StepperEditorService);
+  stepperConfig = this.stepperService.buildConfig(this.selectedNodeSignal);
 
   @ViewChild('editorRef') editorRef!: ElementRef<HTMLDivElement>;
   
@@ -193,6 +200,16 @@ export class BillEditor implements OnInit, OnDestroy {
     } 
   }
 
+  navigateToParent(stepValue: number): void {
+    if (stepValue !== 1 || !this.selectedNode?.data?.type) return;
+    const parentKey = this.selectedNode.data.type;
+    const parent = this.tree[0].children?.find(n => n.key === parentKey) ?? null;
+    this.selectedNode = parent;
+    this.selectedNodeSignal.set(null);
+    this.emitEraseText(null);
+    this.cd.markForCheck();
+  }
+
   emitEraseText($event: any){
     this.styledPrompt = '';
     this.prompt.set('');
@@ -215,8 +232,8 @@ export class BillEditor implements OnInit, OnDestroy {
   }
 
   nodeSelect($event: any){
-    const type = this.selectedNode?.data?.type;
-    if (type === TypePromptEnum.BASIC_TEMPLATE) {
+    this.selectedNodeSignal.set(this.selectedNode);
+    const type = this.selectedNode?.data?.type;    if (type === TypePromptEnum.BASIC_TEMPLATE) {
       const request = this.getBasicTemplateInterface($event?.node?.data?.data);
       this.executingRestFulService.getBasicTemplateById(request);
       return;
