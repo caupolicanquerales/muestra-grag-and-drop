@@ -21,29 +21,11 @@
 }
 
 .title-header {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
     margin-bottom: 0;
-}
-
-.title-text {
-    margin: 0;
-    font-size: 1.2rem;
-    font-weight: 700;
-    color: #1e293b;
-    letter-spacing: -0.01em;
 }
 
 /* ── Main card ── */
 .card-container {
-    width: 100%;
-    padding: 1.5rem;
-    background-color: #ffffff;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.07);
-    border-radius: 0.875rem;
-    border: 1px solid #e2e8f0;
-    border-top: 3px solid #4f46e5;
     display: flex;
     gap: 1.25rem;
     flex-wrap: nowrap;
